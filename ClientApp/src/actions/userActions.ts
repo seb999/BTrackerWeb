@@ -1,7 +1,7 @@
 import axios from 'axios';
 const apiUrl = '/api/User/';    
 
-export const checkUserLocalId = (accessToken : any) =>{
+export const checkLocalUserId = (accessToken : any) =>{
 
  return async (dispatch  :any) =>{
    try{

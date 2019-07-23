@@ -5,7 +5,7 @@ import { Dispatch } from 'redux';
 import { withAuth } from '@okta/okta-react';
 
 interface AppFnProps {
-  getLocalUserId(p:any): void;
+  checkLocalUserId(p:any): void;
 }
 
 interface AppObjectProps {
@@ -27,7 +27,7 @@ class Home extends React.Component<Props, State>{
   async componentDidMount() {
     try {
       var token = await this.props.auth.getAccessToken();
-      this.props.getLocalUserId(token);
+      this.props.checkLocalUserId(token);
     } catch (err) {
       // handle error as needed
     }
@@ -50,7 +50,7 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
       //getSymbolList: (p: string) => dispatch<any>(binanceActionCreator.binanceActions.GetSymbolList(p)),
-      getLocalUserId: (p : any) => dispatch<any>(actions.default.account.checkUserLocalId(p)),
+      getLocalUserId: (p : any) => dispatch<any>(actions.default.account.checkLocalUserId(p)),
   }
 }
 
