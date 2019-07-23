@@ -1,5 +1,5 @@
 import axios from 'axios';
-const apiUrl = '/api/MyDevice/';    
+const apiUrl = '/api/Device/';    
 
 export const trackerList = () =>{
  return async (dispatch  :any) =>{

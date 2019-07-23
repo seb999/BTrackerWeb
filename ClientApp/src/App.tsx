@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { Security, ImplicitCallback } from '@okta/okta-react';
 
 import Home from './components/Home';
+import Tracker from './components/Tracker';
 import NavMenu from './components/NavMenu';
 import { NavCommand } from './components/NavMenu';
 
@@ -40,6 +41,7 @@ class App extends React.Component<Props, State>{
           <NavMenu commands={this.state.navCommands} />
           <Switch>
             <Route path='/' exact={true} component={Home} />
+            <Route path='/Tracker' exact={true} component={Tracker} />} />
             <Route path='/implicit/callback' component={ImplicitCallback} />
           </Switch>
         </Security>

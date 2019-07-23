@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Okta.AspNetCore;
 
 namespace BTrackerWeb.Controllers
 {
@@ -22,20 +23,23 @@ namespace BTrackerWeb.Controllers
             DbContext = appDbContext;
         }
 
-         ///Retrun number of position specify by Count parameter
         [HttpGet]
-        // [Authorize]
+        [Authorize]
         [Route("[action]")]
-        public int CheckLocalUserId()
+        public void CheckLocalUserId()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                return 3;
-               // return DbContext.GpsPosition.Where(p => p.DeviceId == deviceId).OrderByDescending(p=>p.GpsPositionDate).Take(count).ToList();
-                //return DbContext.GpsPosition.Where(p => p.TrackedObject.TrackedObjectId == trackedObjectId && p.TrackedObject.UserId == User.Claims.FirstOrDefault().Value).OrderByDescending(p=>p.GpsPositionDate).Take(count).ToList().OrderBy(p => p.GpsPositionDate).ToList();
-            }
+            string userId = DbContext.Users.Where(p=>p.Email == User.Claims.Last().Value).Select(p=>p.Id).FirstOrDefault();
+            if(userId != null) return;
 
-            return 0;
+            var newUser = new ApplicationUser(){
+                Email =  User.Claims.Last().Value,
+                UserName = User.Claims.Last().Value,
+                LockoutEnabled = true,
+                NormalizedEmail = User.Claims.Last().Value.ToUpper(),
+                NormalizedUserName = User.Claims.Last().Value.ToUpper(),
+            };
+            DbContext.Add(newUser);
+            DbContext.SaveChanges();
         }
     }
 }

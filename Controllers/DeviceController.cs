@@ -8,11 +8,11 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace BTrackerWeb.Controllers
 {
-    public class MyDeviceController : Controller
+    public class DeviceController : Controller
     {
         private readonly ApplicationDbContext DbContext;
 
-        public MyDeviceController([FromServices] ApplicationDbContext appDbContext)
+        public DeviceController([FromServices] ApplicationDbContext appDbContext)
         {
             DbContext = appDbContext;
         }

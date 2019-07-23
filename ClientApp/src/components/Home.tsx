@@ -26,16 +26,8 @@ class Home extends React.Component<Props, State>{
 
   async componentDidMount() {
     try {
-      // const response = await fetch('http://localhost:{serverPort}/api/messages', {
-      //   headers: {
-      //     Authorization: 'Bearer ' + await this.props.auth.getAccessToken()
-      //   }
-      // });
-      // const data = await response.json();
-      // this.setState({ messages: data.messages });
-      console.log("home page");
-      this.props.getLocalUserId(await this.props.auth.getAccessToken());
-
+      var token = await this.props.auth.getAccessToken();
+      this.props.getLocalUserId(token);
     } catch (err) {
       // handle error as needed
     }
@@ -43,7 +35,7 @@ class Home extends React.Component<Props, State>{
 
   render() {
     return (
-      <div>qwertyui</div>
+      <div>This is the home page</div>
     );
 
   }

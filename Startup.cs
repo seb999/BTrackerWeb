@@ -24,18 +24,25 @@ namespace BTrackerWeb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                // The CORS policy is open for testing purposes. In a production application, you should restrict it to known origins.
+                options.AddPolicy(
+                    "AllowAll",
+                    builder => builder.AllowAnyOrigin()
+                                      .AllowAnyMethod()
+                                      .AllowAnyHeader());
+            });
+
              services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = OktaDefaults.MvcAuthenticationScheme;
+                options.DefaultAuthenticateScheme = OktaDefaults.ApiAuthenticationScheme;
+                options.DefaultChallengeScheme = OktaDefaults.ApiAuthenticationScheme;
+                options.DefaultSignInScheme = OktaDefaults.ApiAuthenticationScheme;
             })
-            .AddCookie()
-            .AddOktaMvc(new OktaMvcOptions
+            .AddOktaWebApi(new OktaWebApiOptions
             {
                 OktaDomain = "https://dev-792490.okta.com",
-                ClientId = "0oayfrvlemxp3hNnC356",
-                ClientSecret = "I2HjL-3eca504TTQVrr3w4MeGgV5_bmawMVyAPma"
             });
 
              services.AddDbContextPool<ApplicationDbContext>(options =>
@@ -64,10 +71,11 @@ namespace BTrackerWeb
                 app.UseHsts();
             }
 
-            app.UseAuthentication();
+           
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+             app.UseAuthentication();
 
             app.UseMvc(routes =>
             {

@@ -5,7 +5,7 @@ import { Dispatch } from 'redux';
 import { withRouter } from 'react-router-dom'
 import logo from '../images/Logo.png'
 import './css/NavMenu.css';
-import MyNavLink from './MyNavLink'
+import MyNavLink from './element/MyNavLink'
 import { withAuth } from '@okta/okta-react';
 
 export interface NavCommand {
