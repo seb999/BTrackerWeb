@@ -33,14 +33,10 @@ namespace BTrackerWeb.Controllers
         [Route("/api/[controller]/GetDeviceList")]
         public List<Device> GetDeviceList()
         {
-            var ttt = DbContext.Device.Select(p=>p).OrderByDescending(p => p.DeviceId).ToList();;
+            string userId = DbContext.Users.Where(p=>p.Email == User.Claims.Last().Value).Select(p=>p.Id).FirstOrDefault();
+            if(userId == null) return new List<Device>();
 
-             return DbContext.Device.Select(p=>p).OrderByDescending(p => p.DeviceId).ToList();
-
-            // return DbContext.Device
-            //         .Where(p => p.UserId == User.Claims.FirstOrDefault().Value)
-            //         .Where(p=>p.DeviceIsDeleted.GetValueOrDefault() != true)
-            //         .OrderByDescending(p => p.DeviceId).ToList();
+             return DbContext.Device.Where(p=>p.UserId == userId).Select(p=>p).OrderByDescending(p => p.DeviceId).ToList();
         }
 
         #endregion

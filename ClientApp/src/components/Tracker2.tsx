@@ -3,43 +3,56 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { withRouter } from 'react-router-dom';
 import * as actionCreator from '../actions/actions';
-import TrackerPopup from "./Popup/TrackerPopup"
-import ConfirmPopup from "./Popup/ConfirmPopup"
+import TrackerPopup from "./popup/TrackerPopup";
+import ConfirmPopup from "./popup/ConfirmPopup";
+import { withAuth } from '@okta/okta-react';
 
+
+interface AppFnProps {
+    getTrackerList(token : any): void;
+    deleteTracker(p :number) : void;
+  }
+  
+interface AppObjectProps {
+    auth? : any;
+    history?: any;
+    deviceList: Array<any>;
+    isSaved: boolean;
+    isDeleted: boolean;
+  }
+  
+interface Props
+    extends AppObjectProps,
+    AppFnProps { }
 
 interface State {
     showAddTracker: boolean,
     showConfirmPopup: boolean,
-    deviceId : number
+    deviceId : number,
+    token : any
 }
 
-interface Props {
-    history?: any;
-    isLogged?: boolean;
-    getTrackerList(): void;
-    deleteTracker(p :number) : void;
-    deviceList: Array<Device>;
-    isSaved: boolean;
-    isDeleted: boolean;
-}
-
-class Tracker extends React.Component<Props, State>{
+class Tracker2 extends React.Component<Props, State>{
     constructor(props: any) {
         super(props);
 
         this.state = {
             showAddTracker: false,
             showConfirmPopup: false,
-            deviceId : 0
+            deviceId : 0,
+            token : null,
         };
     };
 
-    componentDidMount() {
-        //Call from redux
-        console.log("component did mount");
-        console.log(this.props.isLogged);
-        this.props.getTrackerList();
-        //!this.props.isLogged ? this.props.history.push("/Login") : this.props.getTrackerList();
+    async componentDidMount() {
+        try {
+             this.setState({
+                token : await this.props.auth.getAccessToken()
+             }) 
+            !this.state.token ? this.props.auth.login('/') : this.props.getTrackerList(this.state.token);
+          } catch (err) {
+            // handle error as needed
+          }
     }
 
     handleClose = () =>{
@@ -72,9 +85,12 @@ class Tracker extends React.Component<Props, State>{
             </tr>
         ));
 
+       
+
         return (
+            
             <div>
-                
+                 {!this.state.token ? <div></div> : 
                     <div>
                         <br ></br>
                         <div >
@@ -103,7 +119,7 @@ class Tracker extends React.Component<Props, State>{
                         <TrackerPopup show={this.state.showAddTracker} hide={this.handleClose}/>
 
                         <ConfirmPopup show={this.state.showConfirmPopup} hide={this.handleConfirmDelete} title="Delete tracker" content="Do you really want to delete this tracker ?"/>
-                    </div>
+                    </div>}
                 
             </div>)
     }
@@ -112,7 +128,6 @@ class Tracker extends React.Component<Props, State>{
 //map the props of this class to the root redux state
 const mapStateToProps = (state: any) => {
     return {
-        isLogged: state.isLogged,
         deviceList: state.deviceList,
         isSaved: state.isSaved,
         isDeleted: state.isDeleted,
@@ -121,9 +136,9 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
-        getTrackerList: () => dispatch<any>(actionCreator.default.tracker.trackerList()),
+        getTrackerList: (token : any) => dispatch<any>(actionCreator.default.tracker.trackerList(token)),
         deleteTracker: (deviceId : number) => dispatch<any>(actionCreator.default.tracker.deleteTracker(deviceId))
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Tracker));
+export default connect(mapStateToProps, mapDispatchToProps)(withAuth(Tracker2));

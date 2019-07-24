@@ -39,13 +39,9 @@ namespace BTrackerWeb.Controllers
         [Route("/api/[controller]/GetGpsData/{deviceId}/{count}")]
         public List<GpsPosition> GetGpsData(int deviceId, int count)
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                return DbContext.GpsPosition.Where(p => p.DeviceId == deviceId).OrderByDescending(p=>p.GpsPositionDate).Take(count).ToList();
-                //return DbContext.GpsPosition.Where(p => p.TrackedObject.TrackedObjectId == trackedObjectId && p.TrackedObject.UserId == User.Claims.FirstOrDefault().Value).OrderByDescending(p=>p.GpsPositionDate).Take(count).ToList().OrderBy(p => p.GpsPositionDate).ToList();
-            }
-
-            return null;
+            string userId = DbContext.Users.Where(p=>p.Email == User.Claims.Last().Value).Select(p=>p.Id).FirstOrDefault();
+            if(userId == null) return new List<GpsPosition>();
+            return DbContext.GpsPosition.Where(p => p.DeviceId == deviceId).OrderByDescending(p=>p.GpsPositionDate).Take(count).ToList();
         }
 
         [HttpPost]

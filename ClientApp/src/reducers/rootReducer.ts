@@ -1,11 +1,9 @@
 import { Device } from "../class/Device";
+import { GpsPosition } from "../class/GpsPosition";
 
 const initState = {
-  userId: "",
-  userEmail: "",
-  isLogged: false,
-  isFirstRender: true,
   deviceList: new Array<Device>(),
+  gpsPositionList: new Array<GpsPosition>(),
   isSaved : false,
   isDeleted : false,
 }
@@ -13,39 +11,9 @@ const initState = {
 const rootReducer = (state = initState, action: any) => {
   const newState = { ...state };
   switch (action.type) {
-    case "REGISTER_USER":
-      if (action.payload.result) {
-        newState.userId = action.payload.userId;
-        newState.userEmail = action.payload.email;
-        newState.isLogged = action.payload.result;
-        newState.isFirstRender = false;
-      }
-      else {
-        newState.userId = "";
-        newState.isLogged = false;
-        newState.isFirstRender = false;
-      }
-      return newState;
 
-    case "LOG_USER":
-      if (action.payload.result) {
-        newState.userId = action.payload.userId;
-        newState.userEmail = action.payload.email;
-        newState.isLogged = action.payload.result;
-        newState.isFirstRender = false;
-      }
-      else {
-        newState.userId = "";
-        newState.isLogged = false;
-        newState.isFirstRender = false;
-      }
-      return newState;
-
-    case "LOGOUT_USER":
-      newState.userId = "";
-      newState.userEmail = "";
-      newState.isLogged = false;
-      newState.isFirstRender = true;
+    case "GPS_POSITION_LIST":
+      newState.gpsPositionList = action.payload
       return newState;
 
     case "TRACKER_LIST":

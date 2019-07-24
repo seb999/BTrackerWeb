@@ -1,11 +1,11 @@
 import axios from 'axios';
 const apiUrl = '/api/Device/';    
 
-export const trackerList = () =>{
+export const trackerList = (accessToken : any) =>{
  return async (dispatch  :any) =>{
    try{
      //We are logged in the API so we don't need to pass again the userId
-     const res = await axios.get<any>(apiUrl + "GetDeviceList/");
+     const res = await axios.get<any>(apiUrl + "GetDeviceList/", {headers: {Authorization: 'Bearer ' + accessToken}});
      return dispatch(trackerListSuccess(res.data));
    }
    catch (error) {

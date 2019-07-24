@@ -9,14 +9,13 @@ import { withAuth } from '@okta/okta-react';
 
 
 interface AppFnProps {
-    getTrackerList(): void;
+    getTrackerList(token : any): void;
     deleteTracker(p :number) : void;
   }
   
 interface AppObjectProps {
     auth? : any;
     history?: any;
-    isLogged?: boolean;
     deviceList: Array<any>;
     isSaved: boolean;
     isDeleted: boolean;
@@ -48,10 +47,9 @@ class Tracker extends React.Component<Props, State>{
     async componentDidMount() {
         try {
              this.setState({
-
                 token : await this.props.auth.getAccessToken()
              }) 
-            !this.state.token ? this.props.auth.login('/') : this.props.getTrackerList();
+            !this.state.token ? this.props.auth.login('/') : this.props.getTrackerList(this.state.token);
           } catch (err) {
             // handle error as needed
           }
@@ -130,7 +128,6 @@ class Tracker extends React.Component<Props, State>{
 //map the props of this class to the root redux state
 const mapStateToProps = (state: any) => {
     return {
-        isLogged: state.isLogged,
         deviceList: state.deviceList,
         isSaved: state.isSaved,
         isDeleted: state.isDeleted,
@@ -139,7 +136,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
-        getTrackerList: () => dispatch<any>(actionCreator.default.tracker.trackerList()),
+        getTrackerList: (token : any) => dispatch<any>(actionCreator.default.tracker.trackerList(token)),
         deleteTracker: (deviceId : number) => dispatch<any>(actionCreator.default.tracker.deleteTracker(deviceId))
     }
 }
