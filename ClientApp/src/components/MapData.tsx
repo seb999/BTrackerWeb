@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import * as actions from '../actions/actions';
 import { withAuth } from '@okta/okta-react';
 
+
 interface AppFnProps {
   getGpsPosition(token: any, deviceId: any, maxData: any): void;
 }
@@ -21,7 +22,7 @@ interface State {
   token: any
 }
 
-class Navigation111 extends React.Component<Props, State>{
+class MapData extends React.Component<Props, State>{
   constructor(props: any) {
     super(props);
 
@@ -35,7 +36,7 @@ class Navigation111 extends React.Component<Props, State>{
       this.setState({
         token: await this.props.auth.getAccessToken()
       })
-      // !this.state.token ? this.props.auth.login('/') : this.props.getGpsPosition(this.state.token, 2, 20);
+      !this.state.token ? this.props.auth.login('/') : this.props.getGpsPosition(this.state.token, 2, 20);
     } catch (err) {
     }
   }
@@ -54,7 +55,7 @@ class Navigation111 extends React.Component<Props, State>{
       <div>
         {!this.state.token ? <div>map page</div> :
           <div>
-            <br >coucou</br>
+            <br ></br>
             <table className="table" >
               <thead className="thead-dark">
                 <tr>
@@ -86,4 +87,4 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withAuth(Navigation111));
+export default connect(mapStateToProps, mapDispatchToProps)(withAuth(MapData));
