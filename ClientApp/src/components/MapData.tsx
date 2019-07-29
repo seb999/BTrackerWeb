@@ -15,7 +15,7 @@ import XYZ from 'ol/source/XYZ';
 
 interface AppFnProps {
   getGpsPosition(token: any, deviceId: any, maxData: any): void;
-  getTrackerList(token : any): void;
+  getTrackerList(token: any): void;
 }
 
 interface AppObjectProps {
@@ -30,7 +30,7 @@ interface Props
 
 interface State {
   token: any,
-  marketSelected :any
+  deviceSelected: any
 }
 
 class MapData extends React.Component<Props, State>{
@@ -39,7 +39,7 @@ class MapData extends React.Component<Props, State>{
 
     this.state = {
       token: null,
-      marketSelected : "",
+      deviceSelected: null,
     };
   };
 
@@ -48,8 +48,8 @@ class MapData extends React.Component<Props, State>{
       this.setState({
         token: await this.props.auth.getAccessToken()
       })
-      if(!this.state.token){ this.props.auth.login('/') } else {
-        this.props.getGpsPosition(this.state.token, 2, 20);
+      if (!this.state.token) { this.props.auth.login('/') } else {
+        this.props.getGpsPosition(this.state.token, 0, 20);
         this.props.getTrackerList(this.state.token);
       }
     } catch (err) {
@@ -65,25 +65,29 @@ class MapData extends React.Component<Props, State>{
         })
       ],
       view: new View({
-        center: [37.41,  8.82],
+        center: [37.41, 8.82],
         zoom: 2,
-      }),  
+      }),
     });
   }
 
-  handleChangeDevice = (p: any) => {
-    this.setState({})
-    //this.props.getSymbolList(p);
-}
+  handleChangeDevice = (device: any) => {
+    this.setState({
+      deviceSelected: device,
+    })
+    this.props.getGpsPosition(this.state.token, device.deviceId, 20);
+  }
 
   render() {
-console.log(this.props.deviceList);
+    console.log(this.props.gpsPositionList);
     let displayList = this.props.gpsPositionList.map((item, index) => (
       <tr key={index}>
+        <td>{item.gpsPositionDate}</td>
         <td>{item.gpsPositionLongitude}</td>
         <td>{item.gpsPositionLatitude}</td>
+        <td>{item.device.deviceDescription}</td>
       </tr>
-    )); 
+    ));
 
 
     return (
@@ -91,23 +95,32 @@ console.log(this.props.deviceList);
         {!this.state.token ? <div></div> :
           <div>
             <br ></br>
-            <div className="float-md-left mb-1">
-                    <DropDown itemList={this.props.deviceList} onClick={this.handleChangeDevice} selectedItem={this.state.marketSelected}></DropDown>
+            <div className="mb-1">
+              <DropDown itemList={this.props.deviceList} onClick={this.handleChangeDevice} selectedItem={this.state.deviceSelected}></DropDown>
+            </div>
+
+            <div className="row">
+              <div className="col-md-6">
+                <table className="table" >
+                  <thead className="thead-dark">
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Longitude</th>
+                      <th scope="col">Latitude</th>
+                      <th scope="col">Tracker</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {displayList}
+                  </tbody>
+                </table>
+              </div>
+              <div className="col-md-6">
+                <div id="map" className="map">
                 </div>
+              </div>
 
-            <div id="map" className="map"></div>
-
-            <table className="table" >
-              <thead className="thead-dark">
-                <tr>
-                  <th scope="col">Longitude</th>
-                  <th scope="col">Latitude</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayList}
-              </tbody>
-            </table>
+            </div>
           </div>}
 
       </div>
@@ -125,7 +138,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    getTrackerList: (token : any) => dispatch<any>(actions.default.tracker.trackerList(token)),
+    getTrackerList: (token: any) => dispatch<any>(actions.default.tracker.trackerList(token)),
     getGpsPosition: (token: any, deviceId: any, maxData: any) => dispatch<any>(actions.default.gps.getGpsDataList(token, deviceId, maxData)),
   }
 }

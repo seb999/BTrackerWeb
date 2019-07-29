@@ -7,6 +7,7 @@ using BTrackerWeb.EF;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -40,8 +41,20 @@ namespace BTrackerWeb.Controllers
         public List<GpsPosition> GetGpsData(int deviceId, int count)
         {
             string userId = DbContext.Users.Where(p=>p.Email == User.Claims.Last().Value).Select(p=>p.Id).FirstOrDefault();
-            if(userId == null) return new List<GpsPosition>();
-            return DbContext.GpsPosition.Where(p => p.DeviceId == deviceId).OrderByDescending(p=>p.GpsPositionDate).Take(count).ToList();
+            if(userId == null) {
+                return new List<GpsPosition>();
+            }
+
+            if(deviceId == 0){
+                return DbContext.GpsPosition
+                    .Include(p=>p.Device)
+                    .Where(p => p.Device.UserId == userId).OrderByDescending(p=>p.GpsPositionDate).Take(count).ToList();
+            }
+            else{
+                return DbContext.GpsPosition
+                    .Include(p=>p.Device)
+                    .Where(p => p.DeviceId == deviceId).OrderByDescending(p=>p.GpsPositionDate).Take(count).ToList();
+            }
         }
 
         [HttpPost]
