@@ -7,11 +7,20 @@ import { withAuth } from '@okta/okta-react';
 import { any } from 'prop-types';
 import DropDown from './element/DropDown'
 
-import Map from 'ol/Map';
-import View from 'ol/View';
+import * as marker from 'marker.png'
+
+
+
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
+import vector from 'ol/source/Vector';
 
+import * as ol from 'ol';
+import * as proj from 'ol/proj';
+import * as geom from 'ol/geom';
+import * as layer from 'ol/layer';
+import * as source from 'ol/source';
+import * as style from 'ol/style';
 
 interface AppFnProps {
   getGpsPosition(token: any, deviceId: any, maxData: any): void;
@@ -51,24 +60,53 @@ class MapData extends React.Component<Props, State>{
       if (!this.state.token) { this.props.auth.login('/') } else {
         this.props.getGpsPosition(this.state.token, 0, 20);
         this.props.getTrackerList(this.state.token);
+        this.setupMap();
       }
     } catch (err) {
     }
+  }
 
-    var ttt = new Map({
-      target: 'map',
-      layers: [
-        new TileLayer({
-          source: new XYZ({
-            url: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          })
-        })
-      ],
-      view: new View({
-        center: [37.41, 8.82],
-        zoom: 2,
-      }),
+  setupMap = () => {
+    var baseMapLayer = new layer.Tile({
+      source: new source.OSM()
     });
+    var map = new ol.Map({
+      target: 'map',
+      layers: [baseMapLayer],
+      view: new ol.View({
+        center: proj.fromLonLat([18.07308972, 59.2558675]),
+        zoom: 5 //Initial Zoom Level
+      })
+    });
+    //Adding a marker on the map
+    var marker = new ol.Feature({
+      geometry: new geom.Point(
+        proj.fromLonLat([18.07308972, 59.2558675])
+      ),  // Cordinates of New York's Town Hall
+    });
+
+    marker.setStyle(new style.Style({
+      image: new style.Icon(({
+        color: '#ffcd46',
+        crossOrigin: 'anonymous',
+        src: '../images/Logo.png'
+      }))
+    }));
+
+    var vectorSource = new source.Vector({
+      features: [marker]
+    });
+    var markerVectorLayer = new layer.Vector({
+      source: vectorSource,
+    });
+    map.addLayer(markerVectorLayer);
+
+
+
+
+
+
+
   }
 
   handleChangeDevice = (device: any) => {
