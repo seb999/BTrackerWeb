@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import * as actions from '../actions/actions';
 import { withAuth } from '@okta/okta-react';
 import { any } from 'prop-types';
-import DropDown from './element/DropDown'
+import DropDown from './element/DropDown';
 
-import * as marker from 'marker.png'
+import markerIcon from './../images/marker.png';
 
 
 
@@ -80,18 +80,22 @@ class MapData extends React.Component<Props, State>{
     });
     //Adding a marker on the map
     var marker = new ol.Feature({
+      name : "toto",
       geometry: new geom.Point(
         proj.fromLonLat([18.07308972, 59.2558675])
       ),  // Cordinates of New York's Town Hall
     });
 
     marker.setStyle(new style.Style({
+
       image: new style.Icon(({
         color: '#ffcd46',
         crossOrigin: 'anonymous',
-        src: '../images/Logo.png'
+        src: "./../images/Mikeldi.jpg"
       }))
     }));
+
+
 
     var vectorSource = new source.Vector({
       features: [marker]
@@ -100,6 +104,27 @@ class MapData extends React.Component<Props, State>{
       source: vectorSource,
     });
     map.addLayer(markerVectorLayer);
+
+    map.on('click', function(evt) {
+      var feature = map.forEachFeatureAtPixel(evt.pixel,
+        function(feature) {
+          console.log("click");
+          return feature;
+        });
+      if (feature) {
+        console.log("click");
+      //   var coordinates = feature.getGeometry().getCoordinates();
+      //   popup.setPosition(coordinates);
+      //   $(element).popover({
+      //     placement: 'top',
+      //     html: true,
+      //     content: feature.get('name')
+      //   });
+      //   $(element).popover('show');
+      // } else {
+      //   $(element).popover('destroy');
+       }
+    });
 
 
 
@@ -134,6 +159,7 @@ class MapData extends React.Component<Props, State>{
           <div>
             <br ></br>
             <div className="mb-1">
+        
               <DropDown itemList={this.props.deviceList} onClick={this.handleChangeDevice} selectedItem={this.state.deviceSelected}></DropDown>
             </div>
 
@@ -154,7 +180,7 @@ class MapData extends React.Component<Props, State>{
                 </table>
               </div>
               <div className="col-md-6">
-                <div id="map" className="map">
+                <div id="map" className="map"><div id="popup"></div>
                 </div>
               </div>
 
