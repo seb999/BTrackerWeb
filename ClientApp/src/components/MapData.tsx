@@ -5,15 +5,7 @@ import { connect } from 'react-redux';
 import * as actions from '../actions/actions';
 import { withAuth } from '@okta/okta-react';
 import { any } from 'prop-types';
-import DropDown from './element/DropDown';
-
-import markerIcon from './../images/marker.png';
-
-
-
-import TileLayer from 'ol/layer/Tile';
-import XYZ from 'ol/source/XYZ';
-import vector from 'ol/source/Vector';
+import DropDownDevice from './element/DropDownDevice';
 
 import * as ol from 'ol';
 import * as proj from 'ol/proj';
@@ -21,16 +13,18 @@ import * as geom from 'ol/geom';
 import * as layer from 'ol/layer';
 import * as source from 'ol/source';
 import * as style from 'ol/style';
+import { Device } from '../class/Device';
+import { GpsPosition } from '../class/GpsPosition';
 
 interface AppFnProps {
-  getGpsPosition(token: any, deviceId: any, maxData: any): void;
+  getGpsPosition(token: any, deviceId: number, maxData: number): void;
   getTrackerList(token: any): void;
 }
 
 interface AppObjectProps {
   auth?: any;
-  gpsPositionList: Array<any>;
-  deviceList: Array<any>;
+  gpsPositionList: Array<GpsPosition>;
+  deviceList: Array<Device>;
 }
 
 interface Props
@@ -39,7 +33,7 @@ interface Props
 
 interface State {
   token: any,
-  deviceSelected: any
+  deviceSelected: Device,
 }
 
 class MapData extends React.Component<Props, State>{
@@ -48,9 +42,13 @@ class MapData extends React.Component<Props, State>{
 
     this.state = {
       token: null,
-      deviceSelected: null,
+      deviceSelected: { deviceId: 0, deviceEUI: "", deviceDescription: "Filter device", userId: "" },
     };
   };
+
+  private markerVectorLayer: any;
+  private vectorSource: any;
+  private map: any;
 
   async componentDidMount() {
     try {
@@ -58,80 +56,78 @@ class MapData extends React.Component<Props, State>{
         token: await this.props.auth.getAccessToken()
       })
       if (!this.state.token) { this.props.auth.login('/') } else {
-        this.props.getGpsPosition(this.state.token, 0, 20);
-        this.props.getTrackerList(this.state.token);
+        await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.deviceId, 20);
+        await this.props.getTrackerList(this.state.token);
+        this.initMap();
         this.setupMap();
       }
     } catch (err) {
     }
   }
 
-  setupMap = () => {
-    var baseMapLayer = new layer.Tile({
+  componentDidUpdate(nextProps: any) {
+    if (this.props != nextProps) {
+
+      this.ClearMap();
+      this.setupMap();
+    }
+}
+
+  initMap = () => {
+    //We build the map
+    let baseMapLayer = new layer.Tile({
       source: new source.OSM()
     });
-    var map = new ol.Map({
+    this.map = new ol.Map({
       target: 'map',
       layers: [baseMapLayer],
       view: new ol.View({
-        center: proj.fromLonLat([18.07308972, 59.2558675]),
-        zoom: 5 //Initial Zoom Level
+        center: this.props.gpsPositionList.length == 0 ? proj.fromLonLat([-1.5, 54]) : proj.fromLonLat([this.props.gpsPositionList[0].gpsPositionLongitude, this.props.gpsPositionList[0].gpsPositionLatitude]),
+        zoom: 5
       })
     });
-    //Adding a marker on the map
-    var marker = new ol.Feature({
-      name : "toto",
-      geometry: new geom.Point(
-        proj.fromLonLat([18.07308972, 59.2558675])
-      ),  // Cordinates of New York's Town Hall
+  }
+
+  setupMap = () => {
+    if(this.map == undefined) return;
+    console.log(this.props.gpsPositionList);
+    //Array with all waypoint
+    var navigationWayPoint = [] as any;
+    //Build way point list  
+    this.props.gpsPositionList.map(item => {
+      //Adding a marker on the map
+      var marker = new ol.Feature({
+        geometry: new geom.Point(
+          proj.fromLonLat([item.gpsPositionLongitude, item.gpsPositionLatitude])
+        ),
+      });
+      marker.setStyle(new style.Style({
+        image: new style.Icon(({
+          color: '#ffcd46',
+          crossOrigin: 'anonymous',
+          src: require("./../images/marker.png"),
+        }))
+      }));
+      navigationWayPoint.push(marker);
+    })
+
+    console.log(navigationWayPoint);
+
+    this.vectorSource = new source.Vector({
+      features: navigationWayPoint
     });
 
-    marker.setStyle(new style.Style({
-
-      image: new style.Icon(({
-        color: '#ffcd46',
-        crossOrigin: 'anonymous',
-        src: "./../images/Mikeldi.jpg"
-      }))
-    }));
-
-
-
-    var vectorSource = new source.Vector({
-      features: [marker]
-    });
-    var markerVectorLayer = new layer.Vector({
-      source: vectorSource,
-    });
-    map.addLayer(markerVectorLayer);
-
-    map.on('click', function(evt) {
-      var feature = map.forEachFeatureAtPixel(evt.pixel,
-        function(feature) {
-          console.log("click");
-          return feature;
-        });
-      if (feature) {
-        console.log("click");
-      //   var coordinates = feature.getGeometry().getCoordinates();
-      //   popup.setPosition(coordinates);
-      //   $(element).popover({
-      //     placement: 'top',
-      //     html: true,
-      //     content: feature.get('name')
-      //   });
-      //   $(element).popover('show');
-      // } else {
-      //   $(element).popover('destroy');
-       }
+    this.markerVectorLayer = new layer.Vector({
+      source: this.vectorSource,
     });
 
+    this.map.addLayer(this.markerVectorLayer);
+  }
 
-
-
-
-
-
+  ClearMap = () => {
+    if(this.vectorSource == undefined) return;
+    this.vectorSource.clear();
+    this.map.removeLayer(this.markerVectorLayer);
   }
 
   handleChangeDevice = (device: any) => {
@@ -141,14 +137,20 @@ class MapData extends React.Component<Props, State>{
     this.props.getGpsPosition(this.state.token, device.deviceId, 20);
   }
 
+  handleShowHideSpot = (positionList: any) => {
+
+  }
+
+
+
   render() {
-    console.log(this.props.gpsPositionList);
     let displayList = this.props.gpsPositionList.map((item, index) => (
       <tr key={index}>
         <td>{item.gpsPositionDate}</td>
         <td>{item.gpsPositionLongitude}</td>
         <td>{item.gpsPositionLatitude}</td>
         <td>{item.device.deviceDescription}</td>
+        <td><button className="btn" onClick={() => this.handleShowHideSpot(item)}><span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span></button></td>
       </tr>
     ));
 
@@ -159,10 +161,8 @@ class MapData extends React.Component<Props, State>{
           <div>
             <br ></br>
             <div className="mb-1">
-        
-              <DropDown itemList={this.props.deviceList} onClick={this.handleChangeDevice} selectedItem={this.state.deviceSelected}></DropDown>
+              <DropDownDevice itemList={this.props.deviceList} onClick={this.handleChangeDevice} selectedItem={this.state.deviceSelected}></DropDownDevice>
             </div>
-
             <div className="row">
               <div className="col-md-6">
                 <table className="table" >
@@ -172,6 +172,7 @@ class MapData extends React.Component<Props, State>{
                       <th scope="col">Longitude</th>
                       <th scope="col">Latitude</th>
                       <th scope="col">Tracker</th>
+                      <th scope="col"></th>
                     </tr>
                   </thead>
                   <tbody>

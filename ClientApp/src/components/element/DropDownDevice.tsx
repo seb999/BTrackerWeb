@@ -10,7 +10,7 @@ interface Props {
 interface State {
 }
 
-class DropDown extends React.Component<Props, State> {
+class DropDownDevice extends React.Component<Props, State> {
     constructor(props: any) {
         super(props);
     }
@@ -31,4 +31,4 @@ class DropDown extends React.Component<Props, State> {
     }
 }
 
-export default DropDown
+export default DropDownDevice
