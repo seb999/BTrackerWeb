@@ -1,16 +1,17 @@
 import * as React from 'react';
 import './../css/DropDown.css'
+import { LookupItem } from '../../class/LookupItem';
 
 interface Props {
-    itemList: Array<any>;
-    onClick(p:any): void;
-    selectedItem: any;
+    lookupList: Array<LookupItem>;
+    onClick(p:LookupItem): void;
+    selectedItem: LookupItem;
 }
 
 interface State {
 }
 
-class DropDownDevice extends React.Component<Props, State> {
+class DropDown extends React.Component<Props, State> {
     constructor(props: any) {
         super(props);
     }
@@ -19,11 +20,11 @@ class DropDownDevice extends React.Component<Props, State> {
         return (
             <div className="dropdown">
                 <button className="btn btn-outline-info dropdown-toggle mt-1" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {this.props.selectedItem ? this.props.selectedItem.deviceDescription : "Select tracker"}
+                    {this.props.selectedItem ? this.props.selectedItem.value : "Select tracker"}
             </button>
                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    {this.props.itemList.map((item, index) => {
-                        return <a key={index} className={this.props.selectedItem == item ? "dropdown-item active" : "dropdown-item"} id={item} onClick={()=>this.props.onClick(item)}>{item.deviceDescription}</a>
+                    {this.props.lookupList.map((item, index) => {
+                        return <a key={index} className={this.props.selectedItem == item ? "dropdown-item active" : "dropdown-item"} id={item.value} onClick={()=>this.props.onClick(item)}>{item.value}</a>
                     })}
                 </div>
             </div>
@@ -31,4 +32,4 @@ class DropDownDevice extends React.Component<Props, State> {
     }
 }
 
-export default DropDownDevice
+export default DropDown

@@ -1,6 +1,26 @@
 import axios from 'axios';
 const apiUrl = '/api/Device/';    
 
+export const lookupList = (accessToken : any) =>{
+  return async (dispatch  :any) =>{
+    try{
+      //We are logged in the API so we don't need to pass again the userId
+      const res = await axios.get<any>(apiUrl + "Get/", {headers: {Authorization: 'Bearer ' + accessToken}});
+      return dispatch(lookupListSuccess(res.data));
+    }
+    catch (error) {
+      throw (error)
+    }
+  }
+ }
+ 
+ export const lookupListSuccess = (data :any) => {
+  return {
+    type: "TRACKER_LOOKUP_LIST",
+    payload: data
+  }
+ }
+
 export const trackerList = (accessToken : any) =>{
  return async (dispatch  :any) =>{
    try{

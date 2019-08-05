@@ -6,6 +6,7 @@ import * as actionCreator from '../actions/actions';
 import TrackerPopup from "./popup/TrackerPopup";
 import ConfirmPopup from "./popup/ConfirmPopup";
 import { withAuth } from '@okta/okta-react';
+import { Device } from '../class/Device';
 
 
 interface AppFnProps {
@@ -16,7 +17,7 @@ interface AppFnProps {
 interface AppObjectProps {
     auth? : any;
     history?: any;
-    deviceList: Array<any>;
+    deviceList: Array<Device>;
     isSaved: boolean;
     isDeleted: boolean;
   }
@@ -85,8 +86,6 @@ class Tracker extends React.Component<Props, State>{
             </tr>
         ));
 
-       
-
         return (
             
             <div>
@@ -95,7 +94,6 @@ class Tracker extends React.Component<Props, State>{
                         <br ></br>
                         <div >
                             <button style={{ float: "left" }} type="button" className="btn btn-primary" onClick={this.handleShow}><span><i className="fas fa-edit"></i></span> Add new tracker</button>
-                          
                             {this.props.isSaved && <div style={{ float: "right", height:"40px", padding:"7px" }} className="alert alert-success" role="alert"> Saved!</div>}
                             {this.props.isDeleted && <div style={{ float: "right", height:"40px", padding:"7px" }} className="alert alert-success" role="alert"> Deleted!</div>}
                         </div>

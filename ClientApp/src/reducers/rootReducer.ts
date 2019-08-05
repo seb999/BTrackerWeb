@@ -1,11 +1,13 @@
 import { Device } from "../class/Device";
 import { GpsPosition } from "../class/GpsPosition";
+import { LookupItem } from "../class/LookupItem";
 
 const initState = {
   deviceList: new Array<Device>(),
+  lookupList: new Array<LookupItem>(),
   gpsPositionList: new Array<GpsPosition>(),
-  isSaved : false,
-  isDeleted : false,
+  isSaved: false,
+  isDeleted: false,
 }
 
 const rootReducer = (state = initState, action: any) => {
@@ -18,6 +20,10 @@ const rootReducer = (state = initState, action: any) => {
 
     case "TRACKER_LIST":
       newState.deviceList = action.payload
+      return newState;
+
+    case "TRACKER_LOOKUP_LIST":
+      newState.lookupList = action.payload
       return newState;
 
     case "TRACKER_SAVED":

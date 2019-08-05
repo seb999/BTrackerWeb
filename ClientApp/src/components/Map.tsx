@@ -4,8 +4,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import * as actions from '../actions/actions';
 import { withAuth } from '@okta/okta-react';
-import { any } from 'prop-types';
-import DropDownDevice from './element/DropDownDevice';
+import DropDown from './element/DropDown';
 
 import * as ol from 'ol';
 import * as proj from 'ol/proj';
@@ -13,8 +12,8 @@ import * as geom from 'ol/geom';
 import * as layer from 'ol/layer';
 import * as source from 'ol/source';
 import * as style from 'ol/style';
-import { Device } from '../class/Device';
 import { GpsPosition } from '../class/GpsPosition';
+import { LookupItem } from '../class/LookupItem';
 
 interface AppFnProps {
   getGpsPosition(token: any, deviceId: number, maxData: number): void;
@@ -24,7 +23,7 @@ interface AppFnProps {
 interface AppObjectProps {
   auth?: any;
   gpsPositionList: Array<GpsPosition>;
-  deviceList: Array<Device>;
+  deviceList: Array<LookupItem>;
 }
 
 interface Props
@@ -33,16 +32,20 @@ interface Props
 
 interface State {
   token: any,
-  deviceSelected: Device,
+  deviceSelected: LookupItem;
+  gpsMaxList: Array<LookupItem>;
+  gpsMaxSelected: LookupItem;
 }
 
-class MapData extends React.Component<Props, State>{
+class Map extends React.Component<Props, State>{
   constructor(props: any) {
     super(props);
 
     this.state = {
       token: null,
-      deviceSelected: { deviceId: 0, deviceEUI: "", deviceDescription: "Filter device", userId: "" },
+      gpsMaxList: [{ id: 1, value: '10' }, { id: 2, value: "25" }, { id: 3, value: "50" }, { id: 4, value: "100" }],
+      gpsMaxSelected: { id: 1, value: '10' },
+      deviceSelected: { id: 0, value: "Filter device" },
     };
   };
 
@@ -56,7 +59,7 @@ class MapData extends React.Component<Props, State>{
         token: await this.props.auth.getAccessToken()
       })
       if (!this.state.token) { this.props.auth.login('/') } else {
-        await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.deviceId, 20);
+        await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
         await this.props.getTrackerList(this.state.token);
         this.initMap();
         this.setupMap();
@@ -67,11 +70,10 @@ class MapData extends React.Component<Props, State>{
 
   componentDidUpdate(nextProps: any) {
     if (this.props != nextProps) {
-
       this.ClearMap();
       this.setupMap();
     }
-}
+  }
 
   initMap = () => {
     //We build the map
@@ -83,14 +85,13 @@ class MapData extends React.Component<Props, State>{
       layers: [baseMapLayer],
       view: new ol.View({
         center: this.props.gpsPositionList.length == 0 ? proj.fromLonLat([-1.5, 54]) : proj.fromLonLat([this.props.gpsPositionList[0].gpsPositionLongitude, this.props.gpsPositionList[0].gpsPositionLatitude]),
-        zoom: 5
+        zoom: 16
       })
     });
   }
 
   setupMap = () => {
-    if(this.map == undefined) return;
-    console.log(this.props.gpsPositionList);
+    if (this.map == undefined) return;
     //Array with all waypoint
     var navigationWayPoint = [] as any;
     //Build way point list  
@@ -111,8 +112,6 @@ class MapData extends React.Component<Props, State>{
       navigationWayPoint.push(marker);
     })
 
-    console.log(navigationWayPoint);
-
     this.vectorSource = new source.Vector({
       features: navigationWayPoint
     });
@@ -122,10 +121,11 @@ class MapData extends React.Component<Props, State>{
     });
 
     this.map.addLayer(this.markerVectorLayer);
+
   }
 
   ClearMap = () => {
-    if(this.vectorSource == undefined) return;
+    if (this.vectorSource == undefined) return;
     this.vectorSource.clear();
     this.map.removeLayer(this.markerVectorLayer);
   }
@@ -134,14 +134,18 @@ class MapData extends React.Component<Props, State>{
     this.setState({
       deviceSelected: device,
     })
-    this.props.getGpsPosition(this.state.token, device.deviceId, 20);
+    this.props.getGpsPosition(this.state.token, device.id, parseInt(this.state.gpsMaxSelected.value));
   }
 
-  handleShowHideSpot = (positionList: any) => {
-
+  handleChangeMaxGps = (lookupItem: LookupItem) => {
+    this.setState({
+      gpsMaxSelected: lookupItem,
+    })
+    this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(lookupItem.value));
   }
 
-
+  handleShowHideSpot = (p: any) => {
+  }
 
   render() {
     let displayList = this.props.gpsPositionList.map((item, index) => (
@@ -161,7 +165,8 @@ class MapData extends React.Component<Props, State>{
           <div>
             <br ></br>
             <div className="mb-1">
-              <DropDownDevice itemList={this.props.deviceList} onClick={this.handleChangeDevice} selectedItem={this.state.deviceSelected}></DropDownDevice>
+              <DropDown lookupList={this.props.deviceList} onClick={this.handleChangeDevice} selectedItem={this.state.deviceSelected}></DropDown>
+              <DropDown lookupList={this.state.gpsMaxList} onClick={this.handleChangeMaxGps} selectedItem={this.state.gpsMaxSelected}></DropDown>
             </div>
             <div className="row">
               <div className="col-md-6">
@@ -181,13 +186,10 @@ class MapData extends React.Component<Props, State>{
                 </table>
               </div>
               <div className="col-md-6">
-                <div id="map" className="map"><div id="popup"></div>
-                </div>
+                <div id="map" className="map" style={{ height: 700 }}><div id="popup"></div></div>
               </div>
-
             </div>
           </div>}
-
       </div>
     );
   }
@@ -197,15 +199,15 @@ class MapData extends React.Component<Props, State>{
 const mapStateToProps = (state: any) => {
   return {
     gpsPositionList: state.gpsPositionList,
-    deviceList: state.deviceList,
+    deviceList: state.lookupList,
   }
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    getTrackerList: (token: any) => dispatch<any>(actions.default.tracker.trackerList(token)),
+    getTrackerList: (token: any) => dispatch<any>(actions.default.tracker.lookupList(token)),
     getGpsPosition: (token: any, deviceId: any, maxData: any) => dispatch<any>(actions.default.gps.getGpsDataList(token, deviceId, maxData)),
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(withAuth(MapData));
+export default connect(mapStateToProps, mapDispatchToProps)(withAuth(Map));

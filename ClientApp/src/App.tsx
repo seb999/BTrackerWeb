@@ -5,7 +5,7 @@ import { Security, ImplicitCallback } from '@okta/okta-react';
 
 import Home from './components/Home';
 import Tracker from './components/Tracker';
-import MapData from './components/MapData';
+import Map from './components/Map';
 import NavMenu from './components/NavMenu';
 import { NavCommand } from './components/NavMenu';
 
@@ -30,7 +30,7 @@ class App extends React.Component<Props, State>{
       navCommands: [
         { type: "NavLink", path: "/", text: "Home", isActive: false },
         { type: "NavLink", path: "/Tracker", text: "Tracker", isActive: false },
-        { type: "NavLink", path: "/MapData", text: "MapData", isActive: false },
+        { type: "NavLink", path: "/Map", text: "Map", isActive: false },
       ]
     }
   }
@@ -40,11 +40,11 @@ class App extends React.Component<Props, State>{
       <BrowserRouter>
         <Security issuer={config.issuer} client_id={config.client_id} redirect_uri={config.redirect_uri}>
           <NavMenu commands={this.state.navCommands} />
-          <div className="container">
+          <div className="container-fluid">
           <Switch>
             <Route path='/' exact={true} component={Home} />
             <Route path='/Tracker' exact={true} component={Tracker} />} />
-            <Route path='/MapData' exact={true} component={MapData} />} />
+            <Route path='/Map' exact={true} component={Map} />} />
             <Route path='/implicit/callback' component={ImplicitCallback} />
           </Switch>
           </div>

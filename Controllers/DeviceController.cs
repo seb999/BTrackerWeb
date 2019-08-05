@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BTrackerWeb.EF;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using BTrackerWeb.Class;
 
 namespace BTrackerWeb.Controllers
 {
@@ -25,40 +26,38 @@ namespace BTrackerWeb.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        #region Portal method
+        ///Return lookuplist of device for current userId
+        [HttpGet]
+        [Authorize]
+        [Route("/api/[controller]/[Action]")]
+        public List<LookupItem> Get()
+        {
+            string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
+            if (userId == null) return null;
+
+            return DbContext.Device
+                .Where(p => p.UserId == userId)
+                .Select(p => new LookupItem{
+                        Id = p.DeviceId,
+                        Value = p.DeviceDescription
+                }).OrderByDescending(p => p.Id).ToList();              
+        }
 
         ///Return list of device for current userId
         [HttpGet]
         [Authorize]
-        [Route("/api/[controller]/GetDeviceList")]
+        [Route("/api/[controller]/[Action]")]
         public List<Device> GetDeviceList()
         {
-            string userId = DbContext.Users.Where(p=>p.Email == User.Claims.Last().Value).Select(p=>p.Id).FirstOrDefault();
-            if(userId == null) return new List<Device>();
+            string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
+            if (userId == null) return new List<Device>();
 
-             return DbContext.Device.Where(p=>p.UserId == userId).Select(p=>p).OrderByDescending(p => p.DeviceId).ToList();
-        }
-
-        #endregion
-
-        #region APP methods
-
-        ///Get list of device for APP
-        [HttpGet]
-        [Route("/api/[controller]/AppGetDeviceList/{userId}")]
-        public List<Device> AppGetDeviceList(string userId)
-        {
-            var result =  DbContext.Device
-                    .Where(p => p.UserId == userId)
-                    .Where(p=>p.DeviceIsDeleted.GetValueOrDefault() != true)
-                    .OrderBy(p => p.DateAdded).ToList();
-
-            return result;
+            return DbContext.Device.Where(p => p.UserId == userId).Select(p => p).OrderByDescending(p => p.DeviceId).ToList();
         }
 
         ///Save a new device
         [HttpPost]
-        [Route("/api/[controller]/SaveDevice")]
+        [Route("/api/[controller]/[Action]")]
         public List<Device> SaveDevice([FromBody] Device device)
         {
             device.UserId = User.Claims.FirstOrDefault().Value;
@@ -67,20 +66,18 @@ namespace BTrackerWeb.Controllers
             return GetDeviceList();
         }
 
-         ///Save a new device
+        ///delete a new device
         [HttpGet]
         [Authorize]
-        [Route("/api/[controller]/DeleteDevice/{deviceId}")]
+        [Route("/api/[controller]/[Action]/{deviceId}")]
         public List<Device> DeleteDevice(int deviceId)
         {
             //Remove all entry from GpsPosition table
-            DbContext.GpsPosition.RemoveRange(DbContext.GpsPosition.Where(predicate=>predicate.DeviceId == deviceId).Select(p=>p).ToList());
+            DbContext.GpsPosition.RemoveRange(DbContext.GpsPosition.Where(predicate => predicate.DeviceId == deviceId).Select(p => p).ToList());
             //Remove device from Device table
-            DbContext.Device.Remove(DbContext.Device.Where(predicate=>predicate.DeviceId == deviceId).FirstOrDefault());
+            DbContext.Device.Remove(DbContext.Device.Where(predicate => predicate.DeviceId == deviceId).FirstOrDefault());
             DbContext.SaveChanges();
             return GetDeviceList();
         }
-
-        #endregion
     }
 }
