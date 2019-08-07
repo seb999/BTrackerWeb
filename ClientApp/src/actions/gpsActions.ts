@@ -19,3 +19,10 @@ export const GetGpsDataSuccess = (data :any) => {
    payload: data
  }
 }
+
+export const hideShowGpsPosition = (data : any) => {
+  return {
+    type: "GPS_POSITION_HIDE",
+    payload: data.gpsPositionId
+  }
+}

@@ -16,6 +16,15 @@ const rootReducer = (state = initState, action: any) => {
 
     case "GPS_POSITION_LIST":
       newState.gpsPositionList = action.payload
+      newState.gpsPositionList.map(item => {
+        item.display = true;
+      })
+      return newState;
+
+    case "GPS_POSITION_HIDE":
+      var indexPosition = newState.gpsPositionList.findIndex(p => p.gpsPositionId == action.payload);
+      newState.gpsPositionList[indexPosition].display = !newState.gpsPositionList[indexPosition].display;
+      newState.gpsPositionList = newState.gpsPositionList.slice(0, newState.gpsPositionList.length);
       return newState;
 
     case "TRACKER_LIST":

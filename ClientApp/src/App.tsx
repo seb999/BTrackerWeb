@@ -6,6 +6,7 @@ import { Security, ImplicitCallback } from '@okta/okta-react';
 import Home from './components/Home';
 import Tracker from './components/Tracker';
 import Map from './components/Map';
+import Footer from './components/Footer';
 import NavMenu from './components/NavMenu';
 import { NavCommand } from './components/NavMenu';
 
@@ -48,6 +49,7 @@ class App extends React.Component<Props, State>{
             <Route path='/implicit/callback' component={ImplicitCallback} />
           </Switch>
           </div>
+          <Footer />
         </Security>
       </BrowserRouter>
     );

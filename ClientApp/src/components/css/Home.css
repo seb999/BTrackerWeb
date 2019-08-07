@@ -1,0 +1,33 @@
+/* mikeldi parallax */
+
+.parallax-background {
+    background-position: 50% 0;
+    background-repeat: no-repeat;
+    -webkit-background-size: auto;
+    background-size: auto;
+
+    -moz-transform: translate3d(0,0,0);
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+  
+}
+
+
+@media screen and (min-width: 1000px){.parallax-background {-webkit-background-size: cover;
+    background-size: cover;}
+}
+
+
+
+.parallax-background.pic1{
+background-image: url('../../images/gamlastan.jpg');
+}
+
+.parallax-background.pic2{
+    background-image: url('../../images/mapAntea25.png');
+    height: 500px
+    }
+
+.parallax-background.pic3{
+    background-image: url('../../images/splash.jpg');
+    }

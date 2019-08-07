@@ -18,6 +18,7 @@ import { LookupItem } from '../class/LookupItem';
 interface AppFnProps {
   getGpsPosition(token: any, deviceId: number, maxData: number): void;
   getTrackerList(token: any): void;
+  hideShowGpsPosition(position: any): void;
 }
 
 interface AppObjectProps {
@@ -96,6 +97,7 @@ class Map extends React.Component<Props, State>{
     var navigationWayPoint = [] as any;
     //Build way point list  
     this.props.gpsPositionList.map(item => {
+      if (!item.display) return;
       //Adding a marker on the map
       var marker = new ol.Feature({
         geometry: new geom.Point(
@@ -145,6 +147,15 @@ class Map extends React.Component<Props, State>{
   }
 
   handleShowHideSpot = (p: any) => {
+    if (p == null) {
+      this.props.gpsPositionList.map(item => {
+        this.props.hideShowGpsPosition(item);
+      })
+    }
+    else { 
+      this.props.hideShowGpsPosition(p); 
+    }
+
   }
 
   render() {
@@ -154,10 +165,9 @@ class Map extends React.Component<Props, State>{
         <td>{item.gpsPositionLongitude}</td>
         <td>{item.gpsPositionLatitude}</td>
         <td>{item.device.deviceDescription}</td>
-        <td><button className="btn" onClick={() => this.handleShowHideSpot(item)}><span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span></button></td>
+        <td><button className="btn" onClick={() => this.handleShowHideSpot(item)}>{item.display ? <span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span> : <span style={{ color: "gray" }}><i className="fas fa-map-marker-alt"></i></span>}</button></td>
       </tr>
     ));
-
 
     return (
       <div>
@@ -165,10 +175,13 @@ class Map extends React.Component<Props, State>{
           <div>
             <br ></br>
             <div className="mb-1">
-              <DropDown lookupList={this.props.deviceList} onClick={this.handleChangeDevice} selectedItem={this.state.deviceSelected}></DropDown>
-              <DropDown lookupList={this.state.gpsMaxList} onClick={this.handleChangeMaxGps} selectedItem={this.state.gpsMaxSelected}></DropDown>
+
+              <div className="float-left mr-1"><DropDown lookupList={this.props.deviceList} onClick={this.handleChangeDevice} selectedItem={this.state.deviceSelected}></DropDown> </div>
+
+              <div className="float-left"> <DropDown lookupList={this.state.gpsMaxList} onClick={this.handleChangeMaxGps} selectedItem={this.state.gpsMaxSelected}></DropDown></div>
+              <div style={{ clear: "both" }}></div>
             </div>
-            <div className="row">
+            <div className="row float-none">
               <div className="col-md-6">
                 <table className="table" >
                   <thead className="thead-dark">
@@ -177,7 +190,8 @@ class Map extends React.Component<Props, State>{
                       <th scope="col">Longitude</th>
                       <th scope="col">Latitude</th>
                       <th scope="col">Tracker</th>
-                      <th scope="col"></th>
+                      <th scope="col"><button className="btn" onClick={() => this.handleShowHideSpot(null)}><span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span></button></th>
+
                     </tr>
                   </thead>
                   <tbody>
@@ -207,6 +221,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
     getTrackerList: (token: any) => dispatch<any>(actions.default.tracker.lookupList(token)),
     getGpsPosition: (token: any, deviceId: any, maxData: any) => dispatch<any>(actions.default.gps.getGpsDataList(token, deviceId, maxData)),
+    hideShowGpsPosition: (position: any) => dispatch<any>(actions.default.gps.hideShowGpsPosition(position)),
   }
 }
 

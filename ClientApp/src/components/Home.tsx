@@ -3,13 +3,14 @@ import { connect } from 'react-redux';
 import * as actions from '../actions/actions';
 import { Dispatch } from 'redux';
 import { withAuth } from '@okta/okta-react';
+import './css/Home.css';
 
 interface AppFnProps {
-  checkLocalUserId(p:any): void;
+  checkLocalUserId(p: any): void;
 }
 
 interface AppObjectProps {
-  auth? : any;
+  auth?: any;
 }
 
 interface Props
@@ -35,7 +36,20 @@ class Home extends React.Component<Props, State>{
 
   render() {
     return (
-      <div>This is the home page</div>
+      <div style={{marginRight:"0"}}>
+
+
+
+        <section className="py-5 parallax-background " style={{height:800}}>
+          <div className="container">
+            <h1 className="display-4" style={{ zIndex: 110, marginTop: 30, color: "gray" }} >IOT simless solution</h1>
+            <p className="lead" style={{ color: "gray" }}>GPS tracker with motion detector that help you to protect your bike </p>
+
+          </div>
+        </section>
+
+      </div>
+
     );
 
   }
@@ -49,8 +63,8 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-      //getSymbolList: (p: string) => dispatch<any>(binanceActionCreator.binanceActions.GetSymbolList(p)),
-      getLocalUserId: (p : any) => dispatch<any>(actions.default.account.checkLocalUserId(p)),
+    //getSymbolList: (p: string) => dispatch<any>(binanceActionCreator.binanceActions.GetSymbolList(p)),
+    getLocalUserId: (p: any) => dispatch<any>(actions.default.account.checkLocalUserId(p)),
   }
 }
 
