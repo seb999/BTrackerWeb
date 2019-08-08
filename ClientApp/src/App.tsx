@@ -39,6 +39,7 @@ class App extends React.Component<Props, State>{
   render() {
     return (
       <BrowserRouter>
+       <div className="main-container">
         <Security issuer={config.issuer} client_id={config.client_id} redirect_uri={config.redirect_uri}>
           <NavMenu commands={this.state.navCommands} />
           <div className="container-fluid">
@@ -51,6 +52,7 @@ class App extends React.Component<Props, State>{
           </div>
           <Footer />
         </Security>
+        </div>
       </BrowserRouter>
     );
   }

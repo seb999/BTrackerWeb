@@ -40,7 +40,7 @@ class Home extends React.Component<Props, State>{
 
 
 
-        <section className="py-5 parallax-background " style={{height:800}}>
+        <section className="py-5 parallax-background " style={{height:600}}>
           <div className="container">
             <h1 className="display-4" style={{ zIndex: 110, marginTop: 30, color: "gray" }} >IOT simless solution</h1>
             <p className="lead" style={{ color: "gray" }}>GPS tracker with motion detector that help you to protect your bike </p>
