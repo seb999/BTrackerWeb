@@ -34,26 +34,26 @@ namespace BTrackerWeb
                                       .AllowAnyHeader());
             });
 
-             services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = OktaDefaults.ApiAuthenticationScheme;
-                options.DefaultChallengeScheme = OktaDefaults.ApiAuthenticationScheme;
-                options.DefaultSignInScheme = OktaDefaults.ApiAuthenticationScheme;
-            })
-            .AddOktaWebApi(new OktaWebApiOptions
-            {
-                OktaDomain = "https://dev-792490.okta.com",
-            });
+            services.AddAuthentication(options =>
+           {
+               options.DefaultAuthenticateScheme = OktaDefaults.ApiAuthenticationScheme;
+               options.DefaultChallengeScheme = OktaDefaults.ApiAuthenticationScheme;
+               options.DefaultSignInScheme = OktaDefaults.ApiAuthenticationScheme;
+           })
+           .AddOktaWebApi(new OktaWebApiOptions
+           {
+               OktaDomain = "https://dev-792490.okta.com",
+           });
 
-             services.AddDbContextPool<ApplicationDbContext>(options =>
-               options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContextPool<ApplicationDbContext>(options =>
+              options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
             .AddJsonOptions(option =>
             {
                 option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
-    
+
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -76,11 +76,12 @@ namespace BTrackerWeb
                 app.UseHsts();
             }
 
-           
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
-             app.UseAuthentication();
+            app.UseAuthentication();
+            app.UseCors("AllowAll");
 
             app.UseMvc(routes =>
             {
