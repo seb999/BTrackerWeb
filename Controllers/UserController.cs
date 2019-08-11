@@ -41,5 +41,12 @@ namespace BTrackerWeb.Controllers
             DbContext.Add(newUser);
             DbContext.SaveChanges();
         }
+
+        [HttpGet]
+        [Route("[action]")]
+        public string TestApi()
+        {
+            return "API running!";
+        }
     }
 }
