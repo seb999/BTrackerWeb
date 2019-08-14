@@ -19,6 +19,7 @@ namespace BTrackerWeb
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseUrls("https://localhost:4001;http://localhost:4000")
                 .UseStartup<Startup>();
     }
 }

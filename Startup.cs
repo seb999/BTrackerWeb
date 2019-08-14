@@ -43,6 +43,7 @@ namespace BTrackerWeb
            .AddOktaWebApi(new OktaWebApiOptions
            {
                OktaDomain = "https://dev-792490.okta.com",
+               
            });
 
             services.AddDbContextPool<ApplicationDbContext>(options =>
@@ -96,8 +97,8 @@ namespace BTrackerWeb
 
                 if (env.IsDevelopment())
                 {
-                    //spa.UseReactDevelopmentServer(npmScript: "start");
-                    spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+                    spa.UseReactDevelopmentServer(npmScript: "start");
+                    //spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
                 }
             });
         }
