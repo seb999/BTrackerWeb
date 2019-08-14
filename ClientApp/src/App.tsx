@@ -47,6 +47,7 @@ class App extends React.Component<Props, State>{
           <div className="container-fluid">
           <Switch>
             <Route path='/' exact={true} component={Home} />
+            <Route path='/Home' exact={true} component={Home} />
             <Route path='/Tracker' exact={true} component={Tracker} />} />
             <Route path='/Map' exact={true} component={Map} />} />
             <Route path='/implicit/callback' component={ImplicitCallback} />

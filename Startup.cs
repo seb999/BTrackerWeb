@@ -78,7 +78,7 @@ namespace BTrackerWeb
             }
 
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
             app.UseAuthentication();
