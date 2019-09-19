@@ -66,7 +66,8 @@ namespace BTrackerWeb.Controllers
                 DeviceId = DbContext.Device.Where(p => p.DeviceEUI == loraData.Hardware_serial).Select(p => p.DeviceId).FirstOrDefault(),
                 GpsPositionLatitude = DegreeToDecimal(loraData.Payload_fields.Latitude, loraData.Payload_fields.LatitudeDecimal),
                 GpsPositionLongitude = DegreeToDecimal(loraData.Payload_fields.Longitude, loraData.Payload_fields.LongitudeDecimal),
-                GpsPositionDate = loraData.Metadata.Time,
+                //GpsPositionDate = loraData.Metadata.Time, //the lora shield give GMT time not GMT+2
+                GpsPositionDate = DateTime.Now,
 
                 //For debugging
                 GpsPositionLatitudeRaw = string.Format("{0}.{1}", loraData.Payload_fields.Latitude, loraData.Payload_fields.LatitudeDecimal),

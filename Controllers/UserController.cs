@@ -44,9 +44,11 @@ namespace BTrackerWeb.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public string TestApi()
+        public List<string> TestApi()
         {
-            return "API running!";
+            List<string> ttt = new List<string>();
+            ttt.Add("Hello world");
+            return ttt;
         }
     }
 }
