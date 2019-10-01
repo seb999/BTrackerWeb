@@ -15,6 +15,9 @@ import * as style from 'ol/style';
 import { GpsPosition } from '../class/GpsPosition';
 import { LookupItem } from '../class/LookupItem';
 
+import socketIOClient from "socket.io-client";
+
+
 interface AppFnProps {
   getGpsPosition(token: any, deviceId: number, maxData: number): void;
   getTrackerList(token: any): void;
@@ -37,6 +40,8 @@ interface State {
   deviceSelected: LookupItem;
   gpsMaxList: Array<LookupItem>;
   gpsMaxSelected: LookupItem;
+  loraMessageEndpoint: string;
+  payloadDeviceId: any;
 }
 
 class Map extends React.Component<Props, State>{
@@ -48,6 +53,8 @@ class Map extends React.Component<Props, State>{
       gpsMaxList: [{ id: 1, value: '10' }, { id: 2, value: "25" }, { id: 3, value: "50" }, { id: 4, value: "100" }],
       gpsMaxSelected: { id: 1, value: '10' },
       deviceSelected: { id: 0, value: "Filter device" },
+      loraMessageEndpoint: "http://127.0.0.1:4001",
+      payloadDeviceId: 0
     };
   };
 
@@ -65,6 +72,7 @@ class Map extends React.Component<Props, State>{
         await this.props.getTrackerList(this.state.token);
         this.initMap();
         this.setupMap();
+        this.initLoraListener();
       }
     } catch (err) {
     }
@@ -75,6 +83,11 @@ class Map extends React.Component<Props, State>{
       this.ClearMap();
       this.setupMap();
     }
+  }
+
+  initLoraListener = () => {
+    const socket = socketIOClient(this.state.loraMessageEndpoint, this.state.payloadDeviceId);
+    socket.on("FromLoraTracker", (data:any)=> this.setState({ payloadDeviceId: data }));
   }
 
   initMap = () => {
