@@ -12,9 +12,9 @@ interface State {
 }
 
 class DropDown extends React.Component<Props, State> {
-    constructor(props: any) {
-        super(props);
-    }
+    // constructor(props: any) {
+    //     super(props);
+    // }
 
     render() {
         return (
@@ -24,7 +24,7 @@ class DropDown extends React.Component<Props, State> {
             </button>
                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     {this.props.lookupList.map((item, index) => {
-                        return <a key={index} className={this.props.selectedItem == item ? "dropdown-item active" : "dropdown-item"} id={item.value} onClick={()=>this.props.onClick(item)}>{item.value}</a>
+                        return <a key={index} className={this.props.selectedItem === item ? "dropdown-item active" : "dropdown-item"} id={item.value} onClick={()=>this.props.onClick(item)}>{item.value}</a>
                     })}
                 </div>
             </div>

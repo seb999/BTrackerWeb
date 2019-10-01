@@ -41,12 +41,12 @@ export const trackerListSuccess = (data :any) => {
  }
 }
 
-export const saveNewTracker = (data :any) =>{
+export const saveNewTracker = (accessToken: any, device :any) =>{
   return async (dispatch  :any) =>{
     dispatch(saving());
-    let device = {DeviceEUI : data.deviceEui, DeviceDescription : data.deviceDescription}
+    //let device = {DeviceEUI : data.deviceEui, DeviceDescription : data.deviceDescription}
     try{
-      const res = await axios.post<any>(apiUrl + "SaveDevice/", device);
+      const res = await axios.post<any>(apiUrl + "SaveDevice/", device, {headers: {Authorization: 'Bearer ' + accessToken}});
       dispatch(saved());
       return dispatch(trackerSavedSuccess(res.data));
     }
@@ -83,11 +83,11 @@ export const savedSuccess = () =>{
   }
 }
 
- export const deleteTracker = (deviceId :number) =>{
+ export const deleteTracker = (accessToken: any, deviceId :number) =>{
   return async (dispatch  :any) =>{
     dispatch(deleting());
     try{
-      const res = await axios.get<any>(apiUrl + "DeleteDevice/" + deviceId);
+      const res = await axios.get<any>(apiUrl + "DeleteDevice/" + deviceId, {headers: {Authorization: 'Bearer ' + accessToken}});
       dispatch(deleted());
       return dispatch(trackerDeletedSuccess(res.data));
     }

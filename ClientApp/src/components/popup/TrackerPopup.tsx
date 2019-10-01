@@ -3,24 +3,24 @@ import { Modal, Button } from "react-bootstrap";
 import { connect } from 'react-redux';
 import * as actionCreator from '../../actions/actions';
 import { Dispatch } from 'redux';
+import {Device} from '../../class/Device'
 
 interface State { 
     deviceEui  : string;
     deviceDescription : string;
-    
 }
 
 interface Props {
-    userId : string,
+    token : any,
     show: boolean,
     hide() : void,
-    saveTracker(p : any) : void;
+    saveTracker(token : any, p : Device) : void;
 }
 
 class TrackerPopup extends React.Component<Props, State>{
-    constructor(props: any) {
-        super(props)
-    }
+    // constructor(props: any) {
+    //     super(props)
+    // }
 
     handleChange = (e:any) => {
         this.setState({
@@ -30,7 +30,9 @@ class TrackerPopup extends React.Component<Props, State>{
 
     handleSaveDevice = (e:any) =>{
         e.preventDefault(); 
-        this.props.saveTracker(this.state);
+        var newDevice : Device = ({deviceId : 0, deviceEUI : this.state.deviceEui, deviceDescription : this.state.deviceDescription});
+        console.log(newDevice);
+        this.props.saveTracker(this.props.token, newDevice);
         this.props.hide();
     }
 
@@ -54,10 +56,10 @@ class TrackerPopup extends React.Component<Props, State>{
                                         <input id="deviceDescription" type="text" className="form-control" placeholder="Description" required onChange={this.handleChange}></input>
                                     </div>
 
-                                    <div className="form-label-group">
+                                    {/* <div className="form-label-group">
                                         <label>User ID</label>
-                                        <input id="userPassword" type="text" className="form-control" placeholder="userId" disabled value={this.props.userId}></input>
-                                    </div>
+                                        <input id="userPassword" type="text" className="form-control" placeholder="userId" disabled value={this.props.user}></input>
+                                    </div> */}
 
                                 </form>
                             </Modal.Body>
@@ -86,7 +88,7 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
         //we add this function to our props
-        saveTracker: (p:any) => dispatch<any>(actionCreator.default.tracker.saveNewTracker(p))
+        saveTracker: (token: any, device:any) => dispatch<any>(actionCreator.default.tracker.saveNewTracker(token, device))
     }
 }
 

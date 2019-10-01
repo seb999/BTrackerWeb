@@ -11,7 +11,7 @@ import { Device } from '../class/Device';
 
 interface AppFnProps {
     getTrackerList(token : any): void;
-    deleteTracker(p :number) : void;
+    deleteTracker(token : any, p :number) : void;
   }
   
 interface AppObjectProps {
@@ -71,7 +71,8 @@ class Tracker extends React.Component<Props, State>{
     }
 
     handleConfirmDelete = (deleteTracker:boolean) =>{
-        if(deleteTracker) this.props.deleteTracker(this.state.deviceId)
+        console.log(this.state.deviceId);
+        if(deleteTracker) this.props.deleteTracker(this.state.token, this.state.deviceId)
         this.setState({ showConfirmPopup: false });
     }
 
@@ -82,7 +83,7 @@ class Tracker extends React.Component<Props, State>{
                 <td>{item.deviceEUI}</td>
                 <td>{item.deviceDescription}</td>
                 <td>{item.userId}</td>
-                <td><button className="btn my-2" onClick={() => this.handleDeleteTracker(item.deviceId)}><span style={{color:"red"}}><i className="fas fa-times-circle"></i></span></button></td>
+                <td><button className="btn my-2" onClick={() => this.handleDeleteTracker(item.deviceId)}><span style={{color:"red"}}><i className="far fa-trash-alt"></i></span></button></td>
             </tr>
         ));
 
@@ -100,7 +101,7 @@ class Tracker extends React.Component<Props, State>{
                       
                         <br /><br />
                         <table className="table" >
-                            <thead className="thead-dark">
+                            <thead className="thead-light">
                                 <tr>
                                     <th scope="col">Device Id</th>
                                     <th scope="col">EUI</th>
@@ -114,7 +115,7 @@ class Tracker extends React.Component<Props, State>{
                             </tbody>
                         </table>
 
-                        <TrackerPopup show={this.state.showAddTracker} hide={this.handleClose}/>
+                        <TrackerPopup show={this.state.showAddTracker} hide={this.handleClose} token={this.state.token} />
 
                         <ConfirmPopup show={this.state.showConfirmPopup} hide={this.handleConfirmDelete} title="Delete tracker" content="Do you really want to delete this tracker ?"/>
                     </div>}
@@ -135,7 +136,7 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
         getTrackerList: (token : any) => dispatch<any>(actionCreator.default.tracker.trackerList(token)),
-        deleteTracker: (deviceId : number) => dispatch<any>(actionCreator.default.tracker.deleteTracker(deviceId))
+        deleteTracker: (token: any, deviceId : number) => dispatch<any>(actionCreator.default.tracker.deleteTracker(token, deviceId)),
     }
 }
 

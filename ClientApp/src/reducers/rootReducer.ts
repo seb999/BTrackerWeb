@@ -22,10 +22,14 @@ const rootReducer = (state = initState, action: any) => {
       return newState;
 
     case "GPS_POSITION_HIDE":
-      var indexPosition = newState.gpsPositionList.findIndex(p => p.gpsPositionId == action.payload);
+      var indexPosition = newState.gpsPositionList.findIndex(p => p.gpsPositionId === action.payload);
       newState.gpsPositionList[indexPosition].display = !newState.gpsPositionList[indexPosition].display;
       newState.gpsPositionList = newState.gpsPositionList.slice(0, newState.gpsPositionList.length);
       return newState;
+
+    case "GPS_DELETE_DATA":
+        newState.isSaved = true;
+        return newState;
 
     case "TRACKER_LIST":
       newState.deviceList = action.payload

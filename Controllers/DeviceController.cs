@@ -57,10 +57,11 @@ namespace BTrackerWeb.Controllers
 
         ///Save a new device
         [HttpPost]
+        [Authorize]
         [Route("/api/[controller]/[Action]")]
         public List<Device> SaveDevice([FromBody] Device device)
         {
-            device.UserId = User.Claims.FirstOrDefault().Value;
+            device.UserId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
             DbContext.Add(device);
             DbContext.SaveChanges();
             return GetDeviceList();

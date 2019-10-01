@@ -24,9 +24,9 @@ interface State {
 }
 
 class Home extends React.Component<Props, State>{
-  constructor(props: any) {
-    super(props);
-  }
+  // constructor(props: any) {
+  //   super(props);
+  // }
 
   async componentDidMount() {
     try {
@@ -40,9 +40,6 @@ class Home extends React.Component<Props, State>{
   render() {
     return (
       <div style={{marginRight:"0"}}>
-
-
-
         <section className="py-5 parallax-background " style={{height:600}}>
           <div className="container">
             <h1 className="display-4" style={{ zIndex: 110, marginTop: 30, color: "gray" }} >IOT simless solution</h1>
@@ -51,11 +48,8 @@ class Home extends React.Component<Props, State>{
             <img src={trackerDownImg} className="col-2 img-thumbnail" style={{ marginTop:100, padding:2, marginLeft:30 }} />
           </div>
         </section>
-
       </div>
-
     );
-
   }
 }
 
@@ -67,7 +61,6 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    //getSymbolList: (p: string) => dispatch<any>(binanceActionCreator.binanceActions.GetSymbolList(p)),
     getLocalUserId: (p: any) => dispatch<any>(actions.default.account.checkLocalUserId(p)),
   }
 }

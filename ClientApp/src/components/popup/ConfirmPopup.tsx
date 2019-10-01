@@ -12,9 +12,9 @@ interface Props {
 }
 
 class ConfirmPopup extends React.Component<Props, State>{
-    constructor(props: any) {
-        super(props)
-    }
+    // constructor(props: any) {
+    //     super(props)
+    // }
 
     render() {
         return (

@@ -78,6 +78,17 @@ namespace BTrackerWeb.Controllers
             return "Saved";
         }
 
+        [HttpGet]
+        [Authorize]
+        [Route("/api/[controller]/deleteData/{id}")]
+        public string DeleteData(int id)
+        {
+            GpsPosition gpsItem = DbContext.GpsPosition.Where(p=>p.GpsPositionId == id).Select(p=>p).FirstOrDefault();
+            DbContext.Remove(gpsItem);
+            DbContext.SaveChanges();
+            return "Deleted";
+        }
+
          ///Check if sensor is moving for APP
         /// usage example : host/api/Loc/IsSensorMoving/deviceEUI/2016-12-01T00:00:00
         [HttpGet]

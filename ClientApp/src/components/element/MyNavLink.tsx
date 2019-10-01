@@ -9,9 +9,9 @@ export interface Props {
 }
 
 class MyNavLink extends React.Component<Props> {
-    constructor(props :any){
-        super(props);
-    }
+    // constructor(props :any){
+    //     super(props);
+    // }
 
     render() {
         return (

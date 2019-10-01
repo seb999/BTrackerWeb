@@ -19,6 +19,7 @@ interface AppFnProps {
   getGpsPosition(token: any, deviceId: number, maxData: number): void;
   getTrackerList(token: any): void;
   hideShowGpsPosition(position: any): void;
+  deleteGpsData(token: any, id: any): void;
 }
 
 interface AppObjectProps {
@@ -70,7 +71,7 @@ class Map extends React.Component<Props, State>{
   }
 
   componentDidUpdate(nextProps: any) {
-    if (this.props != nextProps) {
+    if (this.props !== nextProps) {
       this.ClearMap();
       this.setupMap();
     }
@@ -85,19 +86,20 @@ class Map extends React.Component<Props, State>{
       target: 'map',
       layers: [baseMapLayer],
       view: new ol.View({
-        center: this.props.gpsPositionList.length == 0 ? proj.fromLonLat([-1.5, 54]) : proj.fromLonLat([this.props.gpsPositionList[0].gpsPositionLongitude, this.props.gpsPositionList[0].gpsPositionLatitude]),
+        center: this.props.gpsPositionList.length === 0 ? proj.fromLonLat([-1.5, 54]) : proj.fromLonLat([this.props.gpsPositionList[0].gpsPositionLongitude, this.props.gpsPositionList[0].gpsPositionLatitude]),
         zoom: 16
       })
     });
   }
 
   setupMap = () => {
-    if (this.map == undefined) return;
+    if (this.map === undefined) return;
     //Array with all waypoint
     var navigationWayPoint = [] as any;
     //Build way point list  
     this.props.gpsPositionList.map(item => {
       if (!item.display) return;
+      if (item.gpsPositionLatitude===0) return;
       //Adding a marker on the map
       var marker = new ol.Feature({
         geometry: new geom.Point(
@@ -127,7 +129,7 @@ class Map extends React.Component<Props, State>{
   }
 
   ClearMap = () => {
-    if (this.vectorSource == undefined) return;
+    if (this.vectorSource === undefined) return;
     this.vectorSource.clear();
     this.map.removeLayer(this.markerVectorLayer);
   }
@@ -147,7 +149,7 @@ class Map extends React.Component<Props, State>{
   }
 
   handleShowHideSpot = (p: any) => {
-    if (p == null) {
+    if (p === null) {
       this.props.gpsPositionList.map(item => {
         this.props.hideShowGpsPosition(item);
       })
@@ -155,17 +157,30 @@ class Map extends React.Component<Props, State>{
     else { 
       this.props.hideShowGpsPosition(p); 
     }
+  }
 
+  async handleDeleteGpsData(item: any)  {
+    if(item!=null){
+      await this.props.deleteGpsData(this.state.token, item.gpsPositionId);
+      await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
+      //this.props.gpsPositionList = this.props.gpsPositionList.slice(this.props.gpsPositionList.indexOf(item),1);
+    }
   }
 
   render() {
     let displayList = this.props.gpsPositionList.map((item, index) => (
       <tr key={index}>
+        <td><button className="btn my-2" onClick={() => this.handleDeleteGpsData(item)}><span style={{color:"red"}}><i className="far fa-trash-alt"></i></span></button></td>
         <td>{item.gpsPositionDate}</td>
-        <td>{item.gpsPositionLongitude}</td>
-        <td>{item.gpsPositionLatitude}</td>
+        <td>{item.gpsPositionLongitude===0 ? "--" : item.gpsPositionLongitude}</td>
+        <td>{item.gpsPositionLatitude===0 ? "--" : item.gpsPositionLatitude}</td>
         <td>{item.device.deviceDescription}</td>
-        <td><button className="btn" onClick={() => this.handleShowHideSpot(item)}>{item.display ? <span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span> : <span style={{ color: "gray" }}><i className="fas fa-map-marker-alt"></i></span>}</button></td>
+        {item.gpsPositionLatitude!==0 ? 
+         <td><button className="btn" onClick={() => this.handleShowHideSpot(item)}>{item.display ? <span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span> : <span style={{ color: "gray" }}><i className="fas fa-map-marker-alt"></i></span>}</button></td>
+        :
+        <td> <span style={{ color: "gold" }}><i className="fas fa-bell"></i></span></td>
+        }
+        
       </tr>
     ));
 
@@ -184,14 +199,14 @@ class Map extends React.Component<Props, State>{
             <div className="row float-none">
               <div className="col-md-6">
                 <table className="table" >
-                  <thead className="thead-dark">
+                  <thead className="thead-light">
                     <tr>
+                      <th scope="col"></th>
                       <th scope="col">Date</th>
                       <th scope="col">Longitude</th>
                       <th scope="col">Latitude</th>
                       <th scope="col">Tracker</th>
                       <th scope="col"><button className="btn" onClick={() => this.handleShowHideSpot(null)}><span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span></button></th>
-
                     </tr>
                   </thead>
                   <tbody>
@@ -222,6 +237,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
     getTrackerList: (token: any) => dispatch<any>(actions.default.tracker.lookupList(token)),
     getGpsPosition: (token: any, deviceId: any, maxData: any) => dispatch<any>(actions.default.gps.getGpsDataList(token, deviceId, maxData)),
     hideShowGpsPosition: (position: any) => dispatch<any>(actions.default.gps.hideShowGpsPosition(position)),
+    deleteGpsData: (token: any, id: any) => dispatch<any>(actions.default.gps.deleteGpsData(token, id)),
   }
 }
 
