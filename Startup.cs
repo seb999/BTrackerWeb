@@ -26,12 +26,13 @@ namespace BTrackerWeb
         {
             services.AddCors(options =>
             {
+                
                 // The CORS policy is open for testing purposes. In a production application, you should restrict it to known origins.
                 options.AddPolicy(
                     "AllowAll",
                     builder => builder.AllowAnyOrigin()
                                       .AllowAnyMethod()
-                                      .AllowAnyHeader());
+                                      .AllowAnyHeader().AllowCredentials().WithHeaders("http://localhost:5222"));
             });
 
             services.AddAuthentication(options =>

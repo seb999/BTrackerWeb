@@ -53,7 +53,8 @@ class Map extends React.Component<Props, State>{
       gpsMaxList: [{ id: 1, value: '10' }, { id: 2, value: "25" }, { id: 3, value: "50" }, { id: 4, value: "100" }],
       gpsMaxSelected: { id: 1, value: '10' },
       deviceSelected: { id: 0, value: "Filter device" },
-      loraMessageEndpoint: "http://127.0.0.1:4001",
+      //loraMessageEndpoint: "http://127.0.0.1:4001",
+      loraMessageEndpoint: "http://dspx.eu/MQTT",
       payloadDeviceId: 0
     };
   };
@@ -86,11 +87,21 @@ class Map extends React.Component<Props, State>{
   }
 
   initLoraListener = () => {
-    const socket = socketIOClient(this.state.loraMessageEndpoint, this.state.payloadDeviceId);
-    socket.on("FromLoraTracker", (data:any)=> this.setState({ payloadDeviceId: data }));
+    const socket = socketIOClient(this.state.loraMessageEndpoint, this.state.payloadDeviceId,);
+    socket.on("FromLoraTracker", (data: any) => {
+      this.setState({ payloadDeviceId: data });
+      setTimeout(() => {
+        this.setState({ payloadDeviceId: 0 });
+        this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
+      }, 5000);
+    }
+
+    );
   }
 
   initMap = () => {
+    //We remove alert plot (no latitude, no longitude)
+    let initGpsList = this.props.gpsPositionList.filter(item => item.gpsPositionLatitude !== 0)
     //We build the map
     let baseMapLayer = new layer.Tile({
       source: new source.OSM()
@@ -99,7 +110,7 @@ class Map extends React.Component<Props, State>{
       target: 'map',
       layers: [baseMapLayer],
       view: new ol.View({
-        center: this.props.gpsPositionList.length === 0 ? proj.fromLonLat([-1.5, 54]) : proj.fromLonLat([this.props.gpsPositionList[0].gpsPositionLongitude, this.props.gpsPositionList[0].gpsPositionLatitude]),
+        center: this.props.gpsPositionList.length === 0 ? proj.fromLonLat([-1.5, 54]) : proj.fromLonLat([initGpsList[0].gpsPositionLongitude, initGpsList[0].gpsPositionLatitude]),
         zoom: 16
       })
     });
@@ -112,7 +123,7 @@ class Map extends React.Component<Props, State>{
     //Build way point list  
     this.props.gpsPositionList.map(item => {
       if (!item.display) return;
-      if (item.gpsPositionLatitude===0) return;
+      if (item.gpsPositionLatitude === 0) return;
       //Adding a marker on the map
       var marker = new ol.Feature({
         geometry: new geom.Point(
@@ -167,13 +178,13 @@ class Map extends React.Component<Props, State>{
         this.props.hideShowGpsPosition(item);
       })
     }
-    else { 
-      this.props.hideShowGpsPosition(p); 
+    else {
+      this.props.hideShowGpsPosition(p);
     }
   }
 
-  async handleDeleteGpsData(item: any)  {
-    if(item!=null){
+  async handleDeleteGpsData(item: any) {
+    if (item != null) {
       await this.props.deleteGpsData(this.state.token, item.gpsPositionId);
       await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
       //this.props.gpsPositionList = this.props.gpsPositionList.slice(this.props.gpsPositionList.indexOf(item),1);
@@ -183,17 +194,17 @@ class Map extends React.Component<Props, State>{
   render() {
     let displayList = this.props.gpsPositionList.map((item, index) => (
       <tr key={index}>
-        <td><button className="btn my-2" onClick={() => this.handleDeleteGpsData(item)}><span style={{color:"red"}}><i className="far fa-trash-alt"></i></span></button></td>
+        <td><button className="btn my-2" onClick={() => this.handleDeleteGpsData(item)}><span style={{ color: "red" }}><i className="far fa-trash-alt"></i></span></button></td>
         <td>{item.gpsPositionDate}</td>
-        <td>{item.gpsPositionLongitude===0 ? "--" : item.gpsPositionLongitude}</td>
-        <td>{item.gpsPositionLatitude===0 ? "--" : item.gpsPositionLatitude}</td>
+        <td>{item.gpsPositionLongitude === 0 ? "--" : item.gpsPositionLongitude}</td>
+        <td>{item.gpsPositionLatitude === 0 ? "--" : item.gpsPositionLatitude}</td>
         <td>{item.device.deviceDescription}</td>
-        {item.gpsPositionLatitude!==0 ? 
-         <td><button className="btn" onClick={() => this.handleShowHideSpot(item)}>{item.display ? <span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span> : <span style={{ color: "gray" }}><i className="fas fa-map-marker-alt"></i></span>}</button></td>
-        :
-        <td> <span style={{ color: "gold" }}><i className="fas fa-bell"></i></span></td>
+        {item.gpsPositionLatitude !== 0 ?
+          <td><button className="btn" onClick={() => this.handleShowHideSpot(item)}>{item.display ? <span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span> : <span style={{ color: "gray" }}><i className="fas fa-map-marker-alt"></i></span>}</button></td>
+          :
+          <td> <button className="btn" ><span style={{ color: "gold" }}><i className="fas fa-bell"></i></span></button></td>
         }
-        
+
       </tr>
     ));
 
@@ -207,6 +218,9 @@ class Map extends React.Component<Props, State>{
               <div className="float-left mr-1"><DropDown lookupList={this.props.deviceList} onClick={this.handleChangeDevice} selectedItem={this.state.deviceSelected}></DropDown> </div>
 
               <div className="float-left"> <DropDown lookupList={this.state.gpsMaxList} onClick={this.handleChangeMaxGps} selectedItem={this.state.gpsMaxSelected}></DropDown></div>
+
+              {this.state.payloadDeviceId !== 0 && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Alert Tracker {this.state.payloadDeviceId}</div>}
+
               <div style={{ clear: "both" }}></div>
             </div>
             <div className="row float-none">
