@@ -53,8 +53,7 @@ class Map extends React.Component<Props, State>{
       gpsMaxList: [{ id: 1, value: '10' }, { id: 2, value: "25" }, { id: 3, value: "50" }, { id: 4, value: "100" }],
       gpsMaxSelected: { id: 1, value: '10' },
       deviceSelected: { id: 0, value: "Filter device" },
-      //loraMessageEndpoint: "http://127.0.0.1:4001",
-      loraMessageEndpoint: "http://dspx.eu/MQTT",
+      loraMessageEndpoint: "http://localhost:4001",
       payloadDeviceId: 0
     };
   };

@@ -32,7 +32,7 @@ namespace BTrackerWeb
                     "AllowAll",
                     builder => builder.AllowAnyOrigin()
                                       .AllowAnyMethod()
-                                      .AllowAnyHeader().AllowCredentials().WithHeaders("http://localhost:5222"));
+                                      .AllowAnyHeader());
             });
 
             services.AddAuthentication(options =>

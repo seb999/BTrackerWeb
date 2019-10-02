@@ -11,7 +11,7 @@ class Footer extends React.Component {
         return (
             <footer className="page-footer footer">
                 <div>
-                    <div className="float-left"><h4 className="brand">BTracker 3.0</h4></div>
+                    <div className="float-left"><h4 className="brand">BTracker 3.1</h4></div>
                     <div className="container">
                     <img src={awsImg} className="brand" />
                         <img src={oktaImg} style={{ height: 40 }} />
