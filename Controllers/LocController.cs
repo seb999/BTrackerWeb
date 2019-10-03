@@ -61,19 +61,26 @@ namespace BTrackerWeb.Controllers
 
             //TheThingNetwork send the EUI in the pay_load data
             //EUI is the link between Lora chip and User
-            GpsPosition GpsData = new GpsPosition()
-            {
-                DeviceId = DbContext.Device.Where(p => p.DeviceEUI == loraData.Hardware_serial).Select(p => p.DeviceId).FirstOrDefault(),
-                GpsPositionLatitude = DegreeToDecimal(loraData.Payload_fields.Latitude, loraData.Payload_fields.LatitudeDecimal),
-                GpsPositionLongitude = DegreeToDecimal(loraData.Payload_fields.Longitude, loraData.Payload_fields.LongitudeDecimal),
-                //GpsPositionDate = loraData.Metadata.Time, //the lora shield give GMT time not GMT+2
-                GpsPositionDate = DateTime.Now,
+            GpsPosition gpsData = new GpsPosition();
 
-                //For debugging
-                GpsPositionLatitudeRaw = string.Format("{0}.{1}", loraData.Payload_fields.Latitude, loraData.Payload_fields.LatitudeDecimal),
-                GpsPositionLongitudeRaw = string.Format("{0}.{1}", loraData.Payload_fields.Longitude, loraData.Payload_fields.LongitudeDecimal)
-            };
-            DbContext.Add(GpsData);
+            gpsData.DeviceId = DbContext.Device.Where(p => p.DeviceEUI == loraData.Hardware_serial).Select(p => p.DeviceId).FirstOrDefault();
+            //GpsPositionDate = loraData.Metadata.Time, //the lora shield give GMT time not GMT+2
+            gpsData.GpsPositionDate = DateTime.Now;
+            gpsData.GpsPositionLatitudeRaw = string.Format("{0}.{1}", loraData.Payload_fields.Latitude, loraData.Payload_fields.LatitudeDecimal);
+            gpsData.GpsPositionLongitudeRaw = string.Format("{0}.{1}", loraData.Payload_fields.Longitude, loraData.Payload_fields.LongitudeDecimal);
+
+            if (loraData.Payload_fields.Latitude != 0 && loraData.Payload_fields.Longitude != 0)
+            {
+                gpsData.GspPositionGateway = false;
+                gpsData.GpsPositionLatitude = DegreeToDecimal(loraData.Payload_fields.Latitude, loraData.Payload_fields.LatitudeDecimal);
+                gpsData.GpsPositionLongitude = DegreeToDecimal(loraData.Payload_fields.Longitude, loraData.Payload_fields.LongitudeDecimal);
+            }
+            else
+            {
+                gpsData.GspPositionGateway = true;
+                //add here gateway gps data 
+            }
+            DbContext.Add(gpsData);
             DbContext.SaveChanges();
             return "Saved";
         }
@@ -83,13 +90,13 @@ namespace BTrackerWeb.Controllers
         [Route("/api/[controller]/deleteData/{id}")]
         public string DeleteData(int id)
         {
-            GpsPosition gpsItem = DbContext.GpsPosition.Where(p=>p.GpsPositionId == id).Select(p=>p).FirstOrDefault();
+            GpsPosition gpsItem = DbContext.GpsPosition.Where(p => p.GpsPositionId == id).Select(p => p).FirstOrDefault();
             DbContext.Remove(gpsItem);
             DbContext.SaveChanges();
             return "Deleted";
         }
 
-         ///Check if sensor is moving for APP
+        ///Check if sensor is moving for APP
         /// usage example : host/api/Loc/IsSensorMoving/deviceEUI/2016-12-01T00:00:00
         [HttpGet]
         [Route("/api/[controller]/GetMotion/{deviceEUI}/{fromThisDate}")]

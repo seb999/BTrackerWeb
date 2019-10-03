@@ -11,9 +11,9 @@ namespace BTrackerWeb.EF
         public decimal GpsPositionSpeed { get; set; }
         public decimal GpsPositionHeading { get; set; }
         public DateTime GpsPositionDate { get; set; }
-
         public string GpsPositionLatitudeRaw { get; set; }
         public string GpsPositionLongitudeRaw { get; set; }
+        public Boolean GspPositionGateway {get; set;}
 
         public Device Device { get; set; }
     }
