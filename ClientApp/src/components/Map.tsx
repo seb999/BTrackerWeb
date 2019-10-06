@@ -91,6 +91,7 @@ class Map extends React.Component<Props, State>{
   initLoraListener = () => {
     const socket = socketIOClient(this.state.loraMessageEndpoint, this.state.payloadDeviceId);
     socket.on("FromLoraTracker", (data: any) => {
+
       this.setState({ payloadDeviceId: data });
       setTimeout(() => {
         this.setState({ payloadDeviceId: 0 });
@@ -135,7 +136,7 @@ class Map extends React.Component<Props, State>{
         image: new style.Icon(({
           color: '#ffcd46',
           crossOrigin: 'anonymous',
-          src: require("./../images/marker.png"),
+          src: item.gpsPositionIsGateway ? require("./../images/Tower.png") : require("./../images/Tower.png"),
         }))
       }));
       navigationWayPoint.push(marker);
@@ -205,7 +206,7 @@ class Map extends React.Component<Props, State>{
         {!item.gpsPositionIsGateway ?
           <td><button className="btn" onClick={() => this.handleShowHideSpot(item)}>{item.display ? <span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span> : <span style={{ color: "gray" }}><i className="fas fa-map-marker-alt"></i></span>}</button></td>
           :
-          <td> <button className="btn" ><span style={{ color: "orange" }}><i className="fas fa-broadcast-tower"></i></span></button></td>
+          <td><button className="btn" onClick={() => this.handleShowHideSpot(item)}>{item.display ? <span style={{ color: "orange" }}><i className="fas fa-broadcast-tower"></i></span> : <span style={{ color: "gray" }}><i className="fas fa-broadcast-tower"></i></span>}</button></td>
         }
       </tr>
     ));
