@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import * as actions from '../actions/actions';
 import { withAuth } from '@okta/okta-react';
 import DropDown from './element/DropDown';
+import * as moment from 'moment';
+
 
 import * as ol from 'ol';
 import * as proj from 'ol/proj';
@@ -191,23 +193,27 @@ class Map extends React.Component<Props, State>{
   }
 
   render() {
+
+
     let displayList = this.props.gpsPositionList.map((item, index) => (
       <tr key={index}>
         <td><button className="btn my-2" onClick={() => this.handleDeleteGpsData(item)}><span style={{ color: "red" }}><i className="far fa-trash-alt"></i></span></button></td>
-        <td>{item.gpsPositionDate}</td>
-        <td>{item.gpsPositionLongitude === 0 ? "--" : item.gpsPositionLongitude}</td>
-        <td>{item.gpsPositionLatitude === 0 ? "--" : item.gpsPositionLatitude}</td>
+        <td>{moment.utc(item.gpsPositionDate).format('YYYY-MM-DD HH:MM')}</td>
+        <td>{item.gpsPositionLongitude}</td>
+        <td>{item.gpsPositionLatitude}</td>
         <td>{item.device.deviceDescription}</td>
-        {item.gpsPositionLatitude !== 0 ?
+        {!item.gpsPositionIsGateway ?
           <td><button className="btn" onClick={() => this.handleShowHideSpot(item)}>{item.display ? <span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span> : <span style={{ color: "gray" }}><i className="fas fa-map-marker-alt"></i></span>}</button></td>
           :
-          <td> <button className="btn" ><span style={{ color: "gold" }}><i className="fas fa-bell"></i></span></button></td>
+          <td> <button className="btn" ><span style={{ color: "orange" }}><i className="fas fa-broadcast-tower"></i></span></button></td>
         }
       </tr>
     ));
 
     return (
+
       <div>
+
         {!this.state.token ? <div></div> :
           <div>
             <br ></br>

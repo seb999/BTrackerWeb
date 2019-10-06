@@ -6,8 +6,10 @@ const initState = {
   deviceList: new Array<Device>(),
   lookupList: new Array<LookupItem>(),
   gpsPositionList: new Array<GpsPosition>(),
-  isSaved: false,
-  isDeleted: false,
+  isGpsDeleted: false,
+  isTrackerSaved: false,
+  isTrackerDeleted: false,
+  isTrackerUpdated: false,
 }
 
 const rootReducer = (state = initState, action: any) => {
@@ -28,8 +30,8 @@ const rootReducer = (state = initState, action: any) => {
       return newState;
 
     case "GPS_DELETE_DATA":
-        newState.isSaved = true;
-        return newState;
+      newState.isGpsDeleted = true;
+      return newState;
 
     case "TRACKER_LIST":
       newState.deviceList = action.payload
@@ -40,28 +42,32 @@ const rootReducer = (state = initState, action: any) => {
       return newState;
 
     case "TRACKER_SAVED":
+      newState.isTrackerSaved = true;
       newState.deviceList = action.payload
       return newState;
 
-    case "SAVING":
-      newState.isSaved = true;
-      return newState;
-
-    case "SAVED":
-      newState.isSaved = false;
+    case "TRACKER_HIDE_SAVED_LABEL":
+      newState.isTrackerSaved = false;
       return newState;
 
     case "TRACKER_DELETED":
+      newState.isTrackerDeleted = true;
       newState.deviceList = action.payload
       return newState;
 
-    case "DELETING":
-      newState.isDeleted = true;
+    case "TRACKER_HIDE_DELETED_LABEL":
+      newState.isTrackerDeleted = false;
       return newState;
 
-    case "DELETED":
-      newState.isDeleted = false;
+    case "TRACKER_UPDATED":
+      newState.isTrackerUpdated = true;
+      newState.deviceList = action.payload
       return newState;
+
+    case "TRACKER_HIDE_UPDATED_LABEL":
+      newState.isTrackerUpdated = false;
+      return newState;
+
     default:
       return state;
   }

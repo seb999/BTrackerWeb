@@ -51,23 +51,32 @@ namespace BTrackerWeb.Controllers
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
             if (userId == null) return new List<Device>();
-
             return DbContext.Device.Where(p => p.UserId == userId).Select(p => p).OrderByDescending(p => p.DeviceId).ToList();
         }
 
-        ///Save a new device
         [HttpPost]
         [Authorize]
         [Route("/api/[controller]/[Action]")]
         public List<Device> SaveDevice([FromBody] Device device)
         {
             device.UserId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
+            device.DateAdded = DateTime.Now;
             DbContext.Add(device);
             DbContext.SaveChanges();
             return GetDeviceList();
         }
 
-        ///delete a new device
+        [HttpPost]
+        [Authorize]
+        [Route("/api/[controller]/[Action]")]
+        public List<Device> UpdateDevice([FromBody] Device device)
+        {
+            Device myDevice = DbContext.Device.Where(p=>p.DeviceId == device.DeviceId).Select(p => p).FirstOrDefault();
+            myDevice.DeviceDescription = device.DeviceDescription;
+            DbContext.SaveChanges();
+            return GetDeviceList();
+        }
+
         [HttpGet]
         [Authorize]
         [Route("/api/[controller]/[Action]/{deviceId}")]

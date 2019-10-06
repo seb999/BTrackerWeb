@@ -31,10 +31,8 @@ namespace BTrackerWeb.Controllers
         public List<GpsPosition> GetGpsData(int deviceId, int count)
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            if (userId == null)
-            {
-                return new List<GpsPosition>();
-            }
+            if (userId == null) return new List<GpsPosition>();
+            if(count==0) count = 100;
 
             if (deviceId == 0)
             {
@@ -57,7 +55,7 @@ namespace BTrackerWeb.Controllers
         [Route("/api/[controller]/SaveData")]
         public string SaveData([FromBody]JObject rawPayLoad)
         {
-            RawPayLoad loraData = JsonConvert.DeserializeObject<RawPayLoad>(rawPayLoad.ToString());
+            PayLoad loraData = JsonConvert.DeserializeObject<PayLoad>(rawPayLoad.ToString());
 
             //TheThingNetwork send the EUI in the pay_load data
             //EUI is the link between Lora chip and User
@@ -66,19 +64,21 @@ namespace BTrackerWeb.Controllers
             gpsData.DeviceId = DbContext.Device.Where(p => p.DeviceEUI == loraData.Hardware_serial).Select(p => p.DeviceId).FirstOrDefault();
             //GpsPositionDate = loraData.Metadata.Time, //the lora shield give GMT time not GMT+2
             gpsData.GpsPositionDate = DateTime.Now;
-            gpsData.GpsPositionLatitudeRaw = string.Format("{0}.{1}", loraData.Payload_fields.Latitude, loraData.Payload_fields.LatitudeDecimal);
-            gpsData.GpsPositionLongitudeRaw = string.Format("{0}.{1}", loraData.Payload_fields.Longitude, loraData.Payload_fields.LongitudeDecimal);
+            
 
             if (loraData.Payload_fields.Latitude != 0 && loraData.Payload_fields.Longitude != 0)
             {
-                gpsData.GspPositionGateway = false;
+                gpsData.GpsPositionIsGateway = false;
                 gpsData.GpsPositionLatitude = DegreeToDecimal(loraData.Payload_fields.Latitude, loraData.Payload_fields.LatitudeDecimal);
                 gpsData.GpsPositionLongitude = DegreeToDecimal(loraData.Payload_fields.Longitude, loraData.Payload_fields.LongitudeDecimal);
+                gpsData.GpsPositionLatitudeRaw = string.Format("{0}.{1}", loraData.Payload_fields.Latitude, loraData.Payload_fields.LatitudeDecimal);
+                gpsData.GpsPositionLongitudeRaw = string.Format("{0}.{1}", loraData.Payload_fields.Longitude, loraData.Payload_fields.LongitudeDecimal);
             }
             else
             {
-                gpsData.GspPositionGateway = true;
-                //add here gateway gps data 
+                gpsData.GpsPositionIsGateway = true;
+                gpsData.GpsPositionLatitude = loraData.Metadata.Gateways.FirstOrDefault().Latitude;
+                gpsData.GpsPositionLongitude = loraData.Metadata.Gateways.FirstOrDefault().Longitude;
             }
             DbContext.Add(gpsData);
             DbContext.SaveChanges();
@@ -88,30 +88,11 @@ namespace BTrackerWeb.Controllers
         [HttpGet]
         [Authorize]
         [Route("/api/[controller]/deleteData/{id}")]
-        public string DeleteData(int id)
+        public void DeleteData(int id)
         {
             GpsPosition gpsItem = DbContext.GpsPosition.Where(p => p.GpsPositionId == id).Select(p => p).FirstOrDefault();
             DbContext.Remove(gpsItem);
             DbContext.SaveChanges();
-            return "Deleted";
-        }
-
-        ///Check if sensor is moving for APP
-        /// usage example : host/api/Loc/IsSensorMoving/deviceEUI/2016-12-01T00:00:00
-        [HttpGet]
-        [Route("/api/[controller]/GetMotion/{deviceEUI}/{fromThisDate}")]
-        public bool GetMotion(string deviceEUI, DateTime fromThisDate)
-        {
-            Boolean result;
-            if (DbContext.Device.Where(p => p.DeviceEUI == deviceEUI).FirstOrDefault() == null)
-                return false;
-
-            if (DbContext.GpsPosition.Where(p => p.Device.DeviceEUI == deviceEUI && DateTime.Compare(p.GpsPositionDate, fromThisDate) > 0).Count() > 0)
-                result = true;
-            else
-                result = false;
-
-            return result;
         }
 
         #endregion

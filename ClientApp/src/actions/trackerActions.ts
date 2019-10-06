@@ -43,11 +43,10 @@ export const trackerListSuccess = (data :any) => {
 
 export const saveNewTracker = (accessToken: any, device :any) =>{
   return async (dispatch  :any) =>{
-    dispatch(saving());
     //let device = {DeviceEUI : data.deviceEui, DeviceDescription : data.deviceDescription}
     try{
       const res = await axios.post<any>(apiUrl + "SaveDevice/", device, {headers: {Authorization: 'Bearer ' + accessToken}});
-      dispatch(saved());
+      dispatch(showSavedLabel());
       return dispatch(trackerSavedSuccess(res.data));
     }
     catch (error) {
@@ -63,32 +62,25 @@ export const trackerSavedSuccess = (data :any) => {
   }
  }
 
- export const saving = () =>{
-   return {
-     type:"SAVING"
-   }
- }
-
- export const saved = () =>{
+ export const showSavedLabel = () =>{
   return async (dispatch  :any) =>{
     setTimeout(() => {
-      dispatch(savedSuccess())
+        dispatch(hideSavedLabel());
     }, 3000);
   }
 }
 
-export const savedSuccess = () =>{
+export const hideSavedLabel = () =>{
   return {
-    type:"SAVED"
+    type:"TRACKER_HIDE_SAVED_LABEL"
   }
 }
 
- export const deleteTracker = (accessToken: any, deviceId :number) =>{
+ export const deleteTracker = (accessToken: any, deviceId? :number) =>{
   return async (dispatch  :any) =>{
-    dispatch(deleting());
     try{
       const res = await axios.get<any>(apiUrl + "DeleteDevice/" + deviceId, {headers: {Authorization: 'Bearer ' + accessToken}});
-      dispatch(deleted());
+      dispatch(showDeletedLabel());
       return dispatch(trackerDeletedSuccess(res.data));
     }
     catch (error) {
@@ -104,22 +96,51 @@ export const trackerDeletedSuccess = (data :any) => {
   }
  }
 
- export const deleting = () =>{
-  return {
-    type:"DELETING"
-  }
-}
-
-export const deleted = () =>{
+export const showDeletedLabel = () =>{
  return async (dispatch  :any) =>{
    setTimeout(() => {
      dispatch(deletedSuccess())
-   }, 3000);
+   }, 5000);
  }
 }
 
 export const deletedSuccess = () =>{
  return {
-   type:"DELETED"
+   type:"TRACKER_HIDE_DELETED_LABEL"
  }
+}
+
+export const updateTracker = (accessToken: any, device :any) =>{
+  return async (dispatch  :any) =>{
+    //let device = {DeviceEUI : data.deviceEui, DeviceDescription : data.deviceDescription}
+    try{
+      const res = await axios.post<any>(apiUrl + "UpdateDevice/", device, {headers: {Authorization: 'Bearer ' + accessToken}});
+      dispatch(showUpdatedLabel());
+      return dispatch(trackerUpdatedSuccess(res.data));
+    }
+    catch (error) {
+      throw (error)
+    }
+  }
+}
+
+export const trackerUpdatedSuccess = (data :any) => {
+  return {
+    type: "TRACKER_UPDATED",
+    payload: data
+  }
+ }
+
+ export const showUpdatedLabel = () =>{
+  return async (dispatch  :any) =>{
+    setTimeout(() => {
+        dispatch(hideUpdatedLabel());
+    }, 3000);
+  }
+}
+
+export const hideUpdatedLabel = () =>{
+  return {
+    type:"TRACKER_HIDE_UPDATED_LABEL"
+  }
 }
