@@ -1,12 +1,10 @@
 import * as React from 'react';
-import ReactDOM from 'react-dom';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import * as actions from '../actions/actions';
 import { withAuth } from '@okta/okta-react';
 import DropDown from './element/DropDown';
 import * as moment from 'moment';
-
 
 import * as ol from 'ol';
 import * as proj from 'ol/proj';
@@ -16,6 +14,7 @@ import * as source from 'ol/source';
 import * as style from 'ol/style';
 import { GpsPosition } from '../class/GpsPosition';
 import { LookupItem } from '../class/LookupItem';
+import { Device } from '../class/Device';
 
 import socketIOClient from "socket.io-client";
 
@@ -23,6 +22,7 @@ import socketIOClient from "socket.io-client";
 interface AppFnProps {
   getGpsPosition(token: any, deviceId: number, maxData: number): void;
   getTrackerList(token: any): void;
+  getTrackerLookupList(token: any): void;
   hideShowGpsPosition(position: any): void;
   deleteGpsData(token: any, id: any): void;
 }
@@ -30,7 +30,8 @@ interface AppFnProps {
 interface AppObjectProps {
   auth?: any;
   gpsPositionList: Array<GpsPosition>;
-  deviceList: Array<LookupItem>;
+  lookupTrackerList: Array<LookupItem>;
+  trackerList: Array<Device>;
 }
 
 interface Props
@@ -43,7 +44,7 @@ interface State {
   gpsMaxList: Array<LookupItem>;
   gpsMaxSelected: LookupItem;
   loraMessageEndpoint: string;
-  payloadDeviceId: any;
+  alertDeviceEUI: any;
 }
 
 class Map extends React.Component<Props, State>{
@@ -57,7 +58,7 @@ class Map extends React.Component<Props, State>{
       deviceSelected: { id: 0, value: "Filter device" },
       //loraMessageEndpoint: "http://localhost:4001", //Dev
       loraMessageEndpoint: "http://dspx.eu:1884",   //Prod - port 1884 was opened to EC2 for BTrackerMQTT app
-      payloadDeviceId: 0
+      alertDeviceEUI: 0
     };
   };
 
@@ -73,6 +74,7 @@ class Map extends React.Component<Props, State>{
       if (!this.state.token) { this.props.auth.login('/') } else {
         await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
         await this.props.getTrackerList(this.state.token);
+        await this.props.getTrackerLookupList(this.state.token);
         this.initMap();
         this.setupMap();
         this.initLoraListener();
@@ -89,12 +91,12 @@ class Map extends React.Component<Props, State>{
   }
 
   initLoraListener = () => {
-    const socket = socketIOClient(this.state.loraMessageEndpoint, this.state.payloadDeviceId);
+    const socket = socketIOClient(this.state.loraMessageEndpoint, this.state.alertDeviceEUI);
     socket.on("FromLoraTracker", (data: any) => {
 
-      this.setState({ payloadDeviceId: data });
+      this.setState({ alertDeviceEUI: data });
       setTimeout(() => {
-        this.setState({ payloadDeviceId: 0 });
+        this.setState({ alertDeviceEUI: 0 });
         this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
       }, 5000);
     }
@@ -123,7 +125,7 @@ class Map extends React.Component<Props, State>{
     //Array with all waypoint
     var navigationWayPoint = [] as any;
     //Build way point list  
-    this.props.gpsPositionList.map(item => {
+    this.props.gpsPositionList.forEach(item => {
       if (!item.display) return;
       if (item.gpsPositionLatitude === 0) return;
       //Adding a marker on the map
@@ -136,7 +138,7 @@ class Map extends React.Component<Props, State>{
         image: new style.Icon(({
           color: '#ffcd46',
           crossOrigin: 'anonymous',
-          src: item.gpsPositionIsGateway ? require("./../images/Tower.png") : require("./../images/Tower.png"),
+          src: item.gpsPositionIsGateway ? require("./../images/Tower.png") : require("./../images/marker.png"),
         }))
       }));
       navigationWayPoint.push(marker);
@@ -161,6 +163,7 @@ class Map extends React.Component<Props, State>{
   }
 
   handleChangeDevice = (device: any) => {
+    console.log("change device")
     this.setState({
       deviceSelected: device,
     })
@@ -168,6 +171,7 @@ class Map extends React.Component<Props, State>{
   }
 
   handleChangeMaxGps = (lookupItem: LookupItem) => {
+    console.log("change number of point")
     this.setState({
       gpsMaxSelected: lookupItem,
     })
@@ -176,7 +180,7 @@ class Map extends React.Component<Props, State>{
 
   handleShowHideSpot = (p: any) => {
     if (p === null) {
-      this.props.gpsPositionList.map(item => {
+      this.props.gpsPositionList.forEach(item => {
         this.props.hideShowGpsPosition(item);
       })
     }
@@ -186,6 +190,7 @@ class Map extends React.Component<Props, State>{
   }
 
   async handleDeleteGpsData(item: any) {
+    console.log("delete gps point")
     if (item != null) {
       await this.props.deleteGpsData(this.state.token, item.gpsPositionId);
       await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
@@ -198,7 +203,7 @@ class Map extends React.Component<Props, State>{
 
     let displayList = this.props.gpsPositionList.map((item, index) => (
       <tr key={index}>
-        <td><button className="btn my-2" onClick={() => this.handleDeleteGpsData(item)}><span style={{ color: "red" }}><i className="far fa-trash-alt"></i></span></button></td>
+        <td><button className="btn" onClick={() => this.handleDeleteGpsData(item)}><span style={{ color: "red" }}><i className="far fa-trash-alt"></i></span></button></td>
         <td>{moment.utc(item.gpsPositionDate).format('YYYY-MM-DD HH:MM')}</td>
         <td>{item.gpsPositionLongitude}</td>
         <td>{item.gpsPositionLatitude}</td>
@@ -220,11 +225,11 @@ class Map extends React.Component<Props, State>{
             <br ></br>
             <div className="mb-1">
 
-              <div className="float-left mr-1"><DropDown lookupList={this.props.deviceList} onClick={this.handleChangeDevice} selectedItem={this.state.deviceSelected}></DropDown> </div>
+              <div className="float-left mr-1"><DropDown lookupList={this.props.lookupTrackerList} onClick={this.handleChangeDevice} selectedItem={this.state.deviceSelected}></DropDown> </div>
 
               <div className="float-left"> <DropDown lookupList={this.state.gpsMaxList} onClick={this.handleChangeMaxGps} selectedItem={this.state.gpsMaxSelected}></DropDown></div>
 
-              {this.state.payloadDeviceId !== 0 && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Alert Tracker {this.state.payloadDeviceId}</div>}
+              {this.state.alertDeviceEUI !== 0 && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Alert on tracker: {this.props.trackerList.filter(p => p.deviceEUI == this.state.alertDeviceEUI)[0].deviceDescription} (EUI : {this.state.alertDeviceEUI})</div>}
 
               <div style={{ clear: "both" }}></div>
             </div>
@@ -260,13 +265,15 @@ class Map extends React.Component<Props, State>{
 const mapStateToProps = (state: any) => {
   return {
     gpsPositionList: state.gpsPositionList,
-    deviceList: state.lookupList,
+    lookupTrackerList: state.lookupTrackerList,
+    trackerList: state.trackerList,
   }
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    getTrackerList: (token: any) => dispatch<any>(actions.default.tracker.lookupList(token)),
+    getTrackerLookupList: (token: any) => dispatch<any>(actions.default.tracker.lookupList(token)),
+    getTrackerList: (token: any) => dispatch<any>(actions.default.tracker.trackerList(token)),
     getGpsPosition: (token: any, deviceId: any, maxData: any) => dispatch<any>(actions.default.gps.getGpsDataList(token, deviceId, maxData)),
     hideShowGpsPosition: (position: any) => dispatch<any>(actions.default.gps.hideShowGpsPosition(position)),
     deleteGpsData: (token: any, id: any) => dispatch<any>(actions.default.gps.deleteGpsData(token, id)),

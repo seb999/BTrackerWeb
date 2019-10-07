@@ -16,7 +16,7 @@ interface AppFnProps {
 interface AppObjectProps {
     auth?: any;
     history?: any;
-    deviceList: Array<Device>;
+    trackerList: Array<Device>;
     isTrackerSaved: boolean;
     isTrackerDeleted: boolean;
     isTrackerUpdated: boolean;
@@ -91,7 +91,7 @@ class Tracker extends React.Component<Props, State>{
     }
 
     render() {
-        let displayList = this.props.deviceList.map((item, index) => (
+        let displayList = this.props.trackerList.map((item, index) => (
             <tr key={index}>
                 <td>{item.deviceId}</td>
                 <td>{item.deviceEUI}</td>
@@ -146,7 +146,7 @@ class Tracker extends React.Component<Props, State>{
 //map the props of this class to the root redux state
 const mapStateToProps = (state: any) => {
     return {
-        deviceList: state.deviceList,
+        trackerList: state.trackerList,
         isTrackerSaved: state.isTrackerSaved,
         isTrackerDeleted: state.isTrackerDeleted,
         isTrackerUpdated : state.isTrackerUpdated,

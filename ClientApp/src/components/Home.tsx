@@ -44,8 +44,8 @@ class Home extends React.Component<Props, State>{
           <div className="container">
             <h1 className="display-4" style={{ zIndex: 110, marginTop: 30, color: "gray" }} >IOT simless solution</h1>
             <p className="lead" style={{ color: "gray" }}>GPS tracker with motion detector that help you to protect your bike </p>
-            <img src={trackerUpImg} className="col-2 img-thumbnail" style={{ marginTop:100, padding:2 }} />
-            <img src={trackerDownImg} className="col-2 img-thumbnail" style={{ marginTop:100, padding:2, marginLeft:30 }} />
+            <img src={trackerUpImg} className="col-2 img-thumbnail" style={{ marginTop:100, padding:2 }} alt="#"/>
+            <img src={trackerDownImg} className="col-2 img-thumbnail" style={{ marginTop:100, padding:2, marginLeft:30 }} alt="#"/>
           </div>
         </section>
       </div>

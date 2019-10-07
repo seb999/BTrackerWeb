@@ -3,8 +3,8 @@ import { GpsPosition } from "../class/GpsPosition";
 import { LookupItem } from "../class/LookupItem";
 
 const initState = {
-  deviceList: new Array<Device>(),
-  lookupList: new Array<LookupItem>(),
+  trackerList: new Array<Device>(),
+  lookupTrackerList: new Array<LookupItem>(),
   gpsPositionList: new Array<GpsPosition>(),
   isGpsDeleted: false,
   isTrackerSaved: false,
@@ -18,7 +18,7 @@ const rootReducer = (state = initState, action: any) => {
 
     case "GPS_POSITION_LIST":
       newState.gpsPositionList = action.payload
-      newState.gpsPositionList.map(item => {
+      newState.gpsPositionList.forEach(item => {
         item.display = true;
       })
       return newState;
@@ -34,16 +34,16 @@ const rootReducer = (state = initState, action: any) => {
       return newState;
 
     case "TRACKER_LIST":
-      newState.deviceList = action.payload
+      newState.trackerList = action.payload
       return newState;
 
     case "TRACKER_LOOKUP_LIST":
-      newState.lookupList = action.payload
+      newState.lookupTrackerList = action.payload
       return newState;
 
     case "TRACKER_SAVED":
       newState.isTrackerSaved = true;
-      newState.deviceList = action.payload
+      newState.trackerList = action.payload
       return newState;
 
     case "TRACKER_HIDE_SAVED_LABEL":
@@ -52,7 +52,7 @@ const rootReducer = (state = initState, action: any) => {
 
     case "TRACKER_DELETED":
       newState.isTrackerDeleted = true;
-      newState.deviceList = action.payload
+      newState.trackerList = action.payload
       return newState;
 
     case "TRACKER_HIDE_DELETED_LABEL":
@@ -61,7 +61,7 @@ const rootReducer = (state = initState, action: any) => {
 
     case "TRACKER_UPDATED":
       newState.isTrackerUpdated = true;
-      newState.deviceList = action.payload
+      newState.trackerList = action.payload
       return newState;
 
     case "TRACKER_HIDE_UPDATED_LABEL":

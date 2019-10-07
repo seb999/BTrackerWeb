@@ -13,10 +13,10 @@ class Footer extends React.Component {
                 <div>
                     <div className="float-left"><h4 className="brand">BTracker 3.1</h4></div>
                     <div className="container">
-                    <img src={awsImg} className="brand" />
-                        <img src={oktaImg} style={{ height: 40 }} />
-                        <img src={networkImg} className="brand" />
-                        <img src={loraWanImg} className="brand" />
+                    <img src={awsImg} className="brand" alt="#" />
+                        <img src={oktaImg} style={{ height: 40 }} alt="#" />
+                        <img src={networkImg} className="brand" alt="#" />
+                        <img src={loraWanImg} className="brand" alt="#" />
                     </div>
                     <div className="float-right copyright">© Copyright 2019 BTracker. All Rights Reserved</div>
                 </div>

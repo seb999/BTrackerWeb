@@ -32,7 +32,7 @@ class TrackerPopup extends React.Component<Props, State>{
     }
 
     componentDidUpdate(nextProps: any) {
-        if (this.props != nextProps) {
+        if (this.props !== nextProps) {
             this.setState({
                 deviceId: this.props.device.deviceId,
                 deviceEui: this.props.device.deviceEUI,
@@ -55,7 +55,7 @@ class TrackerPopup extends React.Component<Props, State>{
             deviceDescription: this.state.deviceDescription
         });
 
-        if (this.state.deviceId == 0) {
+        if (this.state.deviceId === 0) {
             this.props.saveTracker(this.props.token, myDevice);
         }
         else {
