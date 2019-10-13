@@ -1,5 +1,5 @@
-import * as account from './userActions';
+import * as user from './userActions';
 import * as tracker from './trackerActions';
 import * as gps from './gpsActions';
  
-export default {account,tracker, gps}
+export default {user,tracker, gps}

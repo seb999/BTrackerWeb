@@ -9,7 +9,7 @@ import trackerDownImg from '../images/trackerDown.png'
 
 
 interface AppFnProps {
-  checkLocalUserId(p: any): void;
+  checkUserId(p: any): void;
 }
 
 interface AppObjectProps {
@@ -21,31 +21,48 @@ interface Props
   AppFnProps { }
 
 interface State {
+  token: any,
 }
 
 class Home extends React.Component<Props, State>{
-  // constructor(props: any) {
-  //   super(props);
-  // }
+  constructor(props: any) {
+    super(props);
+
+    this.state = {
+      token: null
+    }
+  }
 
   async componentDidMount() {
     try {
-      var token = await this.props.auth.getAccessToken();
-      this.props.checkLocalUserId(token);
+      this.setState({
+        token: await this.props.auth.getAccessToken()
+      })
+      if (this.state.token) {
+        this.props.checkUserId(this.state.token);
+      }
     } catch (err) {
       // handle error as needed
     }
   }
 
+  componentDidUpdate(nextProps: any) {
+    if (this.props !== nextProps) {
+      this.componentDidMount();
+    }
+  }
+
   render() {
     return (
-      <div style={{marginRight:"0"}}>
-        <section className="py-5 parallax-background " style={{height:600}}>
+      <div style={{ marginRight: "0" }}>
+        <section className="py-5 parallax-background " style={{ height: 600 }}>
           <div className="container">
-            <h1 className="display-4" style={{ zIndex: 110, marginTop: 30, color: "gray" }} >IOT simless solution</h1>
-            <p className="lead" style={{ color: "gray" }}>GPS tracker with motion detector that help you to protect your bike </p>
-            <img src={trackerUpImg} className="col-2 img-thumbnail" style={{ marginTop:100, padding:2 }} alt="#"/>
-            <img src={trackerDownImg} className="col-2 img-thumbnail" style={{ marginTop:100, padding:2, marginLeft:30 }} alt="#"/>
+            <h1 className="display-3" style={{ zIndex: 110, marginTop: 30, color: "gray" }} >IOT simless solution</h1>
+            {!this.state.token ? <h3 style={{ color: "gray" }}>GPS tracker with motion detector that help you to protect your bike </h3> : ""}
+            {this.state.token ? <h3 style={{ color: "orange" }}>Welcome to BTracker, register a new tracker or go to map page </h3> : ""}
+            <p className="lead" style={{ color: "gray" }}> </p>
+            <img src={trackerUpImg} className="col-2 img-thumbnail" style={{ marginTop: 100, padding: 2 }} alt="#" />
+            <img src={trackerDownImg} className="col-2 img-thumbnail" style={{ marginTop: 100, padding: 2, marginLeft: 30 }} alt="#" />
           </div>
         </section>
       </div>
@@ -61,7 +78,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
   return {
-    getLocalUserId: (p: any) => dispatch<any>(actions.default.account.checkLocalUserId(p)),
+    checkUserId: (p: any) => dispatch<any>(actions.default.user.checkUserId(p)),
   }
 }
 

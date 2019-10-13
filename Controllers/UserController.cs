@@ -26,7 +26,7 @@ namespace BTrackerWeb.Controllers
         [HttpGet]
         [Authorize]
         [Route("[action]")]
-        public void CheckLocalUserId()
+        public void CheckUserId()
         {
             string userId = DbContext.Users.Where(p=>p.Email == User.Claims.Last().Value).Select(p=>p.Id).FirstOrDefault();
             if(userId != null) return;

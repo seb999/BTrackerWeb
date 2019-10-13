@@ -229,8 +229,9 @@ class Map extends React.Component<Props, State>{
 
               <div className="float-left"> <DropDown lookupList={this.state.gpsMaxList} onClick={this.handleChangeMaxGps} selectedItem={this.state.gpsMaxSelected}></DropDown></div>
 
-              {this.state.alertDeviceEUI !== 0 && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Alert on tracker: {this.props.trackerList.filter(p => p.deviceEUI == this.state.alertDeviceEUI)[0].deviceDescription} (EUI : {this.state.alertDeviceEUI})</div>}
+              {this.state.alertDeviceEUI !== 0 && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Alert on tracker: {this.props.trackerList.filter(p => p.deviceEUI === this.state.alertDeviceEUI)[0].deviceDescription} (EUI : {this.state.alertDeviceEUI})</div>}
 
+              {this.props.lookupTrackerList.length ===0 ? <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"><b>No tracker found!</b>, please register a tracker first.</div> :""}
               <div style={{ clear: "both" }}></div>
             </div>
             <div className="row float-none">

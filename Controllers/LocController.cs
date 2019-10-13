@@ -77,8 +77,8 @@ namespace BTrackerWeb.Controllers
             else
             {
                 gpsData.GpsPositionIsGateway = true;
-                gpsData.GpsPositionLatitude = loraData.Metadata.Gateways.FirstOrDefault().Latitude;
-                gpsData.GpsPositionLongitude = loraData.Metadata.Gateways.FirstOrDefault().Longitude;
+                gpsData.GpsPositionLatitude = loraData.Metadata.Gateways != null ? loraData.Metadata.Gateways.FirstOrDefault().Latitude : 0;
+                gpsData.GpsPositionLongitude = loraData.Metadata.Gateways != null ?loraData.Metadata.Gateways.FirstOrDefault().Longitude : 0;
             }
             DbContext.Add(gpsData);
             DbContext.SaveChanges();
