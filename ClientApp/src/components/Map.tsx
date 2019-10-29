@@ -56,8 +56,8 @@ class Map extends React.Component<Props, State>{
       gpsMaxList: [{ id: 1, value: '10' }, { id: 2, value: "25" }, { id: 3, value: "50" }, { id: 4, value: "100" }],
       gpsMaxSelected: { id: 1, value: '10' },
       deviceSelected: { id: 0, value: "Filter device" },
-      //loraMessageEndpoint: "http://localhost:4001", //Dev
-      loraMessageEndpoint: "http://dspx.eu:1884",   //Prod - port 1884 was opened to EC2 for BTrackerMQTT app
+      loraMessageEndpoint: "http://localhost:4001", //Dev
+      //loraMessageEndpoint: "http://dspx.eu:1884",   //Prod - port 1884 was opened to EC2 for BTrackerMQTT app
       alertDeviceEUI: 0
     };
   };
@@ -101,6 +101,8 @@ class Map extends React.Component<Props, State>{
       }, 5000);
     }
     );
+
+    socket.emit("addNewDevice", "qwertyuio");
   }
 
   initMap = () => {
