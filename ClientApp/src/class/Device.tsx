@@ -4,4 +4,5 @@ export interface Device {
     deviceDescription? : string;
     userId? : string;
     dateAdded? : Date;
+    TTNDevID? : string;
 }

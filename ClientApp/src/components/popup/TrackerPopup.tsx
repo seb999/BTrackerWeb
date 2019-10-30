@@ -1,14 +1,21 @@
+//We first try to save the device in TTN db
+//Then we check if success and we save device in local db
+
 import * as React from 'react';
 import { Modal, Button } from "react-bootstrap";
 import { connect } from 'react-redux';
 import * as actionCreator from '../../actions/actions';
 import { Dispatch } from 'redux';
-import { Device } from '../../class/Device'
+import { Device } from '../../class/Device';
+
+import socketIOClient from "socket.io-client";
 
 interface State {
     deviceId: any;
     deviceEui: any;
     deviceDescription: any;
+    TTNDevID: any;
+    loraMessageEndpoint: string;
 }
 
 interface Props {
@@ -16,19 +23,46 @@ interface Props {
     device: Device,
     token: any,
     show: boolean,
-    hide(): void,
+    hide(error : string): void,
     saveTracker(token: any, p: Device): void;
     updateTracker(token: any, p: Device): void;
 }
 
 class TrackerPopup extends React.Component<Props, State>{
+    socket: any;
+
     constructor(props: any) {
         super(props)
         this.state = {
             deviceId: 0,
             deviceEui: '',
-            deviceDescription: ''
+            deviceDescription: '',
+            TTNDevID: '',
+            loraMessageEndpoint: "http://localhost:4001", //Dev
+            //loraMessageEndpoint: "http://dspx.eu:1884", //Prod
         };
+    }
+
+    componentDidMount() {
+        this.socket = socketIOClient(this.state.loraMessageEndpoint);
+
+        //Callback TTN save fail
+        this.socket.on("addDeviceFail", (data: any) => {
+            this.props.hide(data);
+        });
+
+        //Callback TTN save succeeded
+        this.socket.on("addDeviceSucceeded", (TTNDevID: any) => {
+            //Add new device to local db
+            console.log(TTNDevID);
+            var myDevice: Device = ({
+                deviceId: this.state.deviceId,
+                deviceEUI: this.state.deviceEui,
+                deviceDescription: this.state.deviceDescription,
+                TTNDevID: TTNDevID,
+            });
+            //this.props.saveTracker(this.props.token, myDevice);
+        })
     }
 
     componentDidUpdate(nextProps: any) {
@@ -49,25 +83,29 @@ class TrackerPopup extends React.Component<Props, State>{
 
     handleSaveDevice = (e: any) => {
         e.preventDefault();
-        var myDevice: Device = ({
-            deviceId: this.state.deviceId,
-            deviceEUI: this.state.deviceEui,
-            deviceDescription: this.state.deviceDescription
-        });
 
         if (this.state.deviceId === 0) {
-            this.props.saveTracker(this.props.token, myDevice);
+            //Add new device to TTN
+            // let payload = {EUI  : "9988776655443324", Description : "THis is the description"}
+            let payload = { EUI: this.state.deviceEui, Description: this.state.deviceDescription }
+            this.socket.emit("addDevice", payload);
         }
         else {
+            var myDevice: Device = ({
+                deviceId: this.state.deviceId,
+                deviceEUI: this.state.deviceEui,
+                deviceDescription: this.state.deviceDescription
+            });
+
             this.props.updateTracker(this.props.token, myDevice);
+            this.props.hide("");
         }
-        this.props.hide();
     }
 
     render() {
         return (
             <div>
-                <Modal show={this.props.show} onHide={this.props.hide}>
+                <Modal show={this.props.show} onHide={() => this.props.hide("")}>
                     <Modal.Header closeButton>
                         <Modal.Title>{this.props.popupTitle}</Modal.Title>
                     </Modal.Header>
@@ -89,7 +127,7 @@ class TrackerPopup extends React.Component<Props, State>{
                         </form>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={this.props.hide}>
+                        <Button variant="secondary" onClick={()=>this.props.hide("")}>
                             Close
                                 </Button>
                         <Button variant="primary" type="submit" form="newTrackerForm" >
@@ -100,7 +138,6 @@ class TrackerPopup extends React.Component<Props, State>{
             </div>
         )
     }
-
 }
 
 //map the props of this class to the root redux state

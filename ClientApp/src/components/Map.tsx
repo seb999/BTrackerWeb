@@ -101,8 +101,6 @@ class Map extends React.Component<Props, State>{
       }, 5000);
     }
     );
-
-    socket.emit("addNewDevice", "qwertyuio");
   }
 
   initMap = () => {

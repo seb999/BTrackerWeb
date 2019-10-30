@@ -8,6 +8,8 @@ import { withAuth } from '@okta/okta-react';
 import { Device } from '../class/Device';
 import * as moment from 'moment';
 
+import socketIOClient from "socket.io-client";
+
 interface AppFnProps {
     getTrackerList(token: any): void;
     deleteTracker(token: any, deviceId?: number): void;
@@ -32,6 +34,9 @@ interface State {
     showConfirmPopup: boolean,
     token: any,
     popupTitle: string,
+    loraMessageEndpoint: string;
+    isTrackerNotSaved: boolean;
+    errorMessage: string;
 }
 
 class Tracker extends React.Component<Props, State>{
@@ -44,6 +49,10 @@ class Tracker extends React.Component<Props, State>{
             token: null,
             popupTitle: "",
             selectedTracker: {},
+            isTrackerNotSaved: false,
+            errorMessage: "",
+            loraMessageEndpoint: "http://localhost:4001", //Dev
+            //loraMessageEndpoint: "http://dspx.eu:1884", //Prod
         };
     };
 
@@ -58,14 +67,32 @@ class Tracker extends React.Component<Props, State>{
         }
     }
 
-    handleClose = () => {
-        this.setState({ showPopupTracker: false });
+    handleClose = (data: string) => {
+        if (data === "grpc: error unmarshalling request: ttn/core: Invalid length for EUI64") {
+            this.setState({
+                showPopupTracker: false,
+                errorMessage: "Invalid EUI",
+                isTrackerNotSaved: true,
+            });
+
+            setTimeout(() => {
+                this.setState({
+                    errorMessage: "",
+                    isTrackerNotSaved: false,
+                });
+            }, 3000);
+        }
+        else {
+            this.setState({
+                showPopupTracker: false,
+            });
+        }
     }
 
     handleAddTracker = () => {
         this.setState({
             popupTitle: "Add New Tracker",
-            selectedTracker: { deviceDescription:'', deviceEUI : '', deviceId: 0 },
+            selectedTracker: { deviceDescription: '', deviceEUI: '', deviceId: 0 },
             showPopupTracker: true
         });
     }
@@ -95,6 +122,7 @@ class Tracker extends React.Component<Props, State>{
             <tr key={index}>
                 <td>{item.deviceId}</td>
                 <td>{item.deviceEUI}</td>
+                <td>{item.TTNDevID}</td>
                 <td>{item.deviceDescription}</td>
                 <td>{item.userId}</td>
                 <td>{moment.utc(item.dateAdded).format('YYYY-MM-DD HH:MM')}</td>
@@ -114,6 +142,7 @@ class Tracker extends React.Component<Props, State>{
                             {this.props.isTrackerSaved && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-success" role="alert"> New tracker saved and ready to be used!</div>}
                             {this.props.isTrackerDeleted && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Tracker deleted!</div>}
                             {this.props.isTrackerUpdated && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-success" role="alert"> Tracker updated and ready to be used!</div>}
+                            {this.state.isTrackerNotSaved && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Invalid EUI!</div>}
                         </div>
 
                         <br /><br />
@@ -122,6 +151,7 @@ class Tracker extends React.Component<Props, State>{
                                 <tr>
                                     <th scope="col">Id</th>
                                     <th scope="col">EUI</th>
+                                    <th scope="col">TTNId</th>
                                     <th scope="col">Description</th>
                                     <th scope="col">User Id</th>
                                     <th scope="col">Added date</th>
@@ -149,7 +179,7 @@ const mapStateToProps = (state: any) => {
         trackerList: state.trackerList,
         isTrackerSaved: state.isTrackerSaved,
         isTrackerDeleted: state.isTrackerDeleted,
-        isTrackerUpdated : state.isTrackerUpdated,
+        isTrackerUpdated: state.isTrackerUpdated,
     }
 }
 
