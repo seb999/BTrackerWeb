@@ -63,9 +63,19 @@ namespace BTrackerWeb.Controllers
         [Route("/api/[controller]/[Action]")]
         public List<Device> SaveDevice([FromBody] Device device)
         {
-            device.UserId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            device.DateAdded = DateTime.Now;
-            DbContext.Add(device);
+            Device deviceDeleted = DbContext.Device.Where(p => p.DeviceEUI == device.DeviceEUI).FirstOrDefault();
+            if(deviceDeleted!=null)
+            {
+                deviceDeleted.DeviceIsDeleted = false;
+                DbContext.Update(deviceDeleted);
+            }
+            else
+            {
+                device.UserId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
+                device.DateAdded = DateTime.Now;
+                DbContext.Add(device);
+            }
+
             DbContext.SaveChanges();
             return GetDeviceList();
         }
@@ -87,11 +97,12 @@ namespace BTrackerWeb.Controllers
         public List<Device> DeleteDevice(int deviceId)
         {
             //Remove all entry from GpsPosition table
-           // DbContext.GpsPosition.RemoveRange(DbContext.GpsPosition.Where(predicate => predicate.DeviceId == deviceId).Select(p => p).ToList());
+            DbContext.GpsPosition.RemoveRange(DbContext.GpsPosition.Where(predicate => predicate.DeviceId == deviceId).Select(p => p).ToList());
             //We desactivate the device
             Device device = DbContext.Device.Where(predicate => predicate.DeviceId == deviceId).FirstOrDefault();
             device.DeviceIsDeleted = true;
             DbContext.Update(device);
+            DbContext.SaveChanges();
             return GetDeviceList();
         }
     }

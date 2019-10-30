@@ -17,7 +17,6 @@ interface AppFnProps {
 
 interface AppObjectProps {
     auth?: any;
-    history?: any;
     trackerList: Array<Device>;
     isTrackerSaved: boolean;
     isTrackerDeleted: boolean;
@@ -71,22 +70,29 @@ class Tracker extends React.Component<Props, State>{
         if (data === "grpc: error unmarshalling request: ttn/core: Invalid length for EUI64") {
             this.setState({
                 showPopupTracker: false,
-                errorMessage: "Invalid EUI",
+                errorMessage: "Invalid EUI, try again",
                 isTrackerNotSaved: true,
             });
-
-            setTimeout(() => {
-                this.setState({
-                    errorMessage: "",
-                    isTrackerNotSaved: false,
-                });
-            }, 3000);
         }
-        else {
+
+        if (data === "Device with AppEUI and DevEUI already exists") {
             this.setState({
                 showPopupTracker: false,
+                errorMessage: "A device with same EUI already exists",
+                isTrackerNotSaved: true,
             });
         }
+
+        setTimeout(() => {
+            this.setState({
+                errorMessage: "",
+                isTrackerNotSaved: false,
+            });
+        }, 5000);
+
+        this.setState({
+            showPopupTracker: false,
+        });
     }
 
     handleAddTracker = () => {
@@ -113,18 +119,22 @@ class Tracker extends React.Component<Props, State>{
     }
 
     handleConfirmDelete = (deleteTracker: boolean) => {
-        if (deleteTracker) this.props.deleteTracker(this.state.token, this.state.selectedTracker.deviceId)
+       
+        if (deleteTracker) {
+             //Call delete from MQTT
+
+            this.props.deleteTracker(this.state.token, this.state.selectedTracker.deviceId)
+        }
         this.setState({ showConfirmPopup: false });
     }
 
     render() {
+        console.log(this.props.trackerList);
         let displayList = this.props.trackerList.map((item, index) => (
             <tr key={index}>
-                <td>{item.deviceId}</td>
-                <td>{item.deviceEUI}</td>
-                <td>{item.TTNDevID}</td>
+                 <td>{item.deviceEUI}</td>
+                <td>{item.ttnDevID}</td>
                 <td>{item.deviceDescription}</td>
-                <td>{item.userId}</td>
                 <td>{moment.utc(item.dateAdded).format('YYYY-MM-DD HH:MM')}</td>
                 <td><button className="btn" onClick={() => this.handleEditTracker(item)}><span style={{ color: "green" }}><i className="fas fa-edit"></i></span></button></td>
                 <td><button className="btn" onClick={() => this.handleDeleteTracker(item)}><span style={{ color: "red" }}><i className="far fa-trash-alt"></i></span></button></td>
@@ -142,18 +152,16 @@ class Tracker extends React.Component<Props, State>{
                             {this.props.isTrackerSaved && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-success" role="alert"> New tracker saved and ready to be used!</div>}
                             {this.props.isTrackerDeleted && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Tracker deleted!</div>}
                             {this.props.isTrackerUpdated && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-success" role="alert"> Tracker updated and ready to be used!</div>}
-                            {this.state.isTrackerNotSaved && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Invalid EUI!</div>}
+                            {this.state.isTrackerNotSaved && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> {this.state.errorMessage}</div>}
                         </div>
 
                         <br /><br />
                         <table className="table" >
                             <thead className="thead-light">
                                 <tr>
-                                    <th scope="col">Id</th>
-                                    <th scope="col">EUI</th>
-                                    <th scope="col">TTNId</th>
+                                <th scope="col">EUI</th>
+                                    <th scope="col">TheThingNetwork ID</th>
                                     <th scope="col">Description</th>
-                                    <th scope="col">User Id</th>
                                     <th scope="col">Added date</th>
                                     <th scope="col">Edit</th>
                                     <th scope="col">delete</th>

@@ -7,14 +7,12 @@ import { connect } from 'react-redux';
 import * as actionCreator from '../../actions/actions';
 import { Dispatch } from 'redux';
 import { Device } from '../../class/Device';
-
 import socketIOClient from "socket.io-client";
 
 interface State {
     deviceId: any;
     deviceEui: any;
     deviceDescription: any;
-    TTNDevID: any;
     loraMessageEndpoint: string;
 }
 
@@ -23,7 +21,7 @@ interface Props {
     device: Device,
     token: any,
     show: boolean,
-    hide(error : string): void,
+    hide(error: string): void,
     saveTracker(token: any, p: Device): void;
     updateTracker(token: any, p: Device): void;
 }
@@ -37,7 +35,6 @@ class TrackerPopup extends React.Component<Props, State>{
             deviceId: 0,
             deviceEui: '',
             deviceDescription: '',
-            TTNDevID: '',
             loraMessageEndpoint: "http://localhost:4001", //Dev
             //loraMessageEndpoint: "http://dspx.eu:1884", //Prod
         };
@@ -47,21 +44,21 @@ class TrackerPopup extends React.Component<Props, State>{
         this.socket = socketIOClient(this.state.loraMessageEndpoint);
 
         //Callback TTN save fail
-        this.socket.on("addDeviceFail", (data: any) => {
-            this.props.hide(data);
+        this.socket.on("addDeviceFail", (error: any) => {
+            this.props.hide(error);
         });
 
         //Callback TTN save succeeded
-        this.socket.on("addDeviceSucceeded", (TTNDevID: any) => {
+        this.socket.on("addDeviceSucceeded", (ttnDevID: string) => {
             //Add new device to local db
-            console.log(TTNDevID);
             var myDevice: Device = ({
                 deviceId: this.state.deviceId,
                 deviceEUI: this.state.deviceEui,
                 deviceDescription: this.state.deviceDescription,
-                TTNDevID: TTNDevID,
+                ttnDevID: ttnDevID,
             });
-            //this.props.saveTracker(this.props.token, myDevice);
+            this.props.saveTracker(this.props.token, myDevice);
+            this.props.hide("");
         })
     }
 
@@ -86,7 +83,6 @@ class TrackerPopup extends React.Component<Props, State>{
 
         if (this.state.deviceId === 0) {
             //Add new device to TTN
-            // let payload = {EUI  : "9988776655443324", Description : "THis is the description"}
             let payload = { EUI: this.state.deviceEui, Description: this.state.deviceDescription }
             this.socket.emit("addDevice", payload);
         }
@@ -127,7 +123,7 @@ class TrackerPopup extends React.Component<Props, State>{
                         </form>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={()=>this.props.hide("")}>
+                        <Button variant="secondary" onClick={() => this.props.hide("")}>
                             Close
                                 </Button>
                         <Button variant="primary" type="submit" form="newTrackerForm" >
