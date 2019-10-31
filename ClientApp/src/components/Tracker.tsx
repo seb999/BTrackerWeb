@@ -6,8 +6,8 @@ import TrackerPopup from "./popup/TrackerPopup";
 import ConfirmPopup from "./popup/ConfirmPopup";
 import { withAuth } from '@okta/okta-react';
 import { Device } from '../class/Device';
-import * as moment from 'moment';
-
+import * as moment from 'moment';  //Format date
+import appsettings from '../appsettings'
 import socketIOClient from "socket.io-client";
 
 interface AppFnProps {
@@ -39,6 +39,8 @@ interface State {
 }
 
 class Tracker extends React.Component<Props, State>{
+    private socket: any;
+
     constructor(props: any) {
         super(props);
 
@@ -50,12 +52,15 @@ class Tracker extends React.Component<Props, State>{
             selectedTracker: {},
             isTrackerNotSaved: false,
             errorMessage: "",
-            loraMessageEndpoint: "http://localhost:4001", //Dev
-            //loraMessageEndpoint: "http://dspx.eu:1884", //Prod
+            loraMessageEndpoint: appsettings.loraMessageEndpoint,
         };
+
+        this.socket = socketIOClient(this.state.loraMessageEndpoint);
     };
 
     async componentDidMount() {
+
+        console.log(appsettings);
         try {
             this.setState({
                 token: await this.props.auth.getAccessToken()
@@ -121,15 +126,15 @@ class Tracker extends React.Component<Props, State>{
     handleConfirmDelete = (deleteTracker: boolean) => {
        
         if (deleteTracker) {
-             //Call delete from MQTT
-
+            //Delete from TTN
+            this.socket.emit("ttnDeleteDevice", this.state.selectedTracker.ttnDevID);
+            //Delete from LocalDB
             this.props.deleteTracker(this.state.token, this.state.selectedTracker.deviceId)
         }
         this.setState({ showConfirmPopup: false });
     }
 
     render() {
-        console.log(this.props.trackerList);
         let displayList = this.props.trackerList.map((item, index) => (
             <tr key={index}>
                  <td>{item.deviceEUI}</td>

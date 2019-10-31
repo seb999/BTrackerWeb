@@ -8,11 +8,13 @@ import * as actionCreator from '../../actions/actions';
 import { Dispatch } from 'redux';
 import { Device } from '../../class/Device';
 import socketIOClient from "socket.io-client";
+import appsettings from '../../appsettings'
 
 interface State {
     deviceId: any;
     deviceEui: any;
     deviceDescription: any;
+    ttnDevID : any;
     loraMessageEndpoint: string;
 }
 
@@ -35,21 +37,26 @@ class TrackerPopup extends React.Component<Props, State>{
             deviceId: 0,
             deviceEui: '',
             deviceDescription: '',
-            loraMessageEndpoint: "http://localhost:4001", //Dev
-            //loraMessageEndpoint: "http://dspx.eu:1884", //Prod
+            ttnDevID:'',
+            loraMessageEndpoint: appsettings.loraMessageEndpoint,
         };
     }
 
     componentDidMount() {
+        ///////////////////////////////////////////////////////////////////////
+        //This part of the code subscribe to TTN callback functions          //
+        //When we delete / add/ update a tracker, we get a callback from TTN //
+        //and then we update the localDB                                     //
+        ///////////////////////////////////////////////////////////////////////
         this.socket = socketIOClient(this.state.loraMessageEndpoint);
 
         //Callback TTN save fail
-        this.socket.on("addDeviceFail", (error: any) => {
+        this.socket.on("ttnAddFail", (error: any) => {
             this.props.hide(error);
         });
 
         //Callback TTN save succeeded
-        this.socket.on("addDeviceSucceeded", (ttnDevID: string) => {
+        this.socket.on("ttnAddSucceeded", (ttnDevID: string) => {
             //Add new device to local db
             var myDevice: Device = ({
                 deviceId: this.state.deviceId,
@@ -60,14 +67,28 @@ class TrackerPopup extends React.Component<Props, State>{
             this.props.saveTracker(this.props.token, myDevice);
             this.props.hide("");
         })
+
+        this.socket.on("ttnUpdateSucceeded", (ttnDevID: string) => {
+            //Add new device to local db
+            var myDevice: Device = ({
+                deviceId: this.state.deviceId,
+                deviceEUI: this.state.deviceEui,
+                deviceDescription: this.state.deviceDescription,
+                ttnDevID: ttnDevID,
+            });
+            this.props.updateTracker(this.props.token, myDevice);
+            this.props.hide("");
+        })
     }
 
     componentDidUpdate(nextProps: any) {
+        //Detect if we update a tracker
         if (this.props !== nextProps) {
             this.setState({
                 deviceId: this.props.device.deviceId,
                 deviceEui: this.props.device.deviceEUI,
-                deviceDescription: this.props.device.deviceDescription
+                deviceDescription: this.props.device.deviceDescription,
+                ttnDevID: this.props.device.ttnDevID,
             })
         }
     }
@@ -84,17 +105,12 @@ class TrackerPopup extends React.Component<Props, State>{
         if (this.state.deviceId === 0) {
             //Add new device to TTN
             let payload = { EUI: this.state.deviceEui, Description: this.state.deviceDescription }
-            this.socket.emit("addDevice", payload);
+            this.socket.emit("ttnAddDevice", payload);
         }
         else {
-            var myDevice: Device = ({
-                deviceId: this.state.deviceId,
-                deviceEUI: this.state.deviceEui,
-                deviceDescription: this.state.deviceDescription
-            });
-
-            this.props.updateTracker(this.props.token, myDevice);
-            this.props.hide("");
+            //Update existing tracker on TTN
+            let payload = { EUI: this.state.deviceEui, Description: this.state.deviceDescription, devID: this.state.ttnDevID }
+            this.socket.emit("ttnUpdateDevice", payload);
         }
     }
 
@@ -145,7 +161,6 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
-        //we add this function to our props
         saveTracker: (token: any, device: any) => dispatch<any>(actionCreator.default.tracker.saveNewTracker(token, device)),
         updateTracker: (token: any, device: any) => dispatch<any>(actionCreator.default.tracker.updateTracker(token, device))
     }

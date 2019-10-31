@@ -37,11 +37,12 @@ namespace BTrackerWeb.Controllers
 
             return DbContext.Device
                 .Where(p => p.UserId == userId)
-                .Where(p=>p.DeviceIsDeleted !=true)
-                .Select(p => new LookupItem{
-                        Id = p.DeviceId,
-                        Value = p.DeviceDescription
-                }).OrderByDescending(p => p.Id).ToList();              
+                .Where(p => p.DeviceIsDeleted != true)
+                .Select(p => new LookupItem
+                {
+                    Id = p.DeviceId,
+                    Value = p.DeviceDescription
+                }).OrderByDescending(p => p.Id).ToList();
         }
 
         ///Return list of device for current userId
@@ -54,7 +55,7 @@ namespace BTrackerWeb.Controllers
             if (userId == null) return new List<Device>();
             return DbContext.Device
                 .Where(p => p.UserId == userId)
-                .Where(p=>p.DeviceIsDeleted !=true)
+                .Where(p => p.DeviceIsDeleted != true)
                 .Select(p => p).OrderByDescending(p => p.DeviceId).ToList();
         }
 
@@ -63,19 +64,9 @@ namespace BTrackerWeb.Controllers
         [Route("/api/[controller]/[Action]")]
         public List<Device> SaveDevice([FromBody] Device device)
         {
-            Device deviceDeleted = DbContext.Device.Where(p => p.DeviceEUI == device.DeviceEUI).FirstOrDefault();
-            if(deviceDeleted!=null)
-            {
-                deviceDeleted.DeviceIsDeleted = false;
-                DbContext.Update(deviceDeleted);
-            }
-            else
-            {
-                device.UserId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-                device.DateAdded = DateTime.Now;
-                DbContext.Add(device);
-            }
-
+            device.UserId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
+            device.DateAdded = DateTime.Now;
+            DbContext.Add(device);
             DbContext.SaveChanges();
             return GetDeviceList();
         }
@@ -85,8 +76,9 @@ namespace BTrackerWeb.Controllers
         [Route("/api/[controller]/[Action]")]
         public List<Device> UpdateDevice([FromBody] Device device)
         {
-            Device myDevice = DbContext.Device.Where(p=>p.DeviceId == device.DeviceId).Select(p => p).FirstOrDefault();
+            Device myDevice = DbContext.Device.Where(p => p.DeviceId == device.DeviceId).Select(p => p).FirstOrDefault();
             myDevice.DeviceDescription = device.DeviceDescription;
+            myDevice.DeviceEUI = device.DeviceEUI;
             DbContext.SaveChanges();
             return GetDeviceList();
         }
@@ -98,10 +90,9 @@ namespace BTrackerWeb.Controllers
         {
             //Remove all entry from GpsPosition table
             DbContext.GpsPosition.RemoveRange(DbContext.GpsPosition.Where(predicate => predicate.DeviceId == deviceId).Select(p => p).ToList());
-            //We desactivate the device
+            //We remove the device
             Device device = DbContext.Device.Where(predicate => predicate.DeviceId == deviceId).FirstOrDefault();
-            device.DeviceIsDeleted = true;
-            DbContext.Update(device);
+            DbContext.Remove(device);
             DbContext.SaveChanges();
             return GetDeviceList();
         }
