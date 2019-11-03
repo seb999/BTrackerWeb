@@ -21,6 +21,7 @@ interface AppObjectProps {
     isTrackerSaved: boolean;
     isTrackerDeleted: boolean;
     isTrackerUpdated: boolean;
+    socketIO: any;
 }
 
 interface Props
@@ -55,12 +56,11 @@ class Tracker extends React.Component<Props, State>{
             loraMessageEndpoint: appsettings.loraMessageEndpoint,
         };
 
-        this.socket = socketIOClient(this.state.loraMessageEndpoint);
+        //console.log("constructeur called", this.socket);
+        //this.socket = socketIOClient(this.state.loraMessageEndpoint);
     };
 
     async componentDidMount() {
-
-        console.log(appsettings);
         try {
             this.setState({
                 token: await this.props.auth.getAccessToken()
@@ -193,6 +193,7 @@ const mapStateToProps = (state: any) => {
         isTrackerSaved: state.isTrackerSaved,
         isTrackerDeleted: state.isTrackerDeleted,
         isTrackerUpdated: state.isTrackerUpdated,
+        socketIO : state.socketIO,
     }
 }
 

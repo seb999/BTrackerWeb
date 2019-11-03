@@ -91,16 +91,16 @@ class Map extends React.Component<Props, State>{
   }
 
   initLoraListener = () => {
-    const socket = socketIOClient(this.state.loraMessageEndpoint, this.state.alertDeviceEUI);
-    socket.on("ttnMotionDetected", (data: any) => {
+    //const socket = socketIOClient(this.state.loraMessageEndpoint, this.state.alertDeviceEUI);
+    // socket.on("ttnMotionDetected", (data: any) => {
 
-      this.setState({ alertDeviceEUI: data });
-      setTimeout(() => {
-        this.setState({ alertDeviceEUI: 0 });
-        this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
-      }, 5000);
-    }
-    );
+    //   this.setState({ alertDeviceEUI: data });
+    //   setTimeout(() => {
+    //     this.setState({ alertDeviceEUI: 0 });
+    //     this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
+    //   }, 5000);
+    // }
+    // );
   }
 
   initMap = () => {

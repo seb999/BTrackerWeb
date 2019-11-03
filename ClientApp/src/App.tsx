@@ -9,12 +9,12 @@ import Map from './components/Map';
 import Footer from './components/Footer';
 import NavMenu from './components/NavMenu';
 import { NavCommand } from './components/NavMenu';
+import appsettings from './appsettings'
 
 const config = {
   issuer: 'https://dev-792490.okta.com/oauth2/default',
   redirect_uri: window.location.origin + '/implicit/callback',
-  //client_id: '0oayfrvlemxp3hNnC356' //prod
-  client_id: '0oa14m1i7a6och8DH357'   //dev
+  client_id: appsettings.oktaClientId
 }
 
 interface State {
