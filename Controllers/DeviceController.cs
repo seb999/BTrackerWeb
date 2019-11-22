@@ -79,6 +79,7 @@ namespace BTrackerWeb.Controllers
             Device myDevice = DbContext.Device.Where(p => p.DeviceId == device.DeviceId).Select(p => p).FirstOrDefault();
             myDevice.DeviceDescription = device.DeviceDescription;
             myDevice.DeviceEUI = device.DeviceEUI;
+            myDevice.DeviceIsAlarmOn = device.DeviceIsAlarmOn;
             DbContext.SaveChanges();
             return GetDeviceList();
         }

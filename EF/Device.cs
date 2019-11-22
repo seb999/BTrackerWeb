@@ -17,6 +17,7 @@ namespace BTrackerWeb.EF
         public bool? DeviceIsDeleted { get; set; }
         public DateTime DateAdded { get; set; }
         public string TTNDevID { get; set; }
+        public bool? DeviceIsAlarmOn { get; set; }
 
         public ICollection<GpsPosition> GpsPosition { get; set; }
     }
