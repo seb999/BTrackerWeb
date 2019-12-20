@@ -40,9 +40,7 @@ class TrackerPopup extends React.Component<Props, State>{
             ttnDevID:'',
             loraMessageEndpoint: appsettings.loraMessageEndpoint,
         };
-
-        
-       // this.socket = socketIOClient(this.state.loraMessageEndpoint);
+       this.socket = socketIOClient(this.state.loraMessageEndpoint);
     }
 
     componentDidMount() {
@@ -53,37 +51,37 @@ class TrackerPopup extends React.Component<Props, State>{
         ///////////////////////////////////////////////////////////////////////
         
 
-        // //Callback TTN save fail
-        // this.socket.on("ttnAddFail", (error: any) => {
-        //     this.props.hide(error);
-        // });
+        //Callback TTN save fail
+        this.socket.on("ttnAddFail", (error: any) => {
+            this.props.hide(error);
+        });
 
-        // //Callback TTN save succeeded
-        // this.socket.on("ttnAddSucceeded", (ttnDevID: string) => {
-        //     console.log("device eui" , this.state.deviceEui);
+        //Callback TTN save succeeded
+        this.socket.on("ttnAddSucceeded", (ttnDevID: string) => {
+            console.log("device eui" , this.state.deviceEui);
 
-        //     //Add new device to local db
-        //     var myDevice: Device = ({
-        //         deviceId: this.state.deviceId,
-        //         deviceEUI: this.state.deviceEui,
-        //         deviceDescription: this.state.deviceDescription,
-        //         ttnDevID: ttnDevID,
-        //     });
-        //     this.props.saveTracker(this.props.token, myDevice);
-        //     this.props.hide("");
-        // })
+            //Add new device to local db
+            var myDevice: Device = ({
+                deviceId: this.state.deviceId,
+                deviceEUI: this.state.deviceEui,
+                deviceDescription: this.state.deviceDescription,
+                ttnDevID: ttnDevID,
+            });
+            this.props.saveTracker(this.props.token, myDevice);
+            this.props.hide("");
+        })
 
-        // this.socket.on("ttnUpdateSucceeded", (ttnDevID: string) => {
-        //     //Add new device to local db
-        //     var myDevice: Device = ({
-        //         deviceId: this.state.deviceId,
-        //         deviceEUI: this.state.deviceEui,
-        //         deviceDescription: this.state.deviceDescription,
-        //         ttnDevID: ttnDevID,
-        //     });
-        //     this.props.updateTracker(this.props.token, myDevice);
-        //     this.props.hide("");
-        // })
+        this.socket.on("ttnUpdateSucceeded", () => {
+            //Add new device to local db
+            var myDevice: Device = ({
+                deviceId: this.state.deviceId,
+                deviceEUI: this.state.deviceEui,
+                deviceDescription: this.state.deviceDescription,
+                ttnDevID: this.state.ttnDevID,
+            });
+            this.props.updateTracker(this.props.token, myDevice);
+            this.props.hide("");
+        })
     }
 
     componentDidUpdate(nextProps: any) {
