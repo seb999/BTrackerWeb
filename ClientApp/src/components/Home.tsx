@@ -4,8 +4,8 @@ import * as actions from '../actions/actions';
 import { Dispatch } from 'redux';
 import { withAuth } from '@okta/okta-react';
 import './css/Home.css';
-import trackerUpImg from '../images/trackerUp.png'
-import trackerDownImg from '../images/trackerDown.png'
+import trackerUpImg from '../images/PCB_Front.jpg'
+import trackerDownImg from '../images/PCB_Back.jpg'
 
 
 interface AppFnProps {

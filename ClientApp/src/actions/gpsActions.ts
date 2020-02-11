@@ -2,7 +2,6 @@ import axios from 'axios';
 const apiUrl = '/api/Loc/';    
 
 export const getGpsDataList = (accessToken : any, deviceId  :any, maxData : any) =>{
-  console.log("redux get map data");
  return async (dispatch  :any) =>{
    try{
      const res = await axios.get<any>(apiUrl + "GetGpsData/" + deviceId + "/" + maxData, {headers: {Authorization: 'Bearer ' + accessToken}});

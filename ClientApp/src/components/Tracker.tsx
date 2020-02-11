@@ -153,7 +153,7 @@ class Tracker extends React.Component<Props, State>{
                     <div>
                         <br ></br>
                         <div >
-                            <button style={{ float: "left" }} type="button" className="btn btn-primary" onClick={this.handleAddTracker}><span><i className="fas fa-edit"></i></span> Add new tracker</button>
+                            <button style={{ float: "left" }} type="button" className="btn btn-success btn-sm" onClick={this.handleAddTracker}><span><i className="fas fa-edit"></i></span> Add new tracker</button>
                             {this.props.isTrackerSaved && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-success" role="alert"> New tracker saved and ready to be used!</div>}
                             {this.props.isTrackerDeleted && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Tracker deleted!</div>}
                             {this.props.isTrackerUpdated && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-success" role="alert"> Tracker updated and ready to be used!</div>}
@@ -161,7 +161,7 @@ class Tracker extends React.Component<Props, State>{
                         </div>
 
                         <br /><br />
-                        <table className="table" >
+                        <table className="table table-sm table-bordered" >
                             <thead className="thead-light">
                                 <tr>
                                 <th scope="col">EUI</th>

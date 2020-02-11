@@ -90,8 +90,8 @@ class NavMenu extends React.Component<Props, State> {
           </ul>
           {this.state.userProfile !== undefined ? this.state.userProfile.email : ""}&nbsp;
           {this.state.authenticated ? 
-          <button className="btn btn-success" onClick={this.logout}>Logout</button> :
-          <button className="btn btn-success" onClick={this.login}>Login</button>}
+          <button className="btn btn-success btn-sm" onClick={this.logout}>Logout</button> :
+          <button className="btn btn-success btn-sm" onClick={this.login}>Login</button>}
         </div>
 
         

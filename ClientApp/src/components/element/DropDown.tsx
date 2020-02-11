@@ -19,7 +19,7 @@ class DropDown extends React.Component<Props, State> {
     render() {
         return (
             <div className="dropdown">
-                <button className="btn btn-outline-info dropdown-toggle mt-1" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button className="btn btn-outline-info dropdown-toggle mt-1 btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     {this.props.selectedItem ? this.props.selectedItem.value : "Select tracker"}
             </button>
                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">

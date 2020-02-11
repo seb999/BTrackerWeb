@@ -238,7 +238,7 @@ class Map extends React.Component<Props, State>{
             </div>
             <div className="row float-none">
               <div className="col-md-6">
-                <table className="table" >
+                <table className="table table-sm table-bordered" >
                   <thead className="thead-light">
                     <tr>
                       <th scope="col"></th>
@@ -246,7 +246,7 @@ class Map extends React.Component<Props, State>{
                       <th scope="col">Longitude</th>
                       <th scope="col">Latitude</th>
                       <th scope="col">Tracker</th>
-                      <th scope="col"><button className="btn" onClick={() => this.handleShowHideSpot(null)}><span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span></button></th>
+                      <th scope="col"><button className="btn btn-sm" onClick={() => this.handleShowHideSpot(null)}><span style={{ color: "green" }}><i className="fas fa-map-marker-alt"></i></span></button></th>
                     </tr>
                   </thead>
                   <tbody>
