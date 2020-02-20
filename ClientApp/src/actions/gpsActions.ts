@@ -1,10 +1,10 @@
 import axios from 'axios';
-const apiUrl = '/api/Loc/';    
+const apiUrl = '/api/Gps/';    
 
-export const getGpsDataList = (accessToken : any, deviceId  :any, maxData : any) =>{
+export const getGpsDataList = (accessToken : any, trackerId  :any, maxData : any) =>{
  return async (dispatch  :any) =>{
    try{
-     const res = await axios.get<any>(apiUrl + "GetGpsData/" + deviceId + "/" + maxData, {headers: {Authorization: 'Bearer ' + accessToken}});
+     const res = await axios.get<any>(apiUrl + "GetGpsData/" + trackerId + "/" + maxData, {headers: {Authorization: 'Bearer ' + accessToken}});
      return dispatch(getGpsDataSuccess(res.data));
    }
    catch (error) {

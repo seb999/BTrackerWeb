@@ -13,11 +13,11 @@ using Newtonsoft.Json.Linq;
 
 namespace BTrackerWeb.Controllers
 {
-    public class LocController : Controller
+    public class GpsController : Controller
     {
         private readonly ApplicationDbContext DbContext;
 
-        public LocController([FromServices] ApplicationDbContext appDbContext)
+        public GpsController([FromServices] ApplicationDbContext appDbContext)
         {
             DbContext = appDbContext;
         }
@@ -27,14 +27,14 @@ namespace BTrackerWeb.Controllers
         ///Retrun number of position specify by Count parameter
         [HttpGet]
         [Authorize]
-        [Route("/api/[controller]/GetGpsData/{deviceId}/{count}")]
-        public List<GpsPosition> GetGpsData(int deviceId, int count)
+        [Route("/api/[controller]/GetGpsData/{trackerId}/{count}")]
+        public List<GpsPosition> GetGpsData(int trackerId, int count)
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
             if (userId == null) return new List<GpsPosition>();
             if(count==0) count = 100;
 
-            if (deviceId == 0)
+            if (trackerId == 0)
             {
                 return DbContext.GpsPosition
                     .Include(p => p.Device)
@@ -44,13 +44,13 @@ namespace BTrackerWeb.Controllers
             {
                 return DbContext.GpsPosition
                     .Include(p => p.Device)
-                    .Where(p => p.DeviceId == deviceId).OrderByDescending(p => p.GpsPositionDate).Take(count).ToList();
+                    .Where(p => p.DeviceId == trackerId).OrderByDescending(p => p.GpsPositionDate).Take(count).ToList();
             }
         }
 
         ///Called by The Internet network
         ///Transfer position of device to db
-        /// usage example : host/api/Loc/SaveData (use postman to simulate)
+        /// usage example : host/api/Gps/SaveData (use postman to simulate)
         [HttpPost]
         [Route("/api/[controller]/SaveData")]
         public string SaveData([FromBody]JObject rawPayLoad)

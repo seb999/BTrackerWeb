@@ -1,8 +1,6 @@
 import { Device } from "../class/Device";
 import { GpsPosition } from "../class/GpsPosition";
 import { LookupItem } from "../class/LookupItem";
-import appsettings from '../appsettings'
-import socketIOClient from "socket.io-client";
 
 const initState = {
   trackerList: new Array<Device>(),
@@ -12,15 +10,11 @@ const initState = {
   isTrackerSaved: false,
   isTrackerDeleted: false,
   isTrackerUpdated: false,
-  socketIO:  socketIOClient(appsettings.loraMessageEndpoint),
 }
 
 const rootReducer = (state = initState, action: any) => {
   const newState = { ...state };
   switch (action.type) {
-
-    case "SOCKET_IO":
-      return newState
 
     case "GPS_POSITION_LIST":
       newState.gpsPositionList = action.payload

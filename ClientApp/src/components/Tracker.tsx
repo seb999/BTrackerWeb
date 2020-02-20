@@ -7,7 +7,7 @@ import ConfirmPopup from "./popup/ConfirmPopup";
 import { withAuth } from '@okta/okta-react';
 import { Device } from '../class/Device';
 import * as moment from 'moment';  //Format date
-import appsettings from '../appsettings'
+import appsettings from '../appsettings';
 import socketIOClient from "socket.io-client";
 
 interface AppFnProps {
@@ -34,13 +34,12 @@ interface State {
     showConfirmPopup: boolean,
     token: any,
     popupTitle: string,
-    loraMessageEndpoint: string;
     isTrackerNotSaved: boolean;
     errorMessage: string;
 }
 
 class Tracker extends React.Component<Props, State>{
-    private socket: any;
+    public socket: any;
 
     constructor(props: any) {
         super(props);
@@ -53,11 +52,7 @@ class Tracker extends React.Component<Props, State>{
             selectedTracker: {},
             isTrackerNotSaved: false,
             errorMessage: "",
-            loraMessageEndpoint: appsettings.loraMessageEndpoint,
         };
-
-        //console.log("constructeur called", this.socket);
-        //this.socket = socketIOClient(this.state.loraMessageEndpoint);
     };
 
     async componentDidMount() {
@@ -65,10 +60,53 @@ class Tracker extends React.Component<Props, State>{
             this.setState({
                 token: await this.props.auth.getAccessToken()
             })
-            !this.state.token ? this.props.auth.login('/') : this.props.getTrackerList(this.state.token);
+            if (!this.state.token) { this.props.auth.login('/') }
+            else {
+                this.props.getTrackerList(this.state.token);
+               // this.connectToMqtt();
+            }
         } catch (err) {
             // handle error as needed
         }
+    }
+
+    ////////////////////////////////////////////////////////////////
+    ///This part of the code subscribe to TTN callback functions ///
+    ////////////////////////////////////////////////////////////////
+    connectToMqtt = () => {
+        this.socket = socketIOClient(appsettings.loraMessageEndpoint, { autoConnect: false, reconnectionAttempts: 5 });
+
+        this.socket.on("ttnUpdateSucceeded", (devId:any) => {
+            //add device to local db
+            console.log("added from local db");
+            //this.props.(this.state.token, this.state.selectedTracker.deviceId)
+
+           this.disconnectFromMqtt();
+        });
+
+        this.socket.on("ttnDeleteSucceeded", () => {
+            //Delete from local db
+            console.log("delete from local db");
+           // this.props.deleteTracker(this.state.token, this.state.selectedTracker.deviceId)
+
+           this.disconnectFromMqtt();
+        });
+
+        this.socket.on("connect", () => {
+            //Delete from local db
+            console.log("Connected");
+        });
+
+        this.socket.on("disconnect", () => {
+            //Delete from local db
+            console.log("Disconnected");
+        });
+
+        this.socket.open();
+    };
+
+    disconnectFromMqtt = () => {
+        this.socket.disconnect();
     }
 
     handleClose = (data: string) => {
@@ -124,12 +162,12 @@ class Tracker extends React.Component<Props, State>{
     }
 
     handleConfirmDelete = (deleteTracker: boolean) => {
-       
         if (deleteTracker) {
-            //Delete from TTN
+            //1 - connect to mqtt
+            this.connectToMqtt();
+           
+            //2 -Delete from TTN, it will fire ttnDeleteSucceeded
             this.socket.emit("ttnDeleteDevice", this.state.selectedTracker.ttnDevID);
-            //Delete from LocalDB
-            this.props.deleteTracker(this.state.token, this.state.selectedTracker.deviceId)
         }
         this.setState({ showConfirmPopup: false });
     }
@@ -137,7 +175,7 @@ class Tracker extends React.Component<Props, State>{
     render() {
         let displayList = this.props.trackerList.map((item, index) => (
             <tr key={index}>
-                 <td>{item.deviceEUI}</td>
+                <td>{item.deviceEUI}</td>
                 <td>{item.ttnDevID}</td>
                 <td>{item.deviceDescription}</td>
                 <td>{moment.utc(item.dateAdded).format('YYYY-MM-DD HH:MM')}</td>
@@ -154,17 +192,17 @@ class Tracker extends React.Component<Props, State>{
                         <br ></br>
                         <div >
                             <button style={{ float: "left" }} type="button" className="btn btn-success btn-sm" onClick={this.handleAddTracker}><span><i className="fas fa-edit"></i></span> Add new tracker</button>
-                            {this.props.isTrackerSaved && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-success" role="alert"> New tracker saved and ready to be used!</div>}
-                            {this.props.isTrackerDeleted && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Tracker deleted!</div>}
-                            {this.props.isTrackerUpdated && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-success" role="alert"> Tracker updated and ready to be used!</div>}
-                            {this.state.isTrackerNotSaved && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> {this.state.errorMessage}</div>}
+                            {this.props.isTrackerSaved && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success" role="alert"> New tracker saved and ready to be used!</div>}
+                            {this.props.isTrackerDeleted && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-danger" role="alert"> Tracker deleted!</div>}
+                            {this.props.isTrackerUpdated && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success" role="alert"> Tracker updated and ready to be used!</div>}
+                            {this.state.isTrackerNotSaved && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-danger alert-sm" role="alert"> {this.state.errorMessage}</div>}
                         </div>
 
                         <br /><br />
                         <table className="table table-sm table-bordered" >
                             <thead className="thead-light">
                                 <tr>
-                                <th scope="col">EUI</th>
+                                    <th scope="col">EUI</th>
                                     <th scope="col">TheThingNetwork ID</th>
                                     <th scope="col">Description</th>
                                     <th scope="col">Added date</th>
@@ -193,7 +231,6 @@ const mapStateToProps = (state: any) => {
         isTrackerSaved: state.isTrackerSaved,
         isTrackerDeleted: state.isTrackerDeleted,
         isTrackerUpdated: state.isTrackerUpdated,
-        socketIO : state.socketIO,
     }
 }
 

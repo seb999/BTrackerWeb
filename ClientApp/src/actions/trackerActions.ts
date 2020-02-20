@@ -1,6 +1,11 @@
 import axios from 'axios';
-const apiUrl = '/api/Device/';    
+const apiUrl = '/api/Tracker/';    
 
+
+
+////////////////////////////////////////////////////
+//  Tracker list methods                          //
+////////////////////////////////////////////////////
 export const lookupList = (accessToken : any) =>{
   return async (dispatch  :any) =>{
     try{
@@ -25,7 +30,7 @@ export const trackerList = (accessToken : any) =>{
  return async (dispatch  :any) =>{
    try{
      //We are logged in the API so we don't need to pass again the userId
-     const res = await axios.get<any>(apiUrl + "GetDeviceList/", {headers: {Authorization: 'Bearer ' + accessToken}});
+     const res = await axios.get<any>(apiUrl + "GetTrackerList/", {headers: {Authorization: 'Bearer ' + accessToken}});
      return dispatch(trackerListSuccess(res.data));
    }
    catch (error) {
@@ -41,11 +46,13 @@ export const trackerListSuccess = (data :any) => {
  }
 }
 
-export const saveNewTracker = (accessToken: any, device :any) =>{
+////////////////////////////////////////////////////
+//  Tracker Save methods                          //
+////////////////////////////////////////////////////
+export const saveTracker = (accessToken: any, tracker :any) =>{
   return async (dispatch  :any) =>{
-    //let device = {DeviceEUI : data.deviceEui, DeviceDescription : data.deviceDescription}
     try{
-      const res = await axios.post<any>(apiUrl + "SaveDevice/", device, {headers: {Authorization: 'Bearer ' + accessToken}});
+      const res = await axios.post<any>(apiUrl + "SaveTracker/", tracker, {headers: {Authorization: 'Bearer ' + accessToken}});
       dispatch(showSavedLabel());
       return dispatch(trackerSavedSuccess(res.data));
     }
@@ -76,10 +83,13 @@ export const hideSavedLabel = () =>{
   }
 }
 
- export const deleteTracker = (accessToken: any, deviceId? :number) =>{
+////////////////////////////////////////////////////
+//  Tracker Delete methods                        //
+////////////////////////////////////////////////////
+ export const deleteTracker = (accessToken: any, trackerId? :number) =>{
   return async (dispatch  :any) =>{
     try{
-      const res = await axios.get<any>(apiUrl + "DeleteDevice/" + deviceId, {headers: {Authorization: 'Bearer ' + accessToken}});
+      const res = await axios.get<any>(apiUrl + "DeleteTracker/" + trackerId, {headers: {Authorization: 'Bearer ' + accessToken}});
       dispatch(showDeletedLabel());
       return dispatch(trackerDeletedSuccess(res.data));
     }
@@ -110,11 +120,13 @@ export const deletedSuccess = () =>{
  }
 }
 
-export const updateTracker = (accessToken: any, device :any) =>{
+////////////////////////////////////////////////////
+//  Tracker Update methods                        //
+////////////////////////////////////////////////////
+export const updateTracker = (accessToken: any, tracker :any) =>{
   return async (dispatch  :any) =>{
-    //let device = {DeviceEUI : data.deviceEui, DeviceDescription : data.deviceDescription}
     try{
-      const res = await axios.post<any>(apiUrl + "UpdateDevice/", device, {headers: {Authorization: 'Bearer ' + accessToken}});
+      const res = await axios.post<any>(apiUrl + "UpdateTracker/", tracker, {headers: {Authorization: 'Bearer ' + accessToken}});
       dispatch(showUpdatedLabel());
       return dispatch(trackerUpdatedSuccess(res.data));
     }

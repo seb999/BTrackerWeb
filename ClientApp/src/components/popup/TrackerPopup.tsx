@@ -1,6 +1,3 @@
-//We first try to save the device in TTN db
-//Then we check if success and we save device in local db
-
 import * as React from 'react';
 import { Modal, Button } from "react-bootstrap";
 import { connect } from 'react-redux';
@@ -14,7 +11,7 @@ interface State {
     deviceId: any;
     deviceEui: any;
     deviceDescription: any;
-    ttnDevID : any;
+    ttnDevID: any;
     loraMessageEndpoint: string;
 }
 
@@ -37,28 +34,36 @@ class TrackerPopup extends React.Component<Props, State>{
             deviceId: 0,
             deviceEui: '',
             deviceDescription: '',
-            ttnDevID:'',
+            ttnDevID: '',
             loraMessageEndpoint: appsettings.loraMessageEndpoint,
         };
-       this.socket = socketIOClient(this.state.loraMessageEndpoint);
     }
 
     componentDidMount() {
-        ///////////////////////////////////////////////////////////////////////
-        //This part of the code subscribe to TTN callback functions          //
-        //When we delete / add/ update a tracker, we get a callback from TTN //
-        //and then we update the localDB                                     //
-        ///////////////////////////////////////////////////////////////////////
-        
+       
+    }
 
-        //Callback TTN save fail
-        this.socket.on("ttnAddFail", (error: any) => {
-            this.props.hide(error);
+    ///////////////////////////////////////////////////////////////////////
+    //This part of the code subscribe to TTN callback functions          //
+    //When we delete / add/ update a tracker, we get a callback from TTN //
+    //and then we update the localDB                                     //
+    ///////////////////////////////////////////////////////////////////////
+    connectToMqtt = () => {
+        this.socket = socketIOClient(appsettings.loraMessageEndpoint, { autoConnect: false, reconnectionAttempts: 5 });
+
+        this.socket.on("connect", () => {
+            //Delete from local db
+            console.log("Connected");
+        });
+
+        this.socket.on("disconnect", () => {
+            //Delete from local db
+            console.log("Disconnected");
         });
 
         //Callback TTN save succeeded
         this.socket.on("ttnAddSucceeded", (ttnDevID: string) => {
-            console.log("device eui" , this.state.deviceEui);
+            console.log("device eui", this.state.deviceEui);
 
             //Add new device to local db
             var myDevice: Device = ({
@@ -69,6 +74,7 @@ class TrackerPopup extends React.Component<Props, State>{
             });
             this.props.saveTracker(this.props.token, myDevice);
             this.props.hide("");
+            this.disconnectFromMqtt();
         })
 
         this.socket.on("ttnUpdateSucceeded", () => {
@@ -81,8 +87,22 @@ class TrackerPopup extends React.Component<Props, State>{
             });
             this.props.updateTracker(this.props.token, myDevice);
             this.props.hide("");
+            this.disconnectFromMqtt();
         })
+
+        //Callback TTN save fail
+        this.socket.on("ttnAddFail", (error: any) => {
+            this.props.hide(error);
+            this.disconnectFromMqtt();
+        });
+
+        this.socket.open();
+    };
+
+    disconnectFromMqtt = () => {
+        this.socket.disconnect();
     }
+
 
     componentDidUpdate(nextProps: any) {
         //Detect if we update a tracker
@@ -105,10 +125,14 @@ class TrackerPopup extends React.Component<Props, State>{
     handleSaveDevice = (e: any) => {
         console.log("save button press");
         e.preventDefault();
+         //1 - connect to mqtt
+         this.connectToMqtt();
 
         if (this.state.deviceId === 0) {
             //Add new device to TTN
             let payload = { EUI: this.state.deviceEui, Description: this.state.deviceDescription }
+           
+            //2 - Delete from mqtt, then subscribe to callback function
             this.socket.emit("ttnAddDevice", payload);
         }
         else {
@@ -165,8 +189,8 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
-        saveTracker: (token: any, device: any) => dispatch<any>(actionCreator.default.tracker.saveNewTracker(token, device)),
-        updateTracker: (token: any, device: any) => dispatch<any>(actionCreator.default.tracker.updateTracker(token, device))
+        saveTracker: (token: any, device: any) => dispatch<any>(actionCreator.default.tracker.saveTracker(token, device)),
+        updateTracker: (token: any, device: any) => dispatch<any>(actionCreator.default.tracker.updateTracker(token, device)),
     }
 }
 

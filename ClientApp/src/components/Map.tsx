@@ -17,8 +17,6 @@ import { GpsPosition } from '../class/GpsPosition';
 import { LookupItem } from '../class/LookupItem';
 import { Device } from '../class/Device';
 
-import socketIOClient from "socket.io-client";
-
 
 interface AppFnProps {
   getGpsPosition(token: any, deviceId: number, maxData: number): void;
@@ -63,7 +61,7 @@ class Map extends React.Component<Props, State>{
       alertDeviceEUI: 0
     };
 
-    this.socket = socketIOClient(this.state.loraMessageEndpoint);
+    //this.socket = socketIOClient(this.state.loraMessageEndpoint);
   };
 
   private markerVectorLayer: any;
@@ -165,7 +163,6 @@ class Map extends React.Component<Props, State>{
   }
 
   handleChangeDevice = (device: any) => {
-    console.log("change device")
     this.setState({
       deviceSelected: device,
     })
@@ -201,8 +198,6 @@ class Map extends React.Component<Props, State>{
   }
 
   render() {
-
-
     let displayList = this.props.gpsPositionList.map((item, index) => (
       <tr key={index}>
         <td><button className="btn" onClick={() => this.handleDeleteGpsData(item)}><span style={{ color: "red" }}><i className="far fa-trash-alt"></i></span></button></td>
