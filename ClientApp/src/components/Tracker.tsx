@@ -63,7 +63,6 @@ class Tracker extends React.Component<Props, State>{
             if (!this.state.token) { this.props.auth.login('/') }
             else {
                 this.props.getTrackerList(this.state.token);
-               // this.connectToMqtt();
             }
         } catch (err) {
             // handle error as needed
@@ -76,29 +75,16 @@ class Tracker extends React.Component<Props, State>{
     connectToMqtt = () => {
         this.socket = socketIOClient(appsettings.loraMessageEndpoint, { autoConnect: false, reconnectionAttempts: 5 });
 
-        this.socket.on("ttnUpdateSucceeded", (devId:any) => {
-            //add device to local db
-            console.log("added from local db");
-            //this.props.(this.state.token, this.state.selectedTracker.deviceId)
-
-           this.disconnectFromMqtt();
-        });
-
         this.socket.on("ttnDeleteSucceeded", () => {
-            //Delete from local db
-            console.log("delete from local db");
-           // this.props.deleteTracker(this.state.token, this.state.selectedTracker.deviceId)
-
-           this.disconnectFromMqtt();
+            this.props.deleteTracker(this.state.token, this.state.selectedTracker.deviceId)
+            this.disconnectFromMqtt();
         });
 
         this.socket.on("connect", () => {
-            //Delete from local db
             console.log("Connected");
         });
 
         this.socket.on("disconnect", () => {
-            //Delete from local db
             console.log("Disconnected");
         });
 
@@ -165,7 +151,7 @@ class Tracker extends React.Component<Props, State>{
         if (deleteTracker) {
             //1 - connect to mqtt
             this.connectToMqtt();
-           
+
             //2 -Delete from TTN, it will fire ttnDeleteSucceeded
             this.socket.emit("ttnDeleteDevice", this.state.selectedTracker.ttnDevID);
         }

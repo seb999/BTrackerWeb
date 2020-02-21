@@ -34,7 +34,7 @@ const rootReducer = (state = initState, action: any) => {
       return newState;
 
     case "TRACKER_LIST":
-      newState.trackerList = action.payload
+      newState.trackerList = action.payload;
       return newState;
 
     case "TRACKER_LOOKUP_LIST":

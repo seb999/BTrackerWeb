@@ -5,7 +5,6 @@ import * as actions from '../actions/actions';
 import { withAuth } from '@okta/okta-react';
 import DropDown from './element/DropDown';
 import * as moment from 'moment';
-import appsettings from '../appsettings'
 
 import * as ol from 'ol';
 import * as proj from 'ol/proj';
@@ -16,6 +15,8 @@ import * as style from 'ol/style';
 import { GpsPosition } from '../class/GpsPosition';
 import { LookupItem } from '../class/LookupItem';
 import { Device } from '../class/Device';
+import appsettings from '../appsettings';
+import socketIOClient from "socket.io-client";
 
 
 interface AppFnProps {
@@ -31,6 +32,7 @@ interface AppObjectProps {
   gpsPositionList: Array<GpsPosition>;
   lookupTrackerList: Array<LookupItem>;
   trackerList: Array<Device>;
+
 }
 
 interface Props
@@ -44,6 +46,8 @@ interface State {
   gpsMaxSelected: LookupItem;
   loraMessageEndpoint: string;
   alertDeviceEUI: any;
+  isTrackerListLoaded: boolean;
+
 }
 
 class Map extends React.Component<Props, State>{
@@ -58,10 +62,11 @@ class Map extends React.Component<Props, State>{
       gpsMaxSelected: { id: 1, value: '10' },
       deviceSelected: { id: 0, value: "Filter device" },
       loraMessageEndpoint: appsettings.loraMessageEndpoint,
-      alertDeviceEUI: 0
+      alertDeviceEUI: 0,
+      isTrackerListLoaded: false,
     };
 
-    //this.socket = socketIOClient(this.state.loraMessageEndpoint);
+    this.socket = socketIOClient(appsettings.loraMessageEndpoint, { autoConnect: false, reconnectionAttempts: 5 });
   };
 
   private markerVectorLayer: any;
@@ -77,9 +82,12 @@ class Map extends React.Component<Props, State>{
         await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
         await this.props.getTrackerList(this.state.token);
         await this.props.getTrackerLookupList(this.state.token);
+        this.setState({ isTrackerListLoaded: true });
         this.initMap();
         this.setupMap();
-        this.initLoraListener();
+        this.connectToMqtt();
+        this.setupBeforeUnloadListener();
+       
       }
     } catch (err) {
     }
@@ -92,8 +100,31 @@ class Map extends React.Component<Props, State>{
     }
   }
 
-  initLoraListener = () => {
+  // Setup the `beforeunload` event listener
+  setupBeforeUnloadListener = () => {
+    window.addEventListener("beforeunload", (ev) => {
+      ev.preventDefault();
+      return this.disconnectFromMqtt();
+    });
+  };
+
+  disconnectFromMqtt = () => {
+    this.socket.disconnect();
+  }
+
+  connectToMqtt = () => {
+    
+
+    this.socket.on("connect", () => {
+      console.log("Connected");
+    });
+
+    this.socket.on("disconnect", () => {
+      console.log("Disconnected");
+    });
+
     this.socket.on("ttnMotionDetected", (data: any) => {
+      console.log("motion detected");
       this.setState({ alertDeviceEUI: data });
       setTimeout(() => {
         this.setState({ alertDeviceEUI: 0 });
@@ -101,6 +132,8 @@ class Map extends React.Component<Props, State>{
       }, 5000);
     }
     );
+
+    this.socket.open();
   }
 
   initMap = () => {
@@ -228,7 +261,7 @@ class Map extends React.Component<Props, State>{
 
               {this.state.alertDeviceEUI !== 0 && <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"> Alert on tracker: {this.props.trackerList.filter(p => p.deviceEUI === this.state.alertDeviceEUI)[0].deviceDescription} (EUI : {this.state.alertDeviceEUI})</div>}
 
-              {this.props.lookupTrackerList.length ===0 ? <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"><b>No tracker found!</b>, please register a tracker first.</div> :""}
+              {(this.props.lookupTrackerList.length === 0 && this.state.isTrackerListLoaded) ? <div style={{ float: "right", height: "40px", padding: "7px" }} className="alert alert-danger" role="alert"><b>No tracker found!</b>, please register a tracker first.</div> : ""}
               <div style={{ clear: "both" }}></div>
             </div>
             <div className="row float-none">

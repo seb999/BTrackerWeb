@@ -39,8 +39,16 @@ class TrackerPopup extends React.Component<Props, State>{
         };
     }
 
-    componentDidMount() {
-       
+    componentDidUpdate(nextProps: any) {
+        //Detect if we update a tracker
+        if (this.props !== nextProps) {
+            this.setState({
+                deviceId: this.props.device.deviceId,
+                deviceEui: this.props.device.deviceEUI,
+                deviceDescription: this.props.device.deviceDescription,
+                ttnDevID: this.props.device.ttnDevID,
+            })
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -52,12 +60,10 @@ class TrackerPopup extends React.Component<Props, State>{
         this.socket = socketIOClient(appsettings.loraMessageEndpoint, { autoConnect: false, reconnectionAttempts: 5 });
 
         this.socket.on("connect", () => {
-            //Delete from local db
             console.log("Connected");
         });
 
         this.socket.on("disconnect", () => {
-            //Delete from local db
             console.log("Disconnected");
         });
 
@@ -77,6 +83,12 @@ class TrackerPopup extends React.Component<Props, State>{
             this.disconnectFromMqtt();
         })
 
+        //Callback TTN save fail
+        this.socket.on("ttnAddFail", (error: any) => {
+            this.props.hide(error);
+            this.disconnectFromMqtt();
+        });
+
         this.socket.on("ttnUpdateSucceeded", () => {
             //Add new device to local db
             var myDevice: Device = ({
@@ -90,8 +102,8 @@ class TrackerPopup extends React.Component<Props, State>{
             this.disconnectFromMqtt();
         })
 
-        //Callback TTN save fail
-        this.socket.on("ttnAddFail", (error: any) => {
+        //Callback TTN update fail
+        this.socket.on("ttnUpdateFail", (error: any) => {
             this.props.hide(error);
             this.disconnectFromMqtt();
         });
@@ -103,19 +115,6 @@ class TrackerPopup extends React.Component<Props, State>{
         this.socket.disconnect();
     }
 
-
-    componentDidUpdate(nextProps: any) {
-        //Detect if we update a tracker
-        if (this.props !== nextProps) {
-            this.setState({
-                deviceId: this.props.device.deviceId,
-                deviceEui: this.props.device.deviceEUI,
-                deviceDescription: this.props.device.deviceDescription,
-                ttnDevID: this.props.device.ttnDevID,
-            })
-        }
-    }
-
     handleChange = (e: any) => {
         this.setState({
             [e.target.id]: e.target.value
@@ -123,16 +122,13 @@ class TrackerPopup extends React.Component<Props, State>{
     }
 
     handleSaveDevice = (e: any) => {
-        console.log("save button press");
         e.preventDefault();
          //1 - connect to mqtt
          this.connectToMqtt();
 
         if (this.state.deviceId === 0) {
-            //Add new device to TTN
+            //Add new tracker to TTN
             let payload = { EUI: this.state.deviceEui, Description: this.state.deviceDescription }
-           
-            //2 - Delete from mqtt, then subscribe to callback function
             this.socket.emit("ttnAddDevice", payload);
         }
         else {

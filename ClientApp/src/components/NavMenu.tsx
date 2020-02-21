@@ -93,13 +93,9 @@ class NavMenu extends React.Component<Props, State> {
           <button className="btn btn-success btn-sm" onClick={this.logout}>Logout</button> :
           <button className="btn btn-success btn-sm" onClick={this.login}>Login</button>}
         </div>
-
-        
       </nav>
     )
   }
 }
-
-
 
 export default withAuth(NavMenu);
