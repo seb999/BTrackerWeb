@@ -12,6 +12,7 @@ interface State {
     deviceEui: any;
     deviceDescription: any;
     ttnDevID: any;
+    deviceTel:any;
     loraMessageEndpoint: string;
 }
 
@@ -36,6 +37,7 @@ class TrackerPopup extends React.Component<Props, State>{
             deviceDescription: '',
             ttnDevID: '',
             loraMessageEndpoint: appsettings.loraMessageEndpoint,
+            deviceTel: '',
         };
     }
 
@@ -77,6 +79,8 @@ class TrackerPopup extends React.Component<Props, State>{
                 deviceEUI: this.state.deviceEui,
                 deviceDescription: this.state.deviceDescription,
                 ttnDevID: ttnDevID,
+                deviceTel : this.state.deviceTel,
+                deviceIsAlarmOn : false,
             });
             this.props.saveTracker(this.props.token, myDevice);
             this.props.hide("");
@@ -96,6 +100,7 @@ class TrackerPopup extends React.Component<Props, State>{
                 deviceEUI: this.state.deviceEui,
                 deviceDescription: this.state.deviceDescription,
                 ttnDevID: this.state.ttnDevID,
+                deviceTel : this.state.deviceTel
             });
             this.props.updateTracker(this.props.token, myDevice);
             this.props.hide("");
@@ -158,6 +163,11 @@ class TrackerPopup extends React.Component<Props, State>{
                             <div className="form-label-group">
                                 <label>Add a description for your tracker</label>
                                 <input id="deviceDescription" value={this.state.deviceDescription} type="text" className="form-control" placeholder="Description" required onChange={this.handleChange}></input>
+                            </div>
+
+                            <div className="form-label-group">
+                                <label>Numero Tel for alert</label>
+                                <input id="deviceTel" value={this.state.deviceTel} type="text" className="form-control" placeholder="Telephone " required onChange={this.handleChange}></input>
                             </div>
 
                         </form>

@@ -17,14 +17,14 @@ namespace BTrackerWeb.Controllers
         {
             DbContext = appDbContext;
         }
-        public IActionResult Index()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return View();
-            }
-            return RedirectToAction("Login", "Account");
-        }
+        // public IActionResult Index()
+        // {
+        //     if (User.Identity.IsAuthenticated)
+        //     {
+        //         return View();
+        //     }
+        //    // return RedirectToAction("Login", "Account");
+        // }
 
         ///Return lookuplist of tracker for current userId
         [HttpGet]
@@ -80,6 +80,7 @@ namespace BTrackerWeb.Controllers
             myDevice.DeviceDescription = device.DeviceDescription;
             myDevice.DeviceEUI = device.DeviceEUI;
             myDevice.DeviceIsAlarmOn = device.DeviceIsAlarmOn;
+            myDevice.DeviceTel = device.DeviceTel;
             DbContext.SaveChanges();
             return GetTrackerList();
         }

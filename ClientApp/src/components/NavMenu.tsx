@@ -44,7 +44,7 @@ class NavMenu extends React.Component<Props, State> {
   }
 
   componentDidUpdate() {
-    this.checkAuthentication();
+    //this.checkAuthentication();
   }
 
   async checkAuthentication() {

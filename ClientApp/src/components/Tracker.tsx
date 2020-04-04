@@ -9,10 +9,13 @@ import { Device } from '../class/Device';
 import * as moment from 'moment';  //Format date
 import appsettings from '../appsettings';
 import socketIOClient from "socket.io-client";
+import Toggle from 'react-toggle';
+import './css/Tracker.css';
 
 interface AppFnProps {
     getTrackerList(token: any): void;
     deleteTracker(token: any, deviceId?: number): void;
+    updateTracker(token: any, p: Device): void;
 }
 
 interface AppObjectProps {
@@ -60,7 +63,10 @@ class Tracker extends React.Component<Props, State>{
             this.setState({
                 token: await this.props.auth.getAccessToken()
             })
-            if (!this.state.token) { this.props.auth.login('/') }
+            if (!this.state.token) {
+
+                this.props.auth.login('/')
+            }
             else {
                 this.props.getTrackerList(this.state.token);
             }
@@ -158,15 +164,29 @@ class Tracker extends React.Component<Props, State>{
         this.setState({ showConfirmPopup: false });
     }
 
+    handleSetAlarm = (tracker : any) =>{
+        tracker.deviceIsAlarmOn = !tracker.deviceIsAlarmOn;
+        this.props.updateTracker( this.state.token, tracker);
+    }
+
     render() {
         let displayList = this.props.trackerList.map((item, index) => (
             <tr key={index}>
                 <td>{item.deviceEUI}</td>
                 <td>{item.ttnDevID}</td>
                 <td>{item.deviceDescription}</td>
-                <td>{moment.utc(item.dateAdded).format('YYYY-MM-DD HH:MM')}</td>
+                <td>{item.deviceTel} </td>
+                {/* <td>{moment.utc(item.dateAdded).format('YYYY-MM-DD HH:MM')}</td> */}
                 <td><button className="btn" onClick={() => this.handleEditTracker(item)}><span style={{ color: "green" }}><i className="fas fa-edit"></i></span></button></td>
                 <td><button className="btn" onClick={() => this.handleDeleteTracker(item)}><span style={{ color: "red" }}><i className="far fa-trash-alt"></i></span></button></td>
+                <td>
+                    <Toggle style={{height:10}}
+                        id='cheese-status'
+                       defaultChecked={item.deviceIsAlarmOn}
+                       onChange={()=>this.handleSetAlarm(item)}
+                    />
+                </td>
+
             </tr>
         ));
 
@@ -191,9 +211,10 @@ class Tracker extends React.Component<Props, State>{
                                     <th scope="col">EUI</th>
                                     <th scope="col">TheThingNetwork ID</th>
                                     <th scope="col">Description</th>
-                                    <th scope="col">Added date</th>
+                                    <th scope="col">Send to</th>
                                     <th scope="col">Edit</th>
                                     <th scope="col">delete</th>
+                                    <th scope="col">Activate</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -224,6 +245,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
         getTrackerList: (token: any) => dispatch<any>(actionCreator.default.tracker.trackerList(token)),
         deleteTracker: (token: any, deviceId?: number) => dispatch<any>(actionCreator.default.tracker.deleteTracker(token, deviceId)),
+        updateTracker: (token: any, device: any) => dispatch<any>(actionCreator.default.tracker.updateTracker(token, device)),
     }
 }
 

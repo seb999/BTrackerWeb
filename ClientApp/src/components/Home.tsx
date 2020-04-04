@@ -39,7 +39,7 @@ class Home extends React.Component<Props, State>{
         token: await this.props.auth.getAccessToken()
       })
       if (this.state.token) {
-        //this.props.checkUserId(this.state.token);
+        this.props.checkUserId(this.state.token);
       }
     } catch (err) {
       // handle error as needed
@@ -47,10 +47,11 @@ class Home extends React.Component<Props, State>{
   }
 
   componentDidUpdate(nextProps: any) {
+
     if (this.props !== nextProps) {
       this.componentDidMount();
     }
-  }
+    }
 
   render() {
     return (

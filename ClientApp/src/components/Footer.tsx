@@ -11,14 +11,14 @@ class Footer extends React.Component {
         return (
             <footer className="page-footer footer">
                 <div>
-                    <div className="float-left"><h4 className="brand">BTracker 3.2</h4></div>
+                    <div className="float-left"><h4 className="brand">BTracker 4.0</h4></div>
                     <div className="container">
                     <img src={awsImg} className="brand" alt="#" />
                         <img src={oktaImg} style={{ height: 40 }} alt="#" />
                         <img src={networkImg} className="brand" alt="#" />
                         <img src={loraWanImg} className="brand" alt="#" />
                     </div>
-                    <div className="float-right copyright">© Copyright 2019 BTracker. All Rights Reserved</div>
+                    <div className="float-right copyright">© Copyright 2020 BTracker. All Rights Reserved</div>
                 </div>
                 <div ></div>
             </footer>

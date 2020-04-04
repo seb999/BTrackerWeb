@@ -18,6 +18,7 @@ namespace BTrackerWeb.EF
         public DateTime DateAdded { get; set; }
         public string TTNDevID { get; set; }
         public bool? DeviceIsAlarmOn { get; set; }
+        public string DeviceTel { get; set; }
 
         public ICollection<GpsPosition> GpsPosition { get; set; }
     }
