@@ -6,6 +6,8 @@ import { withAuth } from '@okta/okta-react';
 import './css/Home.css';
 import trackerUpImg from '../images/PCB_Front.jpg'
 import trackerDownImg from '../images/PCB_Back.jpg'
+import trackerL80 from '../images/PCB_L80.png'
+import trackerLora from '../images/PCB_Lora.png'
 
 
 interface AppFnProps {
@@ -64,6 +66,9 @@ class Home extends React.Component<Props, State>{
             <p className="lead" style={{ color: "gray" }}> </p>
             <img src={trackerUpImg} className="col-2 img-thumbnail" style={{ marginTop: 100, padding: 2 }} alt="#" />
             <img src={trackerDownImg} className="col-2 img-thumbnail" style={{ marginTop: 100, padding: 2, marginLeft: 30 }} alt="#" />
+            <img src={trackerL80} className="col-2 img-thumbnail" style={{ marginTop: 100, padding: 2, marginLeft: 30 }} alt="#" />
+            <img src={trackerLora} className="col-2 img-thumbnail" style={{ marginTop: 100, padding: 2, marginLeft: 30 }} alt="#" />
+            
           </div>
         </section>
       </div>

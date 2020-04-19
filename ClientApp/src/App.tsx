@@ -35,6 +35,8 @@ class App extends React.Component<Props, State>{
         { type: "NavLink", path: "/Map", text: "Map", isActive: false },
       ]
     }
+
+    console.log(config.redirect_uri);
   }
 
   render() {
