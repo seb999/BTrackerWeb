@@ -96,7 +96,8 @@ namespace BTrackerWeb.Controllers
             Device device = DbContext.Device.Where(predicate => predicate.DeviceId == deviceId).FirstOrDefault();
             DbContext.Remove(device);
             DbContext.SaveChanges();
-            return GetTrackerList();
+            return GetTrackerList();   
+            //sdsds
         }
     }
 }
