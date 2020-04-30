@@ -1,15 +1,18 @@
 import { Device } from "../class/Device";
 import { GpsPosition } from "../class/GpsPosition";
 import { LookupItem } from "../class/LookupItem";
+import { Switchs } from "../class/Switch";
 
 const initState = {
   trackerList: new Array<Device>(),
+  switchList: new Array<Switchs>(),
   lookupTrackerList: new Array<LookupItem>(),
   gpsPositionList: new Array<GpsPosition>(),
   isGpsDeleted: false,
   isTrackerSaved: false,
   isTrackerDeleted: false,
   isTrackerUpdated: false,
+  isSwitchUpdated: false,
 }
 
 const rootReducer = (state = initState, action: any) => {
@@ -36,6 +39,10 @@ const rootReducer = (state = initState, action: any) => {
     case "TRACKER_LIST":
       newState.trackerList = action.payload;
       return newState;
+
+    case "SWITCH_LIST":
+        newState.switchList = action.payload;
+        return newState;
 
     case "TRACKER_LOOKUP_LIST":
       newState.lookupTrackerList = action.payload
@@ -64,8 +71,17 @@ const rootReducer = (state = initState, action: any) => {
       newState.trackerList = action.payload
       return newState;
 
+      case "SWITCH_UPDATED":
+        newState.isSwitchUpdated = true;
+        newState.switchList = action.payload
+        return newState;
+
     case "TRACKER_HIDE_UPDATED_LABEL":
       newState.isTrackerUpdated = false;
+      return newState;
+
+      case "SWITCH_HIDE_UPDATED_LABEL":
+      newState.isSwitchUpdated = false;
       return newState;
 
     default:

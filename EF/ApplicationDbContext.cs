@@ -12,6 +12,7 @@ namespace BTrackerWeb.EF
         }
         public virtual DbSet<GpsPosition> GpsPosition { get; set; }
         public virtual DbSet<Device> Device { get; set; }
+         public virtual DbSet<SmartHouse> SmartHouse { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

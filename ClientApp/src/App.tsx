@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import NavMenu from './components/NavMenu';
 import { NavCommand } from './components/NavMenu';
 import appsettings from './appsettings'
+import SmartHouse from './components/SmartHouse';
 
 const config = {
   issuer: 'https://dev-792490.okta.com/oauth2/default',
@@ -33,6 +34,7 @@ class App extends React.Component<Props, State>{
         { type: "NavLink", path: "/", text: "Home", isActive: false },
         { type: "NavLink", path: "/Tracker", text: "Tracker", isActive: false },
         { type: "NavLink", path: "/Map", text: "Map", isActive: false },
+        { type: "NavLink", path: "/SmartHouse", text: "..", isActive: false },
       ]
     }
 
@@ -50,6 +52,7 @@ class App extends React.Component<Props, State>{
             <Route path='/' exact={true} component={Home} />
             <Route path='/Home' exact={true} component={Home} />
             <Route path='/Tracker' exact={true} component={Tracker} />} />
+            <Route path='/SmartHouse' exact={true} component={SmartHouse} />} />
             <Route path='/Map' exact={true} component={Map} />} />
             <Route path='/implicit/callback' component={ImplicitCallback} />
           </Switch>
