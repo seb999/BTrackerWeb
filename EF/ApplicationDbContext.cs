@@ -14,6 +14,8 @@ namespace BTrackerWeb.EF
         public virtual DbSet<Device> Device { get; set; }
          public virtual DbSet<SmartHouse> SmartHouse { get; set; }
 
+         public virtual DbSet<SmartHouseUser> SmartHouseUser { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

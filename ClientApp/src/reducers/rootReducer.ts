@@ -6,6 +6,7 @@ import { Switchs } from "../class/Switch";
 const initState = {
   trackerList: new Array<Device>(),
   switchList: new Array<Switchs>(),
+  doorSwitch : new Switchs(),
   lookupTrackerList: new Array<LookupItem>(),
   gpsPositionList: new Array<GpsPosition>(),
   isGpsDeleted: false,
@@ -43,6 +44,14 @@ const rootReducer = (state = initState, action: any) => {
     case "SWITCH_LIST":
         newState.switchList = action.payload;
         return newState;
+
+    case "DOOR":
+        newState.doorSwitch = action.payload;
+        return newState;
+
+        case "OPEN_DOOR":
+          newState.doorSwitch = action.payload;
+          return newState;
 
     case "TRACKER_LOOKUP_LIST":
       newState.lookupTrackerList = action.payload
