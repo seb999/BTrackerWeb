@@ -68,7 +68,7 @@ class SmartHouse extends React.Component<Props, State>{
     }
 
     handleCloseDoor = () =>{
-        this.props.doorSwitch.smartHouseIsActivate = true;
+        this.props.doorSwitch.smartHouseIsClosed = true;
         this.props.updateSwitch(this.props.doorSwitch);
     }
 
@@ -105,10 +105,7 @@ class SmartHouse extends React.Component<Props, State>{
                 this.setState({ icon1: false, icon2: false, icon3: false, icon4: false, showWrongCodeAlert: false });
                 this.counter = 0;
             }, 1500);
-          
-       
         }
-
     }
 
     render() {
@@ -120,7 +117,7 @@ class SmartHouse extends React.Component<Props, State>{
                 <td>
                     <Toggle style={{ height: 10 }}
                         id='cheese-status'
-                        defaultChecked={item.smartHouseIsActivate}
+                        defaultChecked={item.smartHouseIsClosed}
                         onChange={() => this.handleSetAlarm(item)}
                     />
                 </td>
@@ -136,8 +133,8 @@ class SmartHouse extends React.Component<Props, State>{
                     <br ></br>
                     <div >
                         {/* {this.props.isSwitchUpdated && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success" role="alert"> Switch updated and ready to be used!</div>} */}
-                        {this.props.doorSwitch.smartHouseIsActivate && <div style={{ float: "left", height: "32px", padding: "3px" }} className="alert alert-danger" role="alert"> Door locked!</div>}
-                        {!this.props.doorSwitch.smartHouseIsActivate && <div style={{ float: "left", height: "32px", padding: "3px" }} className="alert alert-success" role="alert"> Door open!</div>}
+                        {this.props.doorSwitch.smartHouseIsClosed && <div style={{ float: "left", height: "32px", padding: "3px" }} className="alert alert-danger" role="alert"><i className="fa fa-lock"></i> Door locked!</div>}
+                        {!this.props.doorSwitch.smartHouseIsClosed && <div style={{ float: "left", height: "32px", padding: "3px" }} className="alert alert-success" role="alert"><i className="fa fa-unlock"></i> Door opened!</div>}
                     </div>
                     <br /><br />
 
@@ -145,24 +142,24 @@ class SmartHouse extends React.Component<Props, State>{
                     {this.state.icon2 ? <i className="fa fa-star" style={{ color: '#CC6600' }} ></i> : null}
                     {this.state.icon3 ? <i className="fa fa-star" style={{ color: '#CC6600' }} ></i> : null}
                     {this.state.icon4 ? <i className="fa fa-star" style={{ color: '#CC6600' }} ></i> : null}
-                    {this.state.showWrongCodeAlert && this.props.doorSwitch.smartHouseIsActivate && <div style={{ float: "left", height: "32px", padding: "3px" }} className="alert alert-danger" role="alert"> Wrong code!</div>}
+                    {this.state.showWrongCodeAlert && this.props.doorSwitch.smartHouseIsClosed && <div style={{ float: "left", height: "32px", padding: "3px" }} className="alert alert-danger" role="alert"> Wrong code!</div>}
 
                     <br /><br />
-                    <div className="row" style={{ marginLeft: 20 }}>
+                    <div className="row" >
                         <div className="btn-group" role="group" aria-label="Basic example">
                             <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(1)}>1</button>
                             <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(2)}>2</button>
                             <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(3)}>3</button>
                         </div>
                     </div>
-                    <div className="row" style={{ marginLeft: 20 }}>
+                    <div className="row">
                         <div className="btn-group" role="group" aria-label="Basic example">
                             <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(4)}>4</button>
                             <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(5)}>5</button>
                             <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(6)}>6</button>
                         </div>
                     </div>
-                    <div className="row" style={{ marginLeft: 20 }}>
+                    <div className="row" >
                         <div className="btn-group" role="group" aria-label="Basic example">
                             <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(7)}>7</button>
                             <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(8)}>8</button>
@@ -170,7 +167,7 @@ class SmartHouse extends React.Component<Props, State>{
                         </div>
                     </div>
 
-                    <div className="row" style={{ marginLeft: 20, marginTop: 10 }}> <button type="button" className="btn btn-warning rounded-0" onClick={() => this.handleCloseDoor()}>Lock door</button>
+                    <div className="row" style={{marginTop: 10 }}> <button type="button" className="btn btn-warning rounded-0" onClick={() => this.handleCloseDoor()}>Lock door</button>
                     </div>
 
                     <br /><br />

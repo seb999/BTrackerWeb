@@ -2,18 +2,23 @@ import { Device } from "../class/Device";
 import { GpsPosition } from "../class/GpsPosition";
 import { LookupItem } from "../class/LookupItem";
 import { Switchs } from "../class/Switch";
+import { SmartHouseUser } from "../class/SmartHouseUser";
 
 const initState = {
+  isSwitchUpdated: false,
   trackerList: new Array<Device>(),
   switchList: new Array<Switchs>(),
-  doorSwitch : new Switchs(),
+  doorSwitch: new Switchs(),
+  userList: new Array<SmartHouseUser>(),
+  isNewDoorCodeValid: true,
+
   lookupTrackerList: new Array<LookupItem>(),
   gpsPositionList: new Array<GpsPosition>(),
   isGpsDeleted: false,
   isTrackerSaved: false,
   isTrackerDeleted: false,
   isTrackerUpdated: false,
-  isSwitchUpdated: false,
+ 
 }
 
 const rootReducer = (state = initState, action: any) => {
@@ -42,16 +47,16 @@ const rootReducer = (state = initState, action: any) => {
       return newState;
 
     case "SWITCH_LIST":
-        newState.switchList = action.payload;
-        return newState;
+      newState.switchList = action.payload;
+      return newState;
 
     case "DOOR":
-        newState.doorSwitch = action.payload;
-        return newState;
+      newState.doorSwitch = action.payload;
+      return newState;
 
-        case "OPEN_DOOR":
-          newState.doorSwitch = action.payload;
-          return newState;
+    case "OPEN_DOOR":
+      newState.doorSwitch = action.payload;
+      return newState;
 
     case "TRACKER_LOOKUP_LIST":
       newState.lookupTrackerList = action.payload
@@ -80,19 +85,31 @@ const rootReducer = (state = initState, action: any) => {
       newState.trackerList = action.payload
       return newState;
 
-      case "SWITCH_UPDATED":
-        newState.isSwitchUpdated = true;
-        newState.switchList = action.payload
-        return newState;
+    case "SWITCH_UPDATED":
+      newState.isSwitchUpdated = true;
+      newState.switchList = action.payload
+      return newState;
 
     case "TRACKER_HIDE_UPDATED_LABEL":
       newState.isTrackerUpdated = false;
       return newState;
 
-      case "SWITCH_HIDE_UPDATED_LABEL":
+    case "SWITCH_HIDE_UPDATED_LABEL":
       newState.isSwitchUpdated = false;
       return newState;
 
+    case "SMARTHOUSE_GET_USER_LIST":
+      newState.userList =action.payload
+      return newState;
+
+    case "SMARTHOUSE_UPDATE_USER":
+      newState.userList =action.payload
+      return newState;
+
+      case "SMARTHOUSE_CHECK_CODE":
+        newState.isNewDoorCodeValid = action.payload
+        return newState;
+      
     default:
       return state;
   }

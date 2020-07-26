@@ -93,3 +93,62 @@ export const hideUpdatedLabel = () =>{
     type:"SWITCH_HIDE_UPDATED_LABEL"
   }
 }
+
+export const getUserList = (accessToken: any) =>{
+  return async (dispatch  :any) =>{
+    try{
+      //We are logged in the API so we don't need to pass again the userId
+      const res = await axios.get<any>(apiUrl + "GetUserList/", {headers: {Authorization: 'Bearer ' + accessToken}});
+      return dispatch(getUserListSuccess(res.data));
+    }
+    catch (error) {
+      throw (error)
+    }
+  }
+ }
+ 
+ export const getUserListSuccess = (data :any) => {
+  return {
+    type: "SMARTHOUSE_GET_USER_LIST",
+    payload: data
+  }
+ }
+
+ export const updateUser = (user :any, accessToken: any ) =>{
+  return async (dispatch  :any) =>{
+    try{
+      //We are logged in the API so we don't need to pass again the userId
+      const res = await axios.post<any>(apiUrl + "UpdateUser/",user, {headers: {Authorization: 'Bearer ' + accessToken}});
+      return dispatch(updateUserSuccess(res.data));
+    }
+    catch (error) {
+      throw (error)
+    }
+  }
+ }
+ 
+ export const updateUserSuccess = (data :any) => {
+  return {
+    type: "SMARTHOUSE_UPDATE_USER",
+    payload: data
+  }
+ }
+
+ export const checkCode = (accessToken: any, user :any) =>{
+  return async (dispatch  :any) =>{
+    try{
+      const res = await axios.post<any>(apiUrl + "CheckCode/",user, {headers: {Authorization: 'Bearer ' + accessToken}});
+      return dispatch(checkCodeSuccess(res.data));
+    }
+    catch (error) {
+      throw (error)
+    }
+  }
+ }
+ 
+ export const checkCodeSuccess = (data :any) => {
+  return {
+    type: "SMARTHOUSE_CHECK_CODE",
+    payload: data
+  }
+ }

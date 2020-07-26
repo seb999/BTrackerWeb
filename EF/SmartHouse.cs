@@ -8,6 +8,6 @@ namespace BTrackerWeb.EF
         public int SmartHouseType { get; set; }
         public string SmartHouseName { get; set; }
         public string SmartHouseDescription { get; set; }
-        public Boolean? SmartHouseIsActivate {get; set;}
+        public Boolean? SmartHouseIsClosed {get; set;}
     }
 }

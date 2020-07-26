@@ -11,6 +11,8 @@ import NavMenu from './components/NavMenu';
 import { NavCommand } from './components/NavMenu';
 import appsettings from './appsettings'
 import SmartHouse from './components/SmartHouse';
+import SmartHouseUser from './components/SmartHouseAdmin';
+import SmartHouseAdmin from './components/SmartHouseAdmin';
 
 const config = {
   issuer: 'https://dev-792490.okta.com/oauth2/default',
@@ -34,7 +36,8 @@ class App extends React.Component<Props, State>{
         { type: "NavLink", path: "/", text: "Home", isActive: false },
         { type: "NavLink", path: "/Tracker", text: "Tracker", isActive: false },
         { type: "NavLink", path: "/Map", text: "Map", isActive: false },
-        { type: "NavLink", path: "/SmartHouse", text: "..", isActive: false },
+        { type: "NavLink", path: "/SmartHouse", text: "House", isActive: false },
+        { type: "NavLink", path: "/SmartHouseAdmin", text: "Admin", isActive: false },
       ]
     }
 
@@ -51,9 +54,10 @@ class App extends React.Component<Props, State>{
           <Switch>
             <Route path='/' exact={true} component={Home} />
             <Route path='/Home' exact={true} component={Home} />
-            <Route path='/Tracker' exact={true} component={Tracker} />} />
-            <Route path='/SmartHouse' exact={true} component={SmartHouse} />} />
-            <Route path='/Map' exact={true} component={Map} />} />
+            <Route path='/Tracker' exact={true} component={Tracker} /> 
+            <Route path='/SmartHouse' exact={true} component={SmartHouse} />
+            <Route path='/SmartHouseAdmin' exact={true} component={SmartHouseAdmin} />
+            <Route path='/Map' exact={true} component={Map} />
             <Route path='/implicit/callback' component={ImplicitCallback} />
           </Switch>
           </div>
