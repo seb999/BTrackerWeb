@@ -12,9 +12,11 @@ namespace BTrackerWeb.EF
         public int SmartHouseUserId { get; set; }
         public string SmartHouseUserName { get; set; }
         public string SmartHouseUserEmail { get; set; }
+        public string SmartHouseUserPhone { get; set; }
         public string SmartHouseUserCode { get; set; }
         public DateTime SmartHouseUserArrival {get; set;}
         public DateTime SmartHouseUserLeave {get; set;}
+        public decimal SmartHouseUserAmount { get; set; }
         public bool? SmartHouseUserIsDesactivated {get; set;}
 
         public ICollection<SmartHouseEntry> SmartHouseEntry { get; set; }

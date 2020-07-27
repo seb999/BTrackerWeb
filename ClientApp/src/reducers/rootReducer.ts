@@ -18,7 +18,7 @@ const initState = {
   isTrackerSaved: false,
   isTrackerDeleted: false,
   isTrackerUpdated: false,
- 
+
 }
 
 const rootReducer = (state = initState, action: any) => {
@@ -99,17 +99,21 @@ const rootReducer = (state = initState, action: any) => {
       return newState;
 
     case "SMARTHOUSE_GET_USER_LIST":
-      newState.userList =action.payload
+      newState.userList = action.payload
       return newState;
 
     case "SMARTHOUSE_UPDATE_USER":
-      newState.userList =action.payload
+      newState.userList = action.payload
       return newState;
 
-      case "SMARTHOUSE_CHECK_CODE":
-        newState.isNewDoorCodeValid = action.payload
-        return newState;
-      
+    case "SMARTHOUSE_CHECK_CODE":
+      newState.isNewDoorCodeValid = action.payload
+      return newState;
+
+    case "SMARTHOUSE_SAVE_USER":
+      newState.userList = action.payload
+      return newState;
+
     default:
       return state;
   }

@@ -14,7 +14,7 @@ interface State {
     userArrival: any;
     userCode: any;
     userEmail: any;
-    userIsDesactivated:any;
+    userIsDesactivated: any;
     userLeave: any;
 }
 
@@ -25,9 +25,9 @@ interface Props {
     show: boolean,
     isDoorCodeValid: true,
     hide(error: string): void,
-    saveTracker(token: any, p: Device): void;
+    saveUser(token: any, user: any): void;
     updateTracker(token: any, p: Device): void;
-    checkCode(token: any, code: any) : void;
+    checkCode(token: any, code: any): void;
 }
 
 class SmartHouseUserPopup extends React.Component<Props, State>{
@@ -42,7 +42,7 @@ class SmartHouseUserPopup extends React.Component<Props, State>{
             userCode: '',
             userEmail: '',
             userIsDesactivated: '',
-            userLeave:''
+            userLeave: ''
 
         };
     }
@@ -68,26 +68,32 @@ class SmartHouseUserPopup extends React.Component<Props, State>{
             [e.target.id]: e.target.value
         } as any);
 
-        if(e.target.id == 'userCode' && e.target.value.length == 4) {
-            let newUser : SmartHouseUser;
-            newUser = {smartHouseUserCode : e.target.value};
+        if (e.target.id == 'userCode' && e.target.value.length == 4) {
+            let newUser: SmartHouseUser;
+            newUser = { smartHouseUserCode: e.target.value };
             this.props.checkCode(this.props.token, newUser);
-         
+
+        }
     }
-}
 
     handleSaveUser = (e: any) => {
-        //  //Add new device to local db
-        //  var myDevice: Device = ({
-        //     deviceId: this.state.deviceId,
-        //     deviceEUI: this.state.deviceEui,
-        //     deviceDescription: this.state.deviceDescription,
-        //     ttnDevID: ttnDevID,
-        //     deviceTel : this.state.deviceTel,
-        //     deviceIsAlarmOn : false,
-        // });
-        // this.props.saveTracker(this.props.token, myDevice);
-        // this.props.hide("");
+        //Add new device to local db
+        var myUser: SmartHouseUser = ({
+            smartHouseUserArrival: this.state.userArrival,
+            smartHouseUserCode: this.state.userCode,
+            smartHouseUserEmail: this.state.userEmail,
+            smartHouseUserIsDesactivated: false,
+            smartHouseUserLeave: this.state.userLeave,
+            smartHouseUserName: this.state.userName
+        });
+        this.props.saveUser(this.props.token, myUser);
+        this.props.hide("");
+    }
+
+    generateRandomCode = () => {
+        this.setState({
+            userCode: Math.floor(1000 + Math.random() * 9000),
+        })
     }
 
     render() {
@@ -113,9 +119,12 @@ class SmartHouseUserPopup extends React.Component<Props, State>{
                                 <input id="userEmail" value={this.state.userEmail} type="text" className="form-control" placeholder="Email" required onChange={this.handleChange}></input>
                             </div>
 
-                            <div className="form-label-group">
-                                <label>Door code</label>  {!this.props.isDoorCodeValid && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-danger" role="alert"> Code already used!</div>}
+                            <label>Door code</label>  {!this.props.isDoorCodeValid && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-danger" role="alert"> Code already used!</div>}
+                            <div className="input-group">
                                 <input id="userCode" value={this.state.userCode} type="text" className="form-control" placeholder="Door code" required onChange={this.handleChange}></input>
+                                <div className="input-group-append">
+                                    <button className="btn btn-outline-secondary" type="button" onClick={() => this.generateRandomCode()}>Generate code</button>
+                                </div>
                             </div>
 
                             <div className="form-label-group">
@@ -153,7 +162,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
-        saveTracker: (token: any, device: any) => dispatch<any>(actionCreator.default.tracker.saveTracker(token, device)),
+        saveUser: (token: any, user: any) => dispatch<any>(actionCreator.default.smartHouse.saveUser(token, user)),
         updateTracker: (token: any, device: any) => dispatch<any>(actionCreator.default.tracker.updateTracker(token, device)),
         checkCode: (token: any, user: any) => dispatch<any>(actionCreator.default.smartHouse.checkCode(token, user)),
     }

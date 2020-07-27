@@ -152,3 +152,22 @@ export const getUserList = (accessToken: any) =>{
     payload: data
   }
  }
+
+ export const saveUser = (accessToken: any, user :any) =>{
+  return async (dispatch  :any) =>{
+    try{
+      const res = await axios.post<any>(apiUrl + "SaveUser/",user, {headers: {Authorization: 'Bearer ' + accessToken}});
+      return dispatch(saveUseruccess(res.data));
+    }
+    catch (error) {
+      throw (error)
+    }
+  }
+ }
+ 
+ export const saveUseruccess = (data :any) => {
+  return {
+    type: "SMARTHOUSE_SAVE_USER",
+    payload: data
+  }
+ }

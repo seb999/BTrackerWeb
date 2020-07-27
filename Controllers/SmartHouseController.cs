@@ -56,13 +56,16 @@ namespace BTrackerWeb.Controllers
         [Route("/api/[controller]/[Action]")]
         public SmartHouse OpenDoor([FromBody] SmartHouseUser user)
         {
-            var userFound = DbContext.SmartHouseUser.Where(p => p.SmartHouseUserCode == user.SmartHouseUserCode && p.SmartHouseUserIsDesactivated == true).Select(p => p).FirstOrDefault();
+            var userFound = DbContext.SmartHouseUser.Where(p => p.SmartHouseUserCode == user.SmartHouseUserCode && p.SmartHouseUserIsDesactivated != true).Select(p => p).FirstOrDefault();
 
             if (userFound != null)
             {
                 if (DateTime.Now >= userFound.SmartHouseUserArrival &&  DateTime.Now <= userFound.SmartHouseUserLeave){
                     SmartHouse mySwitch = DbContext.SmartHouse.Where(p => p.SmartHouseType == 2).Select(p => p).FirstOrDefault();
                     mySwitch.SmartHouseIsClosed = false;
+
+                    DbContext.SmartHouseEntry.Add(new SmartHouseEntry(){SmartHouseEntryDate = DateTime.Now, SmartHouseUserId = userFound.SmartHouseUserId, SmartHouseEntryType = "Open"});
+                    
                     DbContext.SaveChanges();
                 }
             }
@@ -95,8 +98,13 @@ namespace BTrackerWeb.Controllers
             myUser.SmartHouseUserEmail = user.SmartHouseUserEmail;
             myUser.SmartHouseUserLeave = user.SmartHouseUserLeave;
             myUser.SmartHouseUserName = user.SmartHouseUserName;
+            myUser.SmartHouseUserPhone = user.SmartHouseUserPhone;
+            myUser.SmartHouseUserAmount = user.SmartHouseUserAmount;
             myUser.SmartHouseUserIsDesactivated = user.SmartHouseUserIsDesactivated;
+              // DbContext.Update(user);   try this
+              
             DbContext.SaveChanges();
+         
             return GetUserList();
         }
 

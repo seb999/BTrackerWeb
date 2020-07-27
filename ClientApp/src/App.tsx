@@ -36,7 +36,7 @@ class App extends React.Component<Props, State>{
         { type: "NavLink", path: "/", text: "Home", isActive: false },
         { type: "NavLink", path: "/Tracker", text: "Tracker", isActive: false },
         { type: "NavLink", path: "/Map", text: "Map", isActive: false },
-        { type: "NavLink", path: "/SmartHouse", text: "House", isActive: false },
+        { type: "NavLink", path: "/SmartHouse", text: "My house", isActive: false },
         { type: "NavLink", path: "/SmartHouseAdmin", text: "Admin", isActive: false },
       ]
     }

@@ -116,15 +116,16 @@ class SmartHouseAdmin extends React.Component<Props, State>{
             <tr key={index}>
                 <td>{item.smartHouseUserName}</td>
                 <td>{item.smartHouseUserEmail}</td>
+                <td>{item.smartHouseUserPhone}</td>
                 <td>{item.smartHouseUserCode}</td>
                 <td>{moment.parseZone(item.smartHouseUserArrival).format('DD/MM/YYYY HH:mm')}</td>
                 <td>{moment.parseZone(item.smartHouseUserLeave).format('DD/MM/YYYY HH:mm')}</td>
-              
+                <td>{item.smartHouseUserAmout}</td>
                 <td><button className="btn" onClick={() => this.handleEditUser(item)}><span style={{ color: "green" }}><i className="fas fa-edit"></i></span></button></td>
                 <td>
                     <Toggle style={{height:10}}
                         id='cheese-status'
-                       defaultChecked={item.smartHouseUserIsDesactivated}
+                       defaultChecked={!item.smartHouseUserIsDesactivated}
                        onChange={()=>this.handleDesactivateUser(item)}
                     />
                 </td>
@@ -151,11 +152,13 @@ class SmartHouseAdmin extends React.Component<Props, State>{
                                 <tr>
                                     <th scope="col">Name</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col">Phone</th>
                                     <th scope="col">Code</th>
                                     <th scope="col">Arrival date</th>
                                     <th scope="col">Leave date</th>
+                                    <th scope="col">Amount</th>
                                     <th scope="col">Edit</th>
-                                    <th scope="col">Desactivate</th>
+                                    <th scope="col">Activated</th>
                                 </tr>
                             </thead>
                             <tbody>

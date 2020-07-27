@@ -17,8 +17,8 @@ import { SmartHouseUser } from '../class/SmartHouseUser';
 interface AppFnProps {
     getSwitchList(): void;
     updateSwitch(p: Switchs): void;
-    getDoorSwitch() : Switchs;
-    openDoor(p:SmartHouseUser):void;
+    getDoorSwitch(): Switchs;
+    openDoor(p: SmartHouseUser): void;
 }
 
 interface AppObjectProps {
@@ -67,7 +67,7 @@ class SmartHouse extends React.Component<Props, State>{
         this.props.updateSwitch(theSwitch);
     }
 
-    handleCloseDoor = () =>{
+    handleCloseDoor = () => {
         this.props.doorSwitch.smartHouseIsClosed = true;
         this.props.updateSwitch(this.props.doorSwitch);
     }
@@ -95,7 +95,7 @@ class SmartHouse extends React.Component<Props, State>{
         if (this.counter == 4) {
             this.setState({ icon4: true });
             let user = new SmartHouseUser();
-            user.smartHouseUserCode =  this.mykey;
+            user.smartHouseUserCode = this.mykey;
             this.props.openDoor(user);
 
             setTimeout(() => {
@@ -129,48 +129,50 @@ class SmartHouse extends React.Component<Props, State>{
 
 
             <div>
+
+
                 <div>
                     <br ></br>
                     <div >
                         {/* {this.props.isSwitchUpdated && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success" role="alert"> Switch updated and ready to be used!</div>} */}
-                        {this.props.doorSwitch.smartHouseIsClosed && <div style={{ float: "left", height: "32px", padding: "3px" }} className="alert alert-danger" role="alert"><i className="fa fa-lock"></i> Door locked!</div>}
-                        {!this.props.doorSwitch.smartHouseIsClosed && <div style={{ float: "left", height: "32px", padding: "3px" }} className="alert alert-success" role="alert"><i className="fa fa-unlock"></i> Door opened!</div>}
+                        {this.props.doorSwitch.smartHouseIsClosed && !this.state.showWrongCodeAlert && <div className="alert alert-warning" role="alert"><i className="fa fa-lock"></i> Door locked!</div>}
+                        {!this.props.doorSwitch.smartHouseIsClosed &&  <div className="alert alert-success" role="alert"><i className="fa fa-unlock"></i> Door opened!</div>}
+                        {this.state.showWrongCodeAlert && this.props.doorSwitch.smartHouseIsClosed && <div className="alert alert-danger" role="alert"> Wrong code!</div>}
                     </div>
-                    <br /><br />
-
-                    {this.state.icon1 ? <i className="fa fa-star" style={{ color: '#CC6600' }} ></i> : null}
-                    {this.state.icon2 ? <i className="fa fa-star" style={{ color: '#CC6600' }} ></i> : null}
-                    {this.state.icon3 ? <i className="fa fa-star" style={{ color: '#CC6600' }} ></i> : null}
-                    {this.state.icon4 ? <i className="fa fa-star" style={{ color: '#CC6600' }} ></i> : null}
-                    {this.state.showWrongCodeAlert && this.props.doorSwitch.smartHouseIsClosed && <div style={{ float: "left", height: "32px", padding: "3px" }} className="alert alert-danger" role="alert"> Wrong code!</div>}
-
-                    <br /><br />
-                    <div className="row" >
+                    <div className="row d-flex justify-content-center" style={{height:20}} >
+                        {this.state.icon1 ? <i className="fa fa-star" style={{ color: '#CC6600' }} ></i> : null}
+                        {this.state.icon2 ? <i className="fa fa-star" style={{ color: '#CC6600' }} ></i> : null}
+                        {this.state.icon3 ? <i className="fa fa-star" style={{ color: '#CC6600' }} ></i> : null}
+                        {this.state.icon4 ? <i className="fa fa-star" style={{ color: '#CC6600' }} ></i> : null}
+                       
+                    </div>
+                    <br />
+                    <div className="row d-flex justify-content-center" >
                         <div className="btn-group" role="group" aria-label="Basic example">
-                            <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(1)}>1</button>
-                            <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(2)}>2</button>
-                            <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(3)}>3</button>
+                            <button type="button" className="btn btn-lg btn-outline-secondary rounded-0" onClick={() => this.handleOpenDoor(1)}>1</button>
+                            <button type="button" className="btn btn-lg btn-outline-secondary rounded-0" onClick={() => this.handleOpenDoor(2)}>2</button>
+                            <button type="button" className="btn btn-lg btn-outline-secondary rounded-0" onClick={() => this.handleOpenDoor(3)}>3</button>
                         </div>
                     </div>
-                    <div className="row">
+                    <div className="row d-flex justify-content-center">
                         <div className="btn-group" role="group" aria-label="Basic example">
-                            <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(4)}>4</button>
-                            <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(5)}>5</button>
-                            <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(6)}>6</button>
+                            <button type="button" className="btn btn-lg btn-outline-secondary rounded-0" onClick={() => this.handleOpenDoor(4)}>4</button>
+                            <button type="button" className="btn btn-lg btn-outline-secondary rounded-0" onClick={() => this.handleOpenDoor(5)}>5</button>
+                            <button type="button" className="btn btn-lg btn-outline-secondary rounded-0" onClick={() => this.handleOpenDoor(6)}>6</button>
                         </div>
                     </div>
-                    <div className="row" >
+                    <div className="row d-flex justify-content-center" >
                         <div className="btn-group" role="group" aria-label="Basic example">
-                            <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(7)}>7</button>
-                            <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(8)}>8</button>
-                            <button type="button" className="btn btn-lg btn-outline-primary rounded-0" onClick={() => this.handleOpenDoor(9)}>9</button>
+                            <button type="button" className="btn btn-lg btn-outline-secondary rounded-0" onClick={() => this.handleOpenDoor(7)}>7</button>
+                            <button type="button" className="btn btn-lg btn-outline-secondary rounded-0" onClick={() => this.handleOpenDoor(8)}>8</button>
+                            <button type="button" className="btn btn-lg btn-outline-secondary rounded-0" onClick={() => this.handleOpenDoor(9)}>9</button>
                         </div>
                     </div>
 
-                    <div className="row" style={{marginTop: 10 }}> <button type="button" className="btn btn-warning rounded-0" onClick={() => this.handleCloseDoor()}>Lock door</button>
+                    <div className="row d-flex justify-content-center" style={{ marginTop: 10 }}> <button type="button" className="btn btn-warning rounded-0" onClick={() => this.handleCloseDoor()}>Lock door</button>
                     </div>
 
-                    <br /><br />
+                    {/* <br /><br />
                     <table className="table table-sm table-bordered" >
                         <thead className="thead-light">
                             <tr>
@@ -183,7 +185,7 @@ class SmartHouse extends React.Component<Props, State>{
                         <tbody>
                             {displayList}
                         </tbody>
-                    </table>
+                    </table> */}
                 </div>
 
             </div>)
@@ -204,7 +206,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
         getSwitchList: () => dispatch<any>(actionCreator.default.smartHouse.getSwitchList()),
         updateSwitch: (theSwitch: any) => dispatch<any>(actionCreator.default.smartHouse.updateSwitch(theSwitch)),
         getDoorSwitch: () => dispatch<any>(actionCreator.default.smartHouse.getDoorSwitch()),
-        openDoor: (user:any) => dispatch<any>(actionCreator.default.smartHouse.openDoor(user)),
+        openDoor: (user: any) => dispatch<any>(actionCreator.default.smartHouse.openDoor(user)),
     }
 }
 
