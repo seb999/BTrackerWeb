@@ -33,6 +33,7 @@ interface State {
     errorMessage: string;
     isUserSaved: boolean;
     isUserUpdated: boolean;
+    tokenUser: any,
 }
 
 class SmartHouseAdmin extends React.Component<Props, State>{
@@ -44,6 +45,7 @@ class SmartHouseAdmin extends React.Component<Props, State>{
         this.state = {
             showPopupUser: false,
             token: null,
+            tokenUser: null,
             popupTitle: "",
             selectedUser: {},
             isTrackerNotSaved: false,
@@ -56,13 +58,14 @@ class SmartHouseAdmin extends React.Component<Props, State>{
     async componentDidMount() {
         try {
             this.setState({
-                token: await this.props.auth.getAccessToken()
+                token: await this.props.auth.getAccessToken(),
+                tokenUser: await this.props.auth.getUser()
             })
             if (!this.state.token) {
 
                 this.props.auth.login('/')
             }
-            else {
+            if (this.state.tokenUser.preferred_username == "sebastien.dubos@gmail.com" && this.state.token) {
                 this.props.getUserList(this.state.token);
             }
         } catch (err) {
