@@ -37,7 +37,7 @@ namespace BTrackerWeb.Controllers
         [Route("/api/[controller]/[Action]")]
         public List<SmartHouseUser> GetUserList()
         {
-            return DbContext.SmartHouseUser.Select(p=>p).ToList();
+            return DbContext.SmartHouseUser.Select(p => p).ToList();
         }
 
         #region Door/Switch
@@ -60,14 +60,32 @@ namespace BTrackerWeb.Controllers
 
             if (userFound != null)
             {
-                if (DateTime.Now >= userFound.SmartHouseUserArrival &&  DateTime.Now <= userFound.SmartHouseUserLeave){
+                if (DateTime.Now >= userFound.SmartHouseUserArrival && DateTime.Now <= userFound.SmartHouseUserLeave)
+                {
                     SmartHouse mySwitch = DbContext.SmartHouse.Where(p => p.SmartHouseType == 2).Select(p => p).FirstOrDefault();
                     mySwitch.SmartHouseIsClosed = false;
 
-                    DbContext.SmartHouseEntry.Add(new SmartHouseEntry(){SmartHouseEntryDate = DateTime.Now, SmartHouseUserId = userFound.SmartHouseUserId, SmartHouseEntryType = "Open"});
-                    
+                    DbContext.SmartHouseEntry.Add(new SmartHouseEntry() { SmartHouseEntryDate = DateTime.Now, SmartHouseUserId = userFound.SmartHouseUserId, SmartHouseEntryType = "Open" });
+
                     DbContext.SaveChanges();
                 }
+            }
+
+            return GetDoorSwitch();
+        }
+
+        [HttpPost]
+        [Route("/api/[controller]/[Action]")]
+        public SmartHouse CloseDoor([FromBody] SmartHouseUser user)
+        {
+            var userFound = DbContext.SmartHouseUser.Where(p => p.SmartHouseUserCode == user.SmartHouseUserCode && p.SmartHouseUserIsDesactivated != true).Select(p => p).FirstOrDefault();
+
+            if (userFound != null)
+            {
+                SmartHouse mySwitch = DbContext.SmartHouse.Where(p => p.SmartHouseType == 2).Select(p => p).FirstOrDefault();
+                mySwitch.SmartHouseIsClosed = true;
+                DbContext.SmartHouseEntry.Add(new SmartHouseEntry() { SmartHouseEntryDate = DateTime.Now, SmartHouseUserId = userFound.SmartHouseUserId, SmartHouseEntryType = "Close" });
+                DbContext.SaveChanges();
             }
 
             return GetDoorSwitch();
@@ -101,10 +119,10 @@ namespace BTrackerWeb.Controllers
             myUser.SmartHouseUserPhone = user.SmartHouseUserPhone;
             myUser.SmartHouseUserAmount = user.SmartHouseUserAmount;
             myUser.SmartHouseUserIsDesactivated = user.SmartHouseUserIsDesactivated;
-              // DbContext.Update(user);   try this
-              
+            // DbContext.Update(user);   try this
+
             DbContext.SaveChanges();
-         
+
             return GetUserList();
         }
 
