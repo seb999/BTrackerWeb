@@ -18,7 +18,6 @@ const initState = {
   isTrackerSaved: false,
   isTrackerDeleted: false,
   isTrackerUpdated: false,
-
 }
 
 const rootReducer = (state = initState, action: any) => {

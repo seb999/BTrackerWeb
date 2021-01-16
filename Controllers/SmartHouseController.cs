@@ -33,6 +33,21 @@ namespace BTrackerWeb.Controllers
         }
 
         [HttpGet]
+        [Route("/api/[controller]/[Action]/{isOpen}")]
+        public void OpenCloseDoor(bool isOpen)
+        {
+            if(isOpen){
+                SmartHouse myDoor = DbContext.SmartHouse.Where(p => p.SmartHouseType == 2).Select(p => p).FirstOrDefault();
+                myDoor.SmartHouseIsClosed = false;
+            }
+            else{
+                SmartHouse myDoor = DbContext.SmartHouse.Where(p => p.SmartHouseType == 2).Select(p => p).FirstOrDefault();
+                myDoor.SmartHouseIsClosed = true;
+            }
+            DbContext.SaveChanges();
+        }
+
+        [HttpGet]
         [Authorize]
         [Route("/api/[controller]/[Action]")]
         public List<SmartHouseUser> GetUserList()
