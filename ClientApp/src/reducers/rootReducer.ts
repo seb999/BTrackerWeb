@@ -3,6 +3,7 @@ import { GpsPosition } from "../class/GpsPosition";
 import { LookupItem } from "../class/LookupItem";
 import { Switchs } from "../class/Switch";
 import { SmartHouseUser } from "../class/SmartHouseUser";
+import { Log } from "../class/Log";
 
 const initState = {
   isSwitchUpdated: false,
@@ -10,6 +11,7 @@ const initState = {
   switchList: new Array<Switchs>(),
   doorSwitch: new Switchs(),
   userList: new Array<SmartHouseUser>(),
+  logBookList: new Array<Log>(),
   isNewDoorCodeValid: true,
 
   lookupTrackerList: new Array<LookupItem>(),
@@ -18,6 +20,7 @@ const initState = {
   isTrackerSaved: false,
   isTrackerDeleted: false,
   isTrackerUpdated: false,
+  isLogSaved: false,
 }
 
 const rootReducer = (state = initState, action: any) => {
@@ -111,6 +114,19 @@ const rootReducer = (state = initState, action: any) => {
 
     case "SMARTHOUSE_SAVE_USER":
       newState.userList = action.payload
+      return newState;
+
+    case "LOG_LIST":
+      newState.logBookList = action.payload
+      return newState;
+
+    case "LOG_SAVED":
+      newState.isLogSaved = true;
+      newState.logBookList = action.payload
+      return newState;
+
+    case "LOG_SAVED_HIDE_LABEL":
+      newState.isLogSaved = true;
       return newState;
 
     default:

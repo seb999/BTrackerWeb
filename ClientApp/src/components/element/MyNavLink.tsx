@@ -14,14 +14,14 @@ class MyNavLink extends React.Component<Props> {
     // }
 
     render() {
+
+        var navLink = this.props.isActive 
+            ? <li className={"nav-item "}><NavLink className="nav-link" to={this.props.path}>{this.props.text}</NavLink></li>  
+            : "" 
+        
+
         return (
-            <li className={"nav-item "}>
-            <NavLink 
-              className="nav-link" 
-              to={this.props.path}
-            >{this.props.text}
-            </NavLink>
-        </li>
+          navLink
         );
     }
   }

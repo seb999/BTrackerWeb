@@ -17,25 +17,27 @@ interface AppFnProps {
 interface AppObjectProps {
   history?: any;
   commands: NavCommand[];
-  auth? : any;
+  auth?: any;
 }
 
 interface Props
   extends AppObjectProps,
   AppFnProps { }
 
-export interface State { 
-  authenticated : any;
-  userProfile : any;
+export interface State {
+  authenticated: any;
+  userProfile: any;
+  isAdminUser: any;
 }
 
 class NavMenu extends React.Component<Props, State> {
   constructor(props: any) {
     super(props);
 
-    this.state = { 
+    this.state = {
       authenticated: null,
-      userProfile : ""
+      userProfile: "",
+      isAdminUser: false,
     };
     this.checkAuthentication = this.checkAuthentication.bind(this);
     this.checkAuthentication();
@@ -54,7 +56,17 @@ class NavMenu extends React.Component<Props, State> {
 
       //Get user email
       const userProfile = await this.props.auth.getUser();
-      this.setState({ userProfile :  userProfile});
+      this.setState({ userProfile: userProfile });
+
+
+      if (this.state.authenticated) {
+        console.log(this.state.userProfile.name);
+        if (this.state.userProfile.name == "Sebastien Dubos") {
+          this.setState({ isAdminUser: true });
+        }
+      } else {
+        this.setState({ isAdminUser: false });
+      }
     }
   }
 
@@ -78,20 +90,20 @@ class NavMenu extends React.Component<Props, State> {
             {this.props.commands.map((link, i) => {
               if (link.type === "NavLink") {
                 return (
-                  <MyNavLink key={i}
-                    path={link.path}
-                    text={link.text}
-                    isActive={link.isActive}
-                  />
+                    <MyNavLink key={i}
+                      path={link.path}
+                      text={link.text}
+                      isActive={this.state.isAdminUser ? true : link.isActive}
+                    ></MyNavLink>
                 );
               }
               return (<div key={i}></div>)
             })}
           </ul>
           {this.state.userProfile !== undefined ? this.state.userProfile.email : ""}&nbsp;
-          {this.state.authenticated ? 
-          <button className="btn btn-success btn-sm" onClick={this.logout}>Logout</button> :
-          <button className="btn btn-success btn-sm" onClick={this.login}>Login</button>}
+          {this.state.authenticated ?
+            <button className="btn btn-success btn-sm" onClick={this.logout}>Logout</button> :
+            <button className="btn btn-success btn-sm" onClick={this.login}>Login</button>}
         </div>
       </nav>
     )
