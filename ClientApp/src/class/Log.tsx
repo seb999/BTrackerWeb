@@ -5,9 +5,9 @@ export class Log {
     logBookAircraftRegistration? : string;
     logBookAircraftModel? : string;
     logBookDeparturePlace? : string;
-    logBookDepartureTime? : Date;
+    logBookDepartureTime? : number;
     logBookArrivalPlace? : string;
-    logBookArrivalTime? : Date;
+    logBookArrivalTime? : number;
     logBookTotalFlightTime?: number;
     logBookIFR? : boolean;
     logBookNight? :boolean;

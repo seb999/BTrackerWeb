@@ -25,7 +25,7 @@ namespace BTrackerWeb.Controllers
         public List<LogBook> GetLogBookList()
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            return DbContext.LogBook.Where(p => p.UserId == userId).ToList();
+            return DbContext.LogBook.Where(p => p.UserId == userId).OrderByDescending(p=>p.LogBookDate).ToList();
         }
 
         [HttpPost]

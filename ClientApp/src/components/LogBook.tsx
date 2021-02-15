@@ -45,6 +45,7 @@ class LogBook extends React.Component<Props, State>{
     };
 
     async componentDidMount() {
+        console.log(Date.now());
         try {
             this.setState({
                 token: await this.props.auth.getAccessToken()
@@ -84,7 +85,7 @@ class LogBook extends React.Component<Props, State>{
         // });
     }
 
-    handleCloseLogPopup = (data: string) => {
+    handleCloseLogPopup = () => {
         this.setState({
             showPopupLog: false,
         });
@@ -98,9 +99,9 @@ class LogBook extends React.Component<Props, State>{
                 <td>{item.logBookAircraftRegistration}</td>
                 <td>{item.logBookAircraftModel}</td>
                 <td>{item.logBookDeparturePlace}</td>
-                <td>{moment.parseZone(item.logBookDepartureTime).format('DD/MM/YYYY HH:mm')}</td>
+                <td>{item.logBookDepartureTime}</td>
                 <td>{item.logBookArrivalPlace}</td>
-                <td>{moment.parseZone(item.logBookArrivalTime).format('DD/MM/YYYY HH:mm')}</td>
+                <td>{item.logBookArrivalTime}</td>
                 <td>{item.logBookTotalFlightTime}</td>
                 <td>{item.logBookIFR}</td>
                 <td>{item.logBookNight}</td>
@@ -115,7 +116,7 @@ class LogBook extends React.Component<Props, State>{
         return (
             <div>
                 <div className="mt-3">
-                    {this.state.isLogSaved && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success" role="alert"> New log added!</div>}
+                    {this.props.isLogSaved && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success" role="alert"> New log added!</div>}
                     {/* {this.state.isUserUpdated && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success" role="alert"> User updated!</div>} */}
                 </div>
 

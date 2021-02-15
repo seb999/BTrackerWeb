@@ -10,9 +10,9 @@ namespace BTrackerWeb.EF
          public string LogBookAircraftRegistration { get; set; }
         public string LogBookAircraftModel { get; set; }
         public string LogBookDeparturePlace { get; set; }
-        public DateTime? LogBookDepartureTime {get; set;}
+        public TimeSpan? LogBookDepartureTime {get; set;}
         public string LogBookArrivalPlace { get; set; }
-        public DateTime? LogBookArrivalTime { get; set; }
+        public TimeSpan? LogBookArrivalTime { get; set; }
         public Decimal LogBookTotalFlightTime { get; set; }
         public Boolean? LogBookIFR { get; set; }
         public Boolean? LogBookNight { get; set; }

@@ -59,6 +59,7 @@ export const hideUpdateLogLabel = () =>{
 
 //  ADD LOG----------------------------------------------
  export const addLog = (accessToken: any, log :any) =>{
+  console.log("Action save me");
   return async (dispatch  :any) =>{
     try{
       const res = await axios.post<any>(apiUrl + "SaveLog/",log, {headers: {Authorization: 'Bearer ' + accessToken}});
