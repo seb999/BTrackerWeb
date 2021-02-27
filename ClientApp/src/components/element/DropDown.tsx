@@ -20,11 +20,11 @@ class DropDown extends React.Component<Props, State> {
         return (
             <div className="dropdown">
                 <button className="btn btn-outline-info dropdown-toggle mt-1 btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {this.props.selectedItem ? this.props.selectedItem.value : "Select tracker"}
+                    {this.props.selectedItem ? this.props.selectedItem.label : "Select tracker"}
             </button>
                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     {this.props.lookupList.map((item, index) => {
-                        return <a href="#" key={index} className={this.props.selectedItem === item ? "dropdown-item active" : "dropdown-item"} id={item.value} onClick={()=>this.props.onClick(item)}>{item.value}</a>
+                        return <a href="#" key={index} className={this.props.selectedItem === item ? "dropdown-item active" : "dropdown-item"} id={item.label} onClick={()=>this.props.onClick(item)}>{item.label}</a>
                     })}
                 </div>
             </div>

@@ -40,9 +40,9 @@ namespace BTrackerWeb.Controllers
                 .Where(p => p.DeviceIsDeleted != true)
                 .Select(p => new LookupItem
                 {
-                    Id = p.DeviceId,
-                    Value = p.DeviceDescription
-                }).OrderByDescending(p => p.Id).ToList();
+                    Value = p.DeviceId,
+                    Label = p.DeviceDescription
+                }).OrderByDescending(p => p.Value).ToList();
         }
 
         ///Return list of device for current userId

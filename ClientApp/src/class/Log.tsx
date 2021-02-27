@@ -1,17 +1,23 @@
+import { Aircraft } from "./Aircraft";
+
 export class Log {
     logBookId? : number;
     userId? : string;
+    aircraftModelId? : number;
+    airportDepartureId? : number;
+    airportArrivalId? : number;
     logBookDate? : Date;
     logBookAircraftRegistration? : string;
-    logBookAircraftModel? : string;
+    aircraftModel? : Aircraft;
     logBookDeparturePlace? : string;
-    logBookDepartureTime? : number;
+    logBookDepartureTime? : string;
     logBookArrivalPlace? : string;
-    logBookArrivalTime? : number;
+    logBookArrivalTime? : string;
     logBookTotalFlightTime?: number;
     logBookIFR? : boolean;
     logBookNight? :boolean;
-    logBookPIC? : string;
-    logBookCoPilot? : string;
+    logBookPIC? : boolean;
+    logBookCoPilot? : boolean;
     logBookDual? :boolean;
+    logBookDescription? : string;
 }

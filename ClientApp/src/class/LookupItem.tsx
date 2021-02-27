@@ -1,4 +1,4 @@
 export interface LookupItem {
-    id : number;
-    value : string;
+    value : number;
+    label : string;
 }

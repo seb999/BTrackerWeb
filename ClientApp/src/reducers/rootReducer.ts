@@ -13,6 +13,7 @@ const initState = {
   userList: new Array<SmartHouseUser>(),
   logBookList: new Array<Log>(),
   isNewDoorCodeValid: true,
+  lookupList: new Array<Array<LookupItem>>(),
 
   lookupTrackerList: new Array<LookupItem>(),
   gpsPositionList: new Array<GpsPosition>(),
@@ -21,6 +22,7 @@ const initState = {
   isTrackerDeleted: false,
   isTrackerUpdated: false,
   isLogSaved: false,
+  isLogDeleted: false,
 }
 
 const rootReducer = (state = initState, action: any) => {
@@ -126,7 +128,20 @@ const rootReducer = (state = initState, action: any) => {
       return newState;
 
     case "LOG_SAVED_HIDE_LABEL":
-      newState.isLogSaved = true;
+      newState.isLogSaved = false;
+      return newState;
+
+    case "LOOKUP_LIST":
+      newState.lookupList = action.payload;
+      return newState;
+
+    case "LOG_DELETED":
+      newState.isLogDeleted = true;
+      newState.logBookList = action.payload
+      return newState;
+
+    case "LOG_DELETED_HIDE_LABEL":
+      newState.isLogDeleted = false;
       return newState;
 
     default:

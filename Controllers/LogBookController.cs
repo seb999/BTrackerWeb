@@ -6,6 +6,7 @@ using BTrackerWeb.EF;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using BTrackerWeb.Class;
+using Microsoft.EntityFrameworkCore;
 
 namespace BTrackerWeb.Controllers
 {
@@ -25,7 +26,7 @@ namespace BTrackerWeb.Controllers
         public List<LogBook> GetLogBookList()
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            return DbContext.LogBook.Where(p => p.UserId == userId).OrderByDescending(p=>p.LogBookDate).ToList();
+            return DbContext.pl_logBook.Include(p=>p.AircraftModel).Where(p => p.UserId == userId).OrderByDescending(p=>p.LogBookDate).ToList();
         }
 
         [HttpPost]
@@ -34,7 +35,18 @@ namespace BTrackerWeb.Controllers
         public List<LogBook> SaveLog([FromBody] LogBook log)
         {
             log.UserId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            DbContext.LogBook.Add(log);
+            DbContext.pl_logBook.Add(log);
+            DbContext.SaveChanges();
+            return GetLogBookList();
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("[Action]/{logId}")]
+        public List<LogBook> DeleteLog(int logId)
+        {
+            LogBook logItem = DbContext.pl_logBook.Where(p => p.LogBookId == logId).Select(p => p).FirstOrDefault();
+            DbContext.pl_logBook.Remove(logItem);
             DbContext.SaveChanges();
             return GetLogBookList();
         }

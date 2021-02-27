@@ -15,7 +15,9 @@ namespace BTrackerWeb.EF
         public virtual DbSet<SmartHouse> SmartHouse { get; set; }
         public virtual DbSet<SmartHouseUser> SmartHouseUser { get; set; }
         public virtual DbSet<SmartHouseEntry> SmartHouseEntry { get; set; }
-         public virtual DbSet<LogBook> LogBook { get; set; }
+        public virtual DbSet<LogBook> pl_logBook { get; set; }
+        public virtual DbSet<AircraftModel> pl_aircraftModel { get; set; }
+        public virtual DbSet<Airport> pl_airport { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

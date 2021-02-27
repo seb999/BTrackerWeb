@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BTrackerWeb.EF
 {
@@ -6,6 +8,14 @@ namespace BTrackerWeb.EF
     {
         public int LogBookId { get; set; }
         public string UserId { get; set; }
+
+        [ForeignKey("AirportDeparture")]
+        public int AirportDepartureId { get; set; }
+
+        [ForeignKey("AirportArrival")]
+        public int AirportArrivalId { get; set; }
+
+        public int AircraftModelId { get; set; }
         public DateTime? LogBookDate { get; set; }
          public string LogBookAircraftRegistration { get; set; }
         public string LogBookAircraftModel { get; set; }
@@ -19,5 +29,10 @@ namespace BTrackerWeb.EF
         public string LogBookPIC { get; set; }
         public string LogBookCoPilot { get; set; }
         public Boolean? LogBookDual { get; set; }
+        public string LogBookDescription { get; set; }
+
+        public AircraftModel AircraftModel { get; set; }
+        public virtual Airport AirportDeparture { get; set; }
+        public virtual Airport AirportArrival { get; set; }
     }
-}
+}/*  */

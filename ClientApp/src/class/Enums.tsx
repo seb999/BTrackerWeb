@@ -6,3 +6,8 @@ export enum Page {
     About,
     Contact,
 }
+
+export enum MyLookup {
+    AircraftList = 0,
+    AirportList = 1,
+}

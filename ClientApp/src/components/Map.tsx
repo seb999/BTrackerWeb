@@ -58,9 +58,9 @@ class Map extends React.Component<Props, State>{
 
     this.state = {
       token: null,
-      gpsMaxList: [{ id: 1, value: '10' }, { id: 2, value: "25" }, { id: 3, value: "50" }, { id: 4, value: "100" }],
-      gpsMaxSelected: { id: 1, value: '10' },
-      deviceSelected: { id: 0, value: "Filter device" },
+      gpsMaxList: [{ value: 1, label: '10' }, { value: 2, label: "25" }, { value: 3, label: "50" }, { value: 4, label: "100" }],
+      gpsMaxSelected: { value: 1, label: '10' },
+      deviceSelected: { value: 0, label: "Filter device" },
       loraMessageEndpoint: appsettings.loraMessageEndpoint,
       alertDeviceEUI: 0,
       isTrackerListLoaded: false,
@@ -79,7 +79,7 @@ class Map extends React.Component<Props, State>{
         token: await this.props.auth.getAccessToken()
       })
       if (!this.state.token) { this.props.auth.login('/') } else {
-        await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
+        await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.value, parseInt(this.state.gpsMaxSelected.label));
         await this.props.getTrackerList(this.state.token);
         await this.props.getTrackerLookupList(this.state.token);
         this.setState({ isTrackerListLoaded: true });
@@ -128,7 +128,7 @@ class Map extends React.Component<Props, State>{
       this.setState({ alertDeviceEUI: data });
       setTimeout(() => {
         this.setState({ alertDeviceEUI: 0 });
-        this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
+        this.props.getGpsPosition(this.state.token, this.state.deviceSelected.value, parseInt(this.state.gpsMaxSelected.label));
       }, 5000);
     }
     );
@@ -199,7 +199,7 @@ class Map extends React.Component<Props, State>{
     this.setState({
       deviceSelected: device,
     })
-    this.props.getGpsPosition(this.state.token, device.id, parseInt(this.state.gpsMaxSelected.value));
+    this.props.getGpsPosition(this.state.token, device.id, parseInt(this.state.gpsMaxSelected.label));
   }
 
   handleChangeMaxGps = (lookupItem: LookupItem) => {
@@ -207,7 +207,7 @@ class Map extends React.Component<Props, State>{
     this.setState({
       gpsMaxSelected: lookupItem,
     })
-    this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(lookupItem.value));
+    this.props.getGpsPosition(this.state.token, this.state.deviceSelected.value, parseInt(lookupItem.label));
   }
 
   handleShowHideSpot = (p: any) => {
@@ -225,7 +225,7 @@ class Map extends React.Component<Props, State>{
     console.log("delete gps point")
     if (item != null) {
       await this.props.deleteGpsData(this.state.token, item.gpsPositionId);
-      await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.id, parseInt(this.state.gpsMaxSelected.value));
+      await this.props.getGpsPosition(this.state.token, this.state.deviceSelected.value, parseInt(this.state.gpsMaxSelected.label));
       //this.props.gpsPositionList = this.props.gpsPositionList.slice(this.props.gpsPositionList.indexOf(item),1);
     }
   }

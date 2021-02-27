@@ -30,7 +30,7 @@ class ConfirmPopup extends React.Component<Props, State>{
                         <Button variant="secondary" onClick={()=>this.props.hide(false)}>
                             Cancel
                         </Button>
-                        <Button variant="primary" onClick={() =>this.props.hide(true)} >
+                        <Button variant="success" onClick={() =>this.props.hide(true)} >
                             Ok
                         </Button>
                     </Modal.Footer>
