@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BTrackerWeb.EF;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using BTrackerWeb.Class;
 using Microsoft.EntityFrameworkCore;
 
 namespace BTrackerWeb.Controllers
@@ -26,7 +23,11 @@ namespace BTrackerWeb.Controllers
         public List<LogBook> GetLogBookList()
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            return DbContext.pl_logBook.Include(p=>p.AircraftModel).Where(p => p.UserId == userId).OrderByDescending(p=>p.LogBookDate).ToList();
+            return DbContext.pl_logBook
+                .Include(p => p.AircraftModel)
+                .Include(p => p.AirportDeparture)
+                .Include(p => p.AirportArrival)
+                .Where(p => p.UserId == userId).OrderByDescending(p => p.LogBookDate).ToList();
         }
 
         [HttpPost]
@@ -51,5 +52,15 @@ namespace BTrackerWeb.Controllers
             return GetLogBookList();
         }
 
+        [HttpPost]
+        [Authorize]
+        [Route("/api/[controller]/[Action]")]
+        public List<LogBook> UpdateLog([FromBody] LogBook log)
+        {
+            log.UserId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
+            DbContext.pl_logBook.Update(log);
+            DbContext.SaveChanges();
+            return GetLogBookList();
+        }
     }
 }

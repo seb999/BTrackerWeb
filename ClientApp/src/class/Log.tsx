@@ -1,17 +1,19 @@
 import { Aircraft } from "./Aircraft";
+import { Airport } from "./Airport";
 
 export class Log {
     logBookId? : number;
     userId? : string;
     aircraftModelId? : number;
+    aircraftModel? : Aircraft;
     airportDepartureId? : number;
+    airportDeparture? : Airport;
     airportArrivalId? : number;
+    airportArrival? : Airport;
+
     logBookDate? : Date;
     logBookAircraftRegistration? : string;
-    aircraftModel? : Aircraft;
-    logBookDeparturePlace? : string;
     logBookDepartureTime? : string;
-    logBookArrivalPlace? : string;
     logBookArrivalTime? : string;
     logBookTotalFlightTime?: number;
     logBookIFR? : boolean;

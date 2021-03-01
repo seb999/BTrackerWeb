@@ -3,16 +3,10 @@ import { Modal, Button } from "react-bootstrap";
 import { connect } from 'react-redux';
 import * as actionCreator from '../../actions/actions';
 import { Dispatch } from 'redux';
-import { Device } from '../../class/Device';
 import { Log } from "../../class/Log";
 import Select from 'react-select';
 import { MyLookup } from '../../class/Enums';
-
-const options = [
-    { value: 'chocolate', label: 'Chocolate' },
-    { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' },
-  ];
+import moment from 'moment';
 
 interface State {
     logBookId: any;
@@ -24,7 +18,12 @@ interface State {
     logBookArrivalPlace: any;
     logBookArrivalTime: any;
     logBookTotalFlightTime: any;
-    logBookDescription:any;
+    logBookDescription: any;
+    logBookIFR: any;
+    logBookPIC: any;
+    logBookNight: any;
+    logBookDual: any;
+    logBookCoPilot: any;
 }
 
 interface Props {
@@ -32,14 +31,13 @@ interface Props {
     log: Log;
     token: any;
     show: boolean;
-    aircraftModelList : any;
-    airportList : any;
+    aircraftModelList: any;
+    airportList: any;
 
     hide(): void;
-    saveLog(token: any, user: any): void;
-    updateLog(token: any, p: Device): void;
+    saveLog(token: any, p: Log): void;
+    updateLog(token: any, p: Log): void;
     getLookupList(): any;
-
 }
 
 class LogBookPopup extends React.Component<Props, State>{
@@ -49,7 +47,7 @@ class LogBookPopup extends React.Component<Props, State>{
         super(props)
         this.state = {
             logBookId: 0,
-            logBookDate: '',
+            logBookDate: "",
             logBookAircraftModel: "",
             logBookAircraftRegistration: "",
             logBookDeparturePlace: "",
@@ -58,103 +56,127 @@ class LogBookPopup extends React.Component<Props, State>{
             logBookArrivalTime: "",
             logBookTotalFlightTime: "",
             logBookDescription: "",
-
+            logBookIFR: null,
+            logBookPIC: null,
+            logBookNight: null,
+            logBookDual: null,
+            logBookCoPilot: null,
         };
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.props.getLookupList();
     }
 
-
-
     componentDidUpdate(nextProps: any) {
-        //Detect if we update a user
-        // if (this.props !== nextProps) {
-        //     this.setState({
-        //         userId: this.props.user.smartHouseUserId,
-        //         userName: this.props.user.smartHouseUserName,
-        //         userArrival: this.props.user.smartHouseUserArrival,
-        //         userCode: this.props.user.smartHouseUserCode,
-        //         userEmail: this.props.user.smartHouseUserEmail,
-        //         userIsDesactivated: this.props.user.smartHouseUserIsDesactivated,
-        //         userLeave: this.props.user.smartHouseUserLeave,
-        //     })
-        // }
+        let aircraftLabel = this.props.log.aircraftModel != undefined ? this.props.log.aircraftModel.aircraftModelName : null;
+        let aircraftValue = this.props.log.aircraftModel != undefined ? this.props.log.aircraftModel.aircraftModelId : null;
+        let airportDepartureLabel = this.props.log.airportDeparture != undefined ? this.props.log.airportDeparture.airportName + " | " + this.props.log.airportDeparture.airportCode : null;
+        let airportArrivalLabel = this.props.log.airportArrival != undefined ? this.props.log.airportArrival.airportName + " | " + this.props.log.airportArrival.airportCode : null;
+        let airportDepartureValue = this.props.log.airportDeparture != undefined ? this.props.log.airportDeparture.airportId : null;
+        let airportArrivalValue = this.props.log.airportArrival != undefined ? this.props.log.airportArrival.airportId : null;
 
-       
+        //Edit selected logbook
+        if (this.props !== nextProps) {
+            console.log(this.props.log);
+            this.setState({
+                logBookId: this.props.log.logBookId,
+                logBookDate: moment.parseZone(this.props.log.logBookDate).format('YYYY-MM-DD'),
+                logBookAircraftModel: { label: aircraftLabel, value: aircraftValue },
+                logBookAircraftRegistration: this.props.log.logBookAircraftRegistration,
+                logBookDeparturePlace: { label: airportDepartureLabel, value: airportDepartureValue },
+                logBookDepartureTime: this.props.log.logBookDepartureTime,
+                logBookArrivalPlace: { label: airportArrivalLabel, value: airportArrivalValue },
+                logBookArrivalTime: this.props.log.logBookArrivalTime,
+                logBookTotalFlightTime: this.props.log.logBookTotalFlightTime,
+                logBookDescription: this.props.log.logBookDescription,
+                logBookIFR: this.props.log.logBookIFR != null ? this.props.log.logBookIFR : false,
+                logBookPIC: this.props.log.logBookPIC != null ? this.props.log.logBookPIC : false,
+                logBookCoPilot: this.props.log.logBookCoPilot != null ? this.props.log.logBookCoPilot : false,
+                logBookDual: this.props.log.logBookDual != null ? this.props.log.logBookDual : false,
+                logBookNight: this.props.log.logBookNight != null ? this.props.log.logBookNight : false,
+            })
+        }
     }
 
     handleChange = (e: any) => {
+        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+
         this.setState({
-            [e.target.id]: e.target.value
+            [e.target.id]: value
         } as any);
-
     }
 
-    handleChangeDeparture = (e: any) => {
-        let totalTime = 0;
-        if (e.target.value.length == 5) {
-
-            let startTime = e.target.value.split(':');
-            let endTime = this.state.logBookArrivalTime.split(':');
-            if (this.state.logBookArrivalTime.length == 5) {
-                let totalTime = (endTime[0] * 60 + endTime[1] * 1) - (startTime[0] * 60 + startTime[1] * 1);
-            }
-
-            this.setState({
-                logBookDepartureTime: e.target.value,
-                logBookTotalFlightTime: totalTime / 60,
-            });
-        }
-    }
-
-    handleAircraftChange = (logBookAircraftModel:any) => {
+    handleAircraftChange = (logBookAircraftModel: any) => {
         this.setState({ logBookAircraftModel });
-      };
+    };
 
-      handleAirportDepartureChange = (logBookDeparturePlace:any) => {
+    handleAirportDepartureChange = (logBookDeparturePlace: any) => {
         this.setState({ logBookDeparturePlace });
-      };
+    };
 
-      handleAirportArrivalChange = (logBookArrivalPlace:any) => {
+    handleAirportArrivalChange = (logBookArrivalPlace: any) => {
         this.setState({ logBookArrivalPlace });
-      };
+    };
 
-    handleChangeArrival = (e: any) => {
-        if (e.target.value.length == 5) {
-
-            let endTime = e.target.value.split(':');
-            let startTime = this.state.logBookDepartureTime.split(':');
-            let totalTime = (endTime[0] * 60 + endTime[1] * 1) - (startTime[0] * 60 + startTime[1] * 1);
-
-            this.setState({
-                logBookArrivalTime: e.target.value,
-                logBookTotalFlightTime: totalTime / 60,
-            });
+    handleDepartureChange = (e: any) => {
+        this.setState({
+            logBookDepartureTime: e.target.value,
+        });
+        if (this.state.logBookArrivalTime != undefined) {
+            this.calculateFlightTime(e.target.value, this.state.logBookArrivalTime);
         }
+    }
+
+    handleArrivalChange = (e: any) => {
+        this.setState({
+            logBookArrivalTime: e.target.value,
+        });
+        if (this.state.logBookDepartureTime != undefined) {
+            this.calculateFlightTime(this.state.logBookDepartureTime, e.target.value);
+        }
+    }
+
+    calculateFlightTime = (depart: any, arrival: any) => {
+        let totalTime = 0;
+        let startTime = depart.split(':');
+        let endTime = arrival.split(':');
+        totalTime = (endTime[0] * 60 + endTime[1] * 1) - (startTime[0] * 60 + startTime[1] * 1);
+        this.setState({
+            logBookTotalFlightTime: totalTime / 60,
+        });
     }
 
     handleSaveLog = (e: any) => {
         e.preventDefault();
-        //Add new device to local db
         var myLog: Log = ({
+            logBookId: this.state.logBookId,
             logBookDate: this.state.logBookDate,
-            airportDepartureId : this.state.logBookDeparturePlace.value,
-            airportArrivalId : this.state.logBookArrivalPlace.value,
+            airportDepartureId: this.state.logBookDeparturePlace.value,
+            airportArrivalId: this.state.logBookArrivalPlace.value,
             logBookAircraftRegistration: this.state.logBookAircraftRegistration,
             logBookDepartureTime: this.state.logBookDepartureTime,
             logBookArrivalTime: this.state.logBookArrivalTime,
             logBookTotalFlightTime: this.state.logBookTotalFlightTime,
-            aircraftModelId : this.state.logBookAircraftModel.value,
-            logBookDescription : this.state.logBookDescription,
+            aircraftModelId: this.state.logBookAircraftModel.value,
+            logBookDescription: this.state.logBookDescription,
+            logBookCoPilot:this.state.logBookCoPilot,
+            logBookNight:this.state.logBookNight,
+            logBookDual:this.state.logBookDual,
+            logBookIFR:this.state.logBookIFR,
+            logBookPIC:this.state.logBookPIC,
         });
-        this.props.saveLog(this.props.token, myLog);
+        if (myLog.logBookId != undefined) {
+            this.props.updateLog(this.props.token, myLog);
+        }
+        else {
+            this.props.saveLog(this.props.token, myLog);
+        }
+
         this.props.hide();
     }
 
     render() {
-        console.log(this.props.aircraftModelList);
         return (
             <div>
                 <Modal show={this.props.show} onHide={() => this.props.hide()}>
@@ -166,8 +188,40 @@ class LogBookPopup extends React.Component<Props, State>{
 
                         <form id="newUserForm" className="form-signin" onSubmit={this.handleSaveLog}>
 
-                            <input id="userId" value={this.state.logBookId} type="text" className="form-control" readOnly hidden></input>
+                            <input id="logBookId" value={this.state.logBookId || ''} type="text" className="form-control" readOnly hidden></input>
 
+                            <div className="row mb-2">
+                                <div className="col-sm-2">
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="checkbox" checked={this.state.logBookIFR } id="logBookIFR"  onClick={this.handleChange}></input>
+                                        <label className="form-check-label" >IFR</label>
+                                    </div>
+                                </div>
+                                <div className="col-sm-2">
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="checkbox" checked={this.state.logBookNight} id="logBookNight" onClick={this.handleChange}></input>
+                                        <label className="form-check-label" >Night</label>
+                                    </div>
+                                </div>
+                                <div className="col-sm-2">
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="checkbox" checked={this.state.logBookPIC} id="logBookPIC" onClick={this.handleChange}></input>
+                                        <label className="form-check-label" >PIC</label>
+                                    </div>
+                                </div>
+                                <div className="col-sm-3">
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="checkbox" checked={this.state.logBookCoPilot} id="logBookCoPilot" onClick={this.handleChange}></input>
+                                        <label className="form-check-label" >Co-Pilot</label>
+                                    </div>
+                                </div>
+                                <div className="col-sm-2">
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="checkbox" checked={this.state.logBookDual} id="logBookDual" onClick={this.handleChange}></input>
+                                        <label className="form-check-label" >Dual</label>
+                                    </div>
+                                </div>
+                            </div>
                             <div className="mb-2 row">
                                 <label className="col-sm-4 col-form-label">Date of flight</label>
                                 <div className="col-sm-8">
@@ -178,56 +232,56 @@ class LogBookPopup extends React.Component<Props, State>{
                             <div className="mb-2 row">
                                 <label className="col-sm-4 col-form-label">Model</label>
                                 <div className="col-sm-8">
-                                    <Select id="logBookAircraftModel" onChange={this.handleAircraftChange} options={this.props.aircraftModelList} placeholder="Aircraft model" value={this.state.logBookAircraftModel}/>
+                                    <Select id="logBookAircraftModel" onChange={this.handleAircraftChange} options={this.props.aircraftModelList} placeholder="Aircraft model" value={this.state.logBookAircraftModel} />
                                 </div>
                             </div>
 
                             <div className="mb-2 row">
                                 <label className="col-sm-4 col-form-label">Registration</label>
                                 <div className="col-sm-8">
-                                    <input id="logBookAircraftRegistration" value={this.state.logBookAircraftRegistration} type="text" className="form-control" placeholder="Aircraft registration" required onChange={this.handleChange}></input>
+                                    <input id="logBookAircraftRegistration" value={this.state.logBookAircraftRegistration || ''} type="text" className="form-control" placeholder="Aircraft registration" required onChange={this.handleChange}></input>
                                 </div>
                             </div>
 
                             <div className="mb-2 row">
                                 <label className="col-sm-4 col-form-label">From</label>
                                 <div className="col-sm-8">
-                                    <Select id="logBookDeparturePlace" onChange={this.handleAirportDepartureChange} options={this.props.airportList} placeholder="Airport departure" value={this.state.logBookDeparturePlace}/>
+                                    <Select id="logBookDeparturePlace" onChange={this.handleAirportDepartureChange} options={this.props.airportList} placeholder="Airport departure" value={this.state.logBookDeparturePlace} />
                                 </div>
                             </div>
 
                             <div className="mb-2 row">
                                 <label className="col-sm-4 col-form-label">Departure time</label>
                                 <div className="col-sm-8">
-                                    <input id="logBookDepartureTime" value={this.state.logBookDepartureTime} type="time" className="form-control" placeholder="Date" required onChange={this.handleChangeDeparture}></input>
+                                    <input id="logBookDepartureTime" value={this.state.logBookDepartureTime || ''} type="time" className="form-control" placeholder="Date" required onChange={this.handleDepartureChange}></input>
                                 </div>
                             </div>
 
                             <div className="mb-2 row">
                                 <label className="col-sm-4 col-form-label">To</label>
                                 <div className="col-sm-8">
-                                    <Select id="logBookArrivalPlace" onChange={this.handleAirportArrivalChange} options={this.props.airportList} placeholder="Airport departure" value={this.state.logBookArrivalPlace}/>
+                                    <Select id="logBookArrivalPlace" onChange={this.handleAirportArrivalChange} options={this.props.airportList} placeholder="Airport departure" value={this.state.logBookArrivalPlace} />
                                 </div>
                             </div>
 
                             <div className="mb-2 row">
                                 <label className="col-sm-4 col-form-label">Arrival time</label>
                                 <div className="col-sm-8">
-                                    <input id="logBookArrivalTime" value={this.state.logBookArrivalTime} type="time" className="form-control" placeholder="Date" required onChange={this.handleChangeArrival}></input>
+                                    <input id="logBookArrivalTime" value={this.state.logBookArrivalTime || ''} type="time" className="form-control" placeholder="Date" required onChange={this.handleArrivalChange}></input>
                                 </div>
                             </div>
 
                             <div className="mb-2 row">
                                 <label className="col-sm-4 col-form-label">Total time flight</label>
                                 <div className="col-sm-8">
-                                    <input id="logBookTotalFlightTime" value={this.state.logBookTotalFlightTime} type="text" className="form-control" placeholder="" required onChange={this.handleChange}></input>
+                                    <input id="logBookTotalFlightTime" value={this.state.logBookTotalFlightTime || ''} type="text" className="form-control" placeholder="" required onChange={this.handleChange}></input>
                                 </div>
                             </div>
 
                             <div className="mb-2 row">
                                 <label className="col-sm-4 col-form-label">Note</label>
                                 <div className="col-sm-8">
-                                    <textarea id="logBookDescription" value={this.state.logBookDescription}  rows={3}  className="form-control" placeholder="" required onChange={this.handleChange}></textarea>
+                                    <textarea id="logBookDescription" value={this.state.logBookDescription} rows={3} className="form-control" placeholder="" required onChange={this.handleChange}></textarea>
                                 </div>
                             </div>
 
@@ -253,7 +307,7 @@ const mapStateToProps = (state: any) => {
         userId: state.userId,
         isDoorCodeValid: state.isNewDoorCodeValid,
         aircraftModelList: state.lookupList[MyLookup.AircraftList],
-        airportList : state.lookupList[MyLookup.AirportList],
+        airportList: state.lookupList[MyLookup.AirportList],
     }
 }
 

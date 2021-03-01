@@ -1,4 +1,4 @@
-export class Aircraft {
-    aircraftModelId? : number;
-    aircraftModelName? : string;
+export type Aircraft = {
+    aircraftModelId : number;
+    aircraftModelName : string;
 }

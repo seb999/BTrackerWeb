@@ -23,11 +23,11 @@ export const getLogList = (accessToken: any) =>{
  }
 
 //  UPDATE LOG---------------------------------------------
- export const updateLog = (user :any, accessToken: any ) =>{
+ export const updateLog = (accessToken: any, log: any ) =>{
   return async (dispatch  :any) =>{
     try{
       //We are logged in the API so we don't need to pass again the userId
-      const res = await axios.post<any>(apiUrl + "UpdateLog/",user, {headers: {Authorization: 'Bearer ' + accessToken}});
+      const res = await axios.post<any>(apiUrl + "UpdateLog/",log, {headers: {Authorization: 'Bearer ' + accessToken}});
       dispatch(showsUpdateLogLabel());
       return dispatch(updateLogSuccess(res.data));
     }

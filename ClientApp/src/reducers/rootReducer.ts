@@ -131,6 +131,15 @@ const rootReducer = (state = initState, action: any) => {
       newState.isLogSaved = false;
       return newState;
 
+      case "LOG_UPDATED":
+      newState.isLogSaved = true;
+      newState.logBookList = action.payload
+      return newState;
+
+    case "LOG_UPDATED_HIDE_LABEL":
+      newState.isLogSaved = false;
+      return newState;
+
     case "LOOKUP_LIST":
       newState.lookupList = action.payload;
       return newState;
