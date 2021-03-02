@@ -14,6 +14,7 @@ import SmartHouse from './components/SmartHouse';
 import SmartHouseUser from './components/SmartHouseAdmin';
 import SmartHouseAdmin from './components/SmartHouseAdmin';
 import LogBook from './components/LogBook';
+import PlanNavigation from './components/PlanNavigation';
 
 const config = {
   issuer: 'https://dev-792490.okta.com/oauth2/default',
@@ -40,6 +41,7 @@ class App extends React.Component<Props, State>{
         { type: "NavLink", path: "/SmartHouse", text: "My house", isActive: true },
         { type: "NavLink", path: "/SmartHouseAdmin", text: "Admin", isActive: false },
         { type: "NavLink", path: "/LogBook", text: "LogBook", isActive: false },
+        { type: "NavLink", path: "/PlanNavigation", text: "Navigation", isActive: false },
       ]
     }
 
@@ -60,6 +62,7 @@ class App extends React.Component<Props, State>{
             <Route path='/SmartHouse' exact={true} component={SmartHouse} />
             <Route path='/SmartHouseAdmin' exact={true} component={SmartHouseAdmin} />
             <Route path='/LogBook' exact={true} component={LogBook} />
+            <Route path='/PlanNavigation' exact={true} component={PlanNavigation} />
             <Route path='/Map' exact={true} component={Map} />
             <Route path='/implicit/callback' component={ImplicitCallback} />
           </Switch>
