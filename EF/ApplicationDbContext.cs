@@ -18,6 +18,8 @@ namespace BTrackerWeb.EF
         public virtual DbSet<LogBook> pl_logBook { get; set; }
         public virtual DbSet<AircraftModel> pl_aircraftModel { get; set; }
         public virtual DbSet<Airport> pl_airport { get; set; }
+        public virtual DbSet<FlightPlan> pl_flightPlan { get; set; }
+        public virtual DbSet<WayPoint> pl_wayPoint { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
