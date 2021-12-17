@@ -9,6 +9,7 @@ import { Log } from "../class/Log";
 import LogBookPopup from "./popup/LogBookPopup";
 import MyPopover from "./element/MyPopover";
 import ConfirmPopup from './popup/ConfirmPopup';
+import { isTemplateExpression } from 'typescript';
 
 interface AppFnProps {
     getLogBookList(token: any): void;
@@ -110,10 +111,18 @@ class LogBookAircraft extends React.Component<Props, State>{
 
     render() {
         let totalFlightTime = 0;
+        let totalSoloTime = 0;
         this.props.logBookList.map((item, index) => (
             totalFlightTime = totalFlightTime + (item.logBookTotalFlightTime != undefined ? item.logBookTotalFlightTime : 0))
-        );
+            );
         totalFlightTime = Math.round(totalFlightTime * 100) / 100
+
+        this.props.logBookList.forEach(item => {
+            if(!item.logBookDual){
+                totalSoloTime = totalSoloTime + (item.logBookTotalFlightTime != undefined ? item.logBookTotalFlightTime : 0)
+            }
+        })
+        totalSoloTime = Math.round(totalSoloTime * 100) / 100;
 
 
         let displayList = this.props.logBookList.map((item, index) => (
@@ -158,7 +167,9 @@ class LogBookAircraft extends React.Component<Props, State>{
             <div>
                 <button type="button" className="btn btn-success btn-sm mt-2" onClick={this.handleAddLog}><span><i className="fas fa-edit"></i></span> New Log</button>
 
-                <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-warning mt-2" role="alert"> Total flight time {totalFlightTime}</div>
+                  <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success mt-2" role="alert"> Total flight time {totalFlightTime}</div>
+                  <div style={{ float: "right", height: "32px", padding: "3px", marginRight: "7px", border:"1px"}} className="alert alert-success mt-2" role="alert"> Total solo time {totalSoloTime}</div>
+              
                 {this.props.isLogSaved && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success mt-2 mr-2" role="alert"> New log added!</div>}
                 {this.props.isLogDeleted && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success mt-2 mr-2" role="alert"> Deleted!</div>}
 
