@@ -20,6 +20,7 @@ namespace BTrackerWeb.EF
         public virtual DbSet<Airport> pl_airport { get; set; }
         public virtual DbSet<FlightPlan> pl_flightPlan { get; set; }
         public virtual DbSet<WayPoint> pl_wayPoint { get; set; }
+        public virtual DbSet<RequestTrans> cry_requestTrans { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
