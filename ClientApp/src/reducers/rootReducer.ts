@@ -4,8 +4,17 @@ import { LookupItem } from "../class/LookupItem";
 import { Switchs } from "../class/Switch";
 import { SmartHouseUser } from "../class/SmartHouseUser";
 import { Log } from "../class/Log";
+import { Terminal } from "../class/Cr_terminal";
+import { Transfer } from "../class/Cr_transfer";
+import { Asset } from "../class/Cr_asset";
+import { Transaction } from "../class/Cr_transaction";
 
 const initState = {
+  terminalList: new Array<Terminal>(),
+  transferList: new Array<Transfer>(),
+  assetList: new Array<Asset>(),
+  transactionList: new Array<Transaction>(),
+
   isSwitchUpdated: false,
   trackerList: new Array<Device>(),
   switchList: new Array<Switchs>(),
@@ -23,6 +32,7 @@ const initState = {
   isTrackerUpdated: false,
   isLogSaved: false,
   isLogDeleted: false,
+  isTransSaved: false,
 }
 
 const rootReducer = (state = initState, action: any) => {
@@ -124,14 +134,14 @@ const rootReducer = (state = initState, action: any) => {
 
     case "LOG_SAVED":
       newState.isLogSaved = true;
-      newState.logBookList = action.payload
+      newState.logBookList = action.payload;
       return newState;
 
     case "LOG_SAVED_HIDE_LABEL":
       newState.isLogSaved = false;
       return newState;
 
-      case "LOG_UPDATED":
+    case "LOG_UPDATED":
       newState.isLogSaved = true;
       newState.logBookList = action.payload
       return newState;
@@ -152,6 +162,31 @@ const rootReducer = (state = initState, action: any) => {
     case "LOG_DELETED_HIDE_LABEL":
       newState.isLogDeleted = false;
       return newState;
+
+    case "CR_TRANS_SAVED":
+      newState.isTransSaved = true;
+      return newState;
+
+    case "CR_TRANS_SAVED_HIDE_LABEL":
+      newState.isTransSaved = false;
+      return newState;
+
+    case "TERMINAL_LIST":
+      newState.terminalList = action.payload;
+      return newState;
+
+    case "TRANSFER_LIST":
+      newState.transferList = action.payload;
+      return newState;
+
+    case "BINANCE_BALANCE":
+      newState.assetList = action.payload;
+      return newState;
+
+      case "BINANCE_TRANS_HISTORY":
+      newState.transactionList = action.payload;
+      return newState;
+
 
     default:
       return state;

@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { Security, ImplicitCallback } from '@okta/okta-react';
 
 import Home from './components/Home';
@@ -15,6 +15,7 @@ import SmartHouseUser from './components/SmartHouseAdmin';
 import SmartHouseAdmin from './components/SmartHouseAdmin';
 import LogBook from './components/LogBook';
 import PlanNavigation from './components/PlanNavigation';
+import CryptoTransfer from './components/CryptoTransfer';
 
 const config = {
   issuer: 'https://dev-792490.okta.com/oauth2/default',
@@ -65,6 +66,7 @@ class App extends React.Component<Props, State>{
             <Route path='/LogBook' exact={true} component={LogBook} />
             <Route path='/PlanNavigation' exact={true} component={PlanNavigation} />
             <Route path='/Map' exact={true} component={Map} />
+            <Route path='/CryptoTransfer' exact={true} component={CryptoTransfer} />
             <Route path='/implicit/callback' component={ImplicitCallback} />
           </Switch>
           </div>
