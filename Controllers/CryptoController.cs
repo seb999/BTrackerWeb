@@ -38,17 +38,6 @@ namespace BTrackerWeb.Controllers
                 .Select(p => p).OrderBy(p => p.TerminalId).ToList();   
         }
 
-        [HttpGet]
-        [Authorize]
-        [Route("[Action]")]
-        public List<Transfer> GetTransferList()
-        {
-            string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            return DbContext.cr_transfer
-                .Where(p => p.Terminal.UserId == userId)
-                .Select(p => p).OrderByDescending(p => p.TransferId).ToList();
-        }
-
         [HttpPost]
         [Authorize]
         [Route("/api/[controller]/[Action]")]
@@ -59,6 +48,17 @@ namespace BTrackerWeb.Controllers
             DbContext.cr_terminal.Add(terminal);
             DbContext.SaveChanges();
             return GetTerminalList();
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("[Action]")]
+        public List<Transfer> GetTransferList()
+        {
+            string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
+            return DbContext.cr_transfer
+                .Where(p => p.Terminal.UserId == userId)
+                .Select(p => p).OrderByDescending(p => p.TransferId).ToList();
         }
 
         [HttpPost]
@@ -76,6 +76,14 @@ namespace BTrackerWeb.Controllers
         public Transfer GetTransferAmount(int terminalId)
         {
             return DbContext.cr_transfer.Where(p => p.TerminalId == terminalId).FirstOrDefault();
+        }
+
+        [HttpGet]
+        [Route("[Action]")]
+        public void ValidateTransaction(int terminalId)
+        {
+            Transfer myTransfert =  DbContext.cr_transfer.Where(p => p.TerminalId == terminalId).FirstOrDefault();
+            BinanceExecuteTransfer(myTransfert.TransferAmount);
         }
 
         [HttpGet]
@@ -122,18 +130,18 @@ namespace BTrackerWeb.Controllers
         
         [HttpGet]
         [Route("[Action]")]
-        public object BinanceTransfer()
+        public object BinanceExecuteTransfer(decimal amount)
         {
+            //Get number of ADA from UI (convert euros requested into ADA and call this method)
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
             string secretKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserSecretKey).FirstOrDefault();
             string apiKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserApiKey).FirstOrDefault();
 
-            string parameters = $"timestamp={ServerTime(apiKey)}&recvWindow=60000&type=MAIN_FUNDING";
+            string parameters = $"timestamp={ServerTime(apiKey)}&recvWindow=60000&type=MAIN_FUNDING&asset=ADA&amount={amount}";
             string signature = GetSignature(parameters, secretKey);
-           string apiUrl = $"https://api3.binance.com/sapi/v1/asset/transfer?{parameters}&signature={signature}";
-//TODO : we have to do a post to execute a transfer
-            var toto = HttpHelper.GetApiData<object>(new Uri(apiUrl), apiKey); 
-            return HttpHelper.GetApiData<List<object>>(new Uri(apiUrl), apiKey);            
+            string apiUrl = $"https://api3.binance.com/sapi/v1/asset/transfer?{parameters}&signature={signature}";
+
+            return  HttpHelper.PostApiData<List<CryptoAsset>>(new Uri(apiUrl), apiKey, new StringContent("", Encoding.UTF8, "application/json"));                    
         }
 
         private static long ServerTime(string apiKey)
