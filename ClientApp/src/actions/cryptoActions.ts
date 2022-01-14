@@ -25,6 +25,29 @@ export const terminalList = (accessToken : any) =>{
   }
  }
 
+ ///////////////////////////////////////////////////////////////
+//--------------GET SYMBOL CURRENT PRICE----------------------//
+////////////////////////////////////////////////////////////////
+ export const symbolCurrentPrice = ( symbol: any) =>{
+  return async (dispatch  :any) =>{
+    try{
+      //We are logged in the API so we don't need to pass again the userId
+      const res = await axios.get<any>("https://api3.binance.com/api/v3/avgPrice?symbol=" + symbol);
+      return dispatch(symbolCurrentPriceSuccess(res.data));
+    }
+    catch (error) {
+      throw (error)
+    }
+  }
+ }
+ 
+ export const symbolCurrentPriceSuccess = (data :any) => {
+  return {
+    type: "BINANCE_SYMBOL_PRICE",
+    payload: data
+  }
+ }
+
  ////////////////////////////////////////////////////////////////
 //--------------GET ASSET BALANCE from BINANCE-----------------------------//
 ////////////////////////////////////////////////////////////////
@@ -78,7 +101,6 @@ export const SaveTransferAmount = (accessToken: any, requestTrans :any) =>{
   return async (dispatch  :any) =>{
     try{
       const res = await axios.post<any>(apiUrl + "SaveTransferAmount/",requestTrans, {headers: {Authorization: 'Bearer ' + accessToken}});
-      dispatch(showsSaveTransfertLabel());
       return dispatch(saveTransfertSuccess(res.data));
     }
     catch (error) {
@@ -89,24 +111,10 @@ export const SaveTransferAmount = (accessToken: any, requestTrans :any) =>{
  
  export const saveTransfertSuccess = (data :any) => {
   return {
-    type: "CR_TRANS_SAVED",
+    type: "TRANSACTION_SAVED",
     payload: data
   }
  }
-
- export const showsSaveTransfertLabel = () =>{
-  return async (dispatch  :any) =>{
-    setTimeout(() => {
-        dispatch(hideSaveLogLabel());
-    }, 3000);
-  }
-}
-
-export const hideSaveLogLabel = () =>{
-  return {
-    type:"CR_TRANS_SAVED_HIDE_LABEL"
-  }
-}
 
  ////////////////////////////////////////////////////////////////
 //--------------GET TRANSFER LIST-----------------------------//

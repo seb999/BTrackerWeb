@@ -7,9 +7,11 @@ namespace BTrackerWeb.EF
     {
         public int TransferId { get; set; }
         public int TerminalId { get; set; }
+        public decimal TransferAmountRequested { get; set; }
         public string TransferSymbol { get; set; }
         public decimal TransferAmount { get; set; }
+        public bool? TransferIsCompleted { get; set; }
 
-         public Terminal Terminal { get; set; }
+        public Terminal Terminal { get; set; }
     }
 }

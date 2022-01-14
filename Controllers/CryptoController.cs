@@ -56,9 +56,25 @@ namespace BTrackerWeb.Controllers
         public List<Transfer> GetTransferList()
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
+            if (userId == null) return new List<Transfer>();
             return DbContext.cr_transfer
-                .Where(p => p.Terminal.UserId == userId)
+                .Where(p => p.Terminal.UserId == userId && p.TransferIsCompleted!=true)
                 .Select(p => p).OrderByDescending(p => p.TransferId).ToList();
+        }
+
+        [HttpGet]
+        [Route("[Action]")]
+        public Transfer GetTransfer()
+        {
+            return DbContext.cr_transfer.Where(p=>p.TransferIsCompleted!=true).Select(p=>p).FirstOrDefault();
+        }
+
+        [HttpGet]
+        [Route("[Action]")]
+        public void ValidateTransfer(int terminalId)
+        {
+            Transfer myTransfert =  DbContext.cr_transfer.Where(p => p.TerminalId == terminalId).FirstOrDefault();
+            BinanceExecuteTransfer(myTransfert.TransferAmount);
         }
 
         [HttpPost]
@@ -76,14 +92,6 @@ namespace BTrackerWeb.Controllers
         public Transfer GetTransferAmount(int terminalId)
         {
             return DbContext.cr_transfer.Where(p => p.TerminalId == terminalId).FirstOrDefault();
-        }
-
-        [HttpGet]
-        [Route("[Action]")]
-        public void ValidateTransaction(int terminalId)
-        {
-            Transfer myTransfert =  DbContext.cr_transfer.Where(p => p.TerminalId == terminalId).FirstOrDefault();
-            BinanceExecuteTransfer(myTransfert.TransferAmount);
         }
 
         [HttpGet]

@@ -14,6 +14,7 @@ const initState = {
   transferList: new Array<Transfer>(),
   assetList: new Array<Asset>(),
   transactionList: new Array<Transaction>(),
+  symbolCurrentPrice: 0,
 
   isSwitchUpdated: false,
   trackerList: new Array<Device>(),
@@ -163,12 +164,9 @@ const rootReducer = (state = initState, action: any) => {
       newState.isLogDeleted = false;
       return newState;
 
-    case "CR_TRANS_SAVED":
+    case "TRANSACTION_SAVED":
       newState.isTransSaved = true;
-      return newState;
-
-    case "CR_TRANS_SAVED_HIDE_LABEL":
-      newState.isTransSaved = false;
+      newState.transferList = action.payload;
       return newState;
 
     case "TERMINAL_LIST":
@@ -183,8 +181,12 @@ const rootReducer = (state = initState, action: any) => {
       newState.assetList = action.payload;
       return newState;
 
-      case "BINANCE_TRANS_HISTORY":
+    case "BINANCE_TRANS_HISTORY":
       newState.transactionList = action.payload;
+      return newState;
+
+    case "BINANCE_SYMBOL_PRICE":
+      newState.symbolCurrentPrice = action.payload.price;
       return newState;
 
 
