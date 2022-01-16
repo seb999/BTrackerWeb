@@ -17,10 +17,7 @@ namespace BTrackerWeb.Controllers
     public class CryptoController : Controller
     {
         private readonly ApplicationDbContext DbContext;
-
-        static string apiKey = "lJ1rj5uEaCGEzd6RdXE5P6Em7oEc1Kp0bMXbcy7MoKFNEaajhEr873xzAkX5C2Px";
  
-
         public CryptoController([FromServices] ApplicationDbContext appDbContext)
         {
             DbContext = appDbContext;
@@ -110,7 +107,8 @@ namespace BTrackerWeb.Controllers
         public List<CryptoAsset> BinanceBalance()
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            string secretKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserSecretKey).FirstOrDefault();
+            //string secretKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserSecretKey).FirstOrDefault();
+            string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY",EnvironmentVariableTarget.Process);
             string apiKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserApiKey).FirstOrDefault();
 
             string parameters = $"timestamp={ServerTime(apiKey)}&recvWindow=60000";
@@ -126,7 +124,8 @@ namespace BTrackerWeb.Controllers
         public List<CryptoTransfer> BinanceTransactionHistory()
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            string secretKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserSecretKey).FirstOrDefault();
+            //string secretKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserSecretKey).FirstOrDefault();
+            string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY", EnvironmentVariableTarget.Process);
             string apiKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserApiKey).FirstOrDefault();
 
             string parameters = $"timestamp={ServerTime(apiKey)}&recvWindow=60000&type=MAIN_FUNDING";
@@ -142,7 +141,8 @@ namespace BTrackerWeb.Controllers
         {
             //Get number of ADA from UI (convert euros requested into ADA and call this method)
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            string secretKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserSecretKey).FirstOrDefault();
+            //string secretKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserSecretKey).FirstOrDefault();
+            string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY",EnvironmentVariableTarget.Process);
             string apiKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserApiKey).FirstOrDefault();
 
             string parameters = $"timestamp={ServerTime(apiKey)}&recvWindow=60000&type=MAIN_FUNDING&asset=ADA&amount={amount}";
