@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import * as actionCreator from '../actions/actions';
@@ -13,6 +13,7 @@ import { Transaction } from '../class/Cr_transaction';
 import Toggle from 'react-toggle';
 import moment from 'moment';
 import ReactTooltip from 'react-tooltip';
+import SignalRService from './../service/SignalRService';
 
 interface AppFnProps {
     getTerminalList(token: any): void;
@@ -114,7 +115,7 @@ class CryptoTransfer extends React.Component<Props, State>{
         this.props.geSymbolCurrentPrice("ADAEUR");
         e.preventDefault();
         var newTransfert: Transfer = ({
-            terminalId: 1,
+            terminalId: this.props.terminalList[0].terminalId,
             transferAmountRequested: this.state.amount,
             transferSymbol: this.state.currencySelected.label,
             transferAmount: this.state.amount / this.props.symbolCurrentPrice,
@@ -129,6 +130,12 @@ class CryptoTransfer extends React.Component<Props, State>{
 
     getCurrentAvragePrice = () => {
 
+    }
+
+    refresh = () => {
+        this.props.getAssetList(this.state.token);
+        this.props.getTransactionList(this.state.token);
+        this.props.getTransferList(this.state.token);
     }
 
     cancel = () => {
@@ -167,18 +174,18 @@ class CryptoTransfer extends React.Component<Props, State>{
         ));
 
         let transferList = this.props.transferList.map((item, index) => (
-            
+
             <div key={index} className='row justify-content-center' style={{ marginTop: 30 }}>
-                 <div className="card text-white bg-warning mb-3"></div>
+                <div className="card text-white bg-warning mb-3"></div>
                 <div className="card-body">
                     <h5 className="card-title">Pending payment Terminal {item.terminalId}</h5>
                     <p className="card-text">Amount {item.transferAmountRequested}€ </p>
                     <p className="card-text"> ({item.transferAmount} Ada) </p>
                 </div>
-        </div>
-       ));  
+            </div>
+        ));
 
-  
+
         return (
             <div style={{ marginTop: 10 }}>
                 <div className='row justify-content-end'>
@@ -230,9 +237,9 @@ class CryptoTransfer extends React.Component<Props, State>{
                         </form>
 
                         <div className='row justify-content-center' >
-                      {transferList}
-                      </div>
-                       
+                            {transferList}
+                        </div>
+
 
 
                     </div>
@@ -259,6 +266,7 @@ class CryptoTransfer extends React.Component<Props, State>{
                         </table>
                     </div>
                 </div>
+                <SignalRService onChange = {() =>{this.refresh()}}   />
             </div>)
     }
 }

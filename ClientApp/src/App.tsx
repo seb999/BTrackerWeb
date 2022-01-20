@@ -17,6 +17,8 @@ import LogBook from './components/LogBook';
 import PlanNavigation from './components/PlanNavigation';
 import CryptoTransfer from './components/CryptoTransfer';
 
+
+
 const config = {
   issuer: 'https://dev-792490.okta.com/oauth2/default',
   redirect_uri: window.location.origin + '/implicit/callback',

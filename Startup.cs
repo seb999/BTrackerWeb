@@ -9,6 +9,7 @@ using Okta.AspNetCore;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 
 using Microsoft.Extensions.Hosting;
+using BTrackerWeb.Misc;
 
 namespace BTrackerWeb
 {
@@ -24,17 +25,23 @@ namespace BTrackerWeb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+           
 
+            services.AddControllersWithViews();
+services.AddSignalR();
             services.AddCors(options =>
             {
                 
                 // The CORS policy is open for testing purposes. In a production application, you should restrict it to known origins.
                 options.AddPolicy(
                     "AllowAll",
-                    builder => builder.AllowAnyOrigin()
+                    builder => builder
+                                        //.AllowAnyOrigin()
                                       .AllowAnyMethod()
-                                      .AllowAnyHeader());
+                                      .AllowAnyHeader()
+                                      .WithOrigins("http://localhost:3000")
+                                        .AllowCredentials());
+                                      
             });
 
             services.AddAuthentication(options =>
@@ -57,7 +64,6 @@ namespace BTrackerWeb
             {
                 option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
-
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -89,6 +95,8 @@ namespace BTrackerWeb
             
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<signalRHub>("/signalRHub");
+                
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");

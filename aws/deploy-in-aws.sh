@@ -13,5 +13,5 @@ sudo mv publish.tmp publish
 
 sudo killall dotnet
 
-sudo supervisord -n
+sudo -s supervisord -n
 
