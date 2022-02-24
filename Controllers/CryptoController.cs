@@ -28,6 +28,8 @@ namespace BTrackerWeb.Controllers
             DbContext = appDbContext;
         }
 
+        #region FrontEnd methods
+
         [HttpGet]
         [Authorize]
         [Route("[Action]")]
@@ -52,6 +54,16 @@ namespace BTrackerWeb.Controllers
             return GetTerminalList();
         }
 
+        [HttpPost]
+        [Authorize]
+        [Route("[Action]")]
+        public List<Transfer> SaveTransferAmount([FromBody] Transfer transfer)
+        {
+            DbContext.cr_transfer.Add(transfer);
+            DbContext.SaveChanges();
+            return GetTransferList();
+        }
+
         [HttpGet]
         [Authorize]
         [Route("[Action]")]
@@ -65,48 +77,7 @@ namespace BTrackerWeb.Controllers
         }
 
         [HttpGet]
-        [Route("[Action]")]
-        public CryptoArduinoTransfer GetTransfer()
-        {
-            CryptoArduinoTransfer myArduinoTransfer = DbContext.cr_transfer
-                .Where(p => p.TransferIsCompleted != true)
-                .Select(p => new CryptoArduinoTransfer()
-                {
-                    TerminalId = p.TerminalId,
-                    TransferAmount = p.TransferAmount.ToString() + " " + p.TransferSymbol,
-                    TransferAmountRequested = p.TransferAmountRequested.ToString(),
-                    TransferId = p.TransferId,
-                    TransferIsCompleted = p.TransferIsCompleted,
-                    TransferSymbol = p.TransferSymbol
-                }).FirstOrDefault();
-
-            return myArduinoTransfer;
-        }
-
-        [HttpGet]
-        [Route("[Action]/{transferId}")]
-        public async Task<string> ValidateTransfer(int transferId)
-        {
-            Transfer myTransfert = DbContext.cr_transfer.Where(p => p.TransferId == transferId).FirstOrDefault();
-            myTransfert.TransferIsCompleted = true;
-            DbContext.cr_transfer.Update(myTransfert);
-            DbContext.SaveChanges();
-            await _hub.Clients.All.SendAsync("transferExecuted", "done");
-            //BinanceExecuteTransfer(myTransfert.TransferAmount);
-            return "done";
-        }
-
-        [HttpPost]
-        //[Authorize]
-        [Route("[Action]")]
-        public  List<Transfer> SaveTransferAmount([FromBody] Transfer transfer)
-        {
-            DbContext.cr_transfer.Add(transfer);
-            DbContext.SaveChanges();
-            return GetTransferList();
-        }
-
-        [HttpGet]
+        [Authorize]
         [Route("[Action]")]
         public Transfer GetTransferAmount(int terminalId)
         {
@@ -114,6 +85,7 @@ namespace BTrackerWeb.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("[Action]")]
         public Transfer DeleteRequestAmount(int terminalId)
         {
@@ -129,7 +101,6 @@ namespace BTrackerWeb.Controllers
         public List<CryptoAsset> BinanceBalance()
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            //string secretKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserSecretKey).FirstOrDefault();
             string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY", EnvironmentVariableTarget.Process);
             string apiKey = DbContext.cr_userKey.Where(predicate => predicate.UserId == userId).Select(p => p.UserApiKey).FirstOrDefault();
 
@@ -149,7 +120,6 @@ namespace BTrackerWeb.Controllers
         public List<CryptoTransfer> BinanceTransactionHistory()
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            //string secretKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserSecretKey).FirstOrDefault();
             string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY", EnvironmentVariableTarget.Process);
             string apiKey = DbContext.cr_userKey.Where(predicate => predicate.UserId == userId).Select(p => p.UserApiKey).FirstOrDefault();
 
@@ -164,9 +134,45 @@ namespace BTrackerWeb.Controllers
             else return new List<CryptoTransfer>();
         }
 
+        #endregion
+
+        #region Arduino methods
+
         [HttpGet]
         [Route("[Action]")]
-        public async void BinanceExecuteTransfer(decimal amount)
+        public CryptoArduinoTransfer ArduinoGetTransfer()
+        {
+            CryptoArduinoTransfer myArduinoTransfer = DbContext.cr_transfer
+                .Where(p => p.TransferIsCompleted != true)
+                .Select(p => new CryptoArduinoTransfer()
+                {
+                    TerminalId = p.TerminalId,
+                    TransferAmount = p.TransferAmount.ToString() + " " + p.TransferSymbol,
+                    TransferAmountRequested = p.TransferAmountRequested.ToString(),
+                    TransferId = p.TransferId,
+                    TransferIsCompleted = p.TransferIsCompleted,
+                    TransferSymbol = p.TransferSymbol
+                }).FirstOrDefault();
+
+            return myArduinoTransfer;
+        }
+
+        [HttpGet]
+        [Route("[Action]/{transferId}")]
+        public async Task<string> ArduinoValidateTransfer(int transferId)
+        {
+            Transfer myTransfert = DbContext.cr_transfer.Where(p => p.TransferId == transferId).FirstOrDefault();
+            myTransfert.TransferIsCompleted = true;
+            DbContext.cr_transfer.Update(myTransfert);
+            DbContext.SaveChanges();
+            await _hub.Clients.All.SendAsync("transferExecuted", "done");
+            //BinanceExecuteTransfer(myTransfert.TransferAmount);
+            return "done";
+        }
+
+        [HttpGet]
+        [Route("[Action]")]
+        private async void BinanceExecuteTransfer(decimal amount)
         {
             //Get number of ADA from UI (convert euros requested into ADA and call this method)
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
@@ -183,12 +189,17 @@ namespace BTrackerWeb.Controllers
             await _hub.Clients.All.SendAsync("transferExecuted", "done");
         }
 
+        #endregion
+
+        #region Helper
+
         private static long ServerTime(string apiKey)
         {
             string apiUrl = string.Format("https://api.binance.com/api/v3/time");
             CryptoTimeStamp result = HttpHelper.GetApiData<CryptoTimeStamp>(new Uri(apiUrl), apiKey);
             return result.ServerTime;
         }
+
 
         private static string GetSignature(string totalParams, string secretKey)
         {
@@ -204,4 +215,6 @@ namespace BTrackerWeb.Controllers
             return new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
         }
     }
+
+    #endregion
 }
