@@ -51,10 +51,12 @@ namespace BTrackerWeb.Misc
                 if (response.IsSuccessStatusCode)
                 {
                     var toto = response.Content.ReadAsStringAsync().Result;
+                    Console.WriteLine(toto);
                     return JsonSerializer.Deserialize<T>(response.Content.ReadAsStringAsync().Result, jsonSerializerOptions);
                 }
                 else
                 {
+                     Console.WriteLine(response.IsSuccessStatusCode);
                     return default(T);
                 }
             }

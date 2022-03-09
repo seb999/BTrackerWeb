@@ -14,7 +14,7 @@ namespace BTrackerWeb.Class
         public string Amount { get; set; }
         public string Type { get; set; }
         public string Status { get; set; }
-        public long TransId { get; set; }
+        public long TranId { get; set; }
         public long Timestamp { get; set; }
     }
 }

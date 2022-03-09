@@ -113,13 +113,13 @@ class LogBookAircraft extends React.Component<Props, State>{
         let totalFlightTime = 0;
         let totalSoloTime = 0;
         this.props.logBookList.map((item, index) => (
-            totalFlightTime = totalFlightTime + (item.logBookTotalFlightTime != undefined ? item.logBookTotalFlightTime : 0))
+            totalFlightTime = totalFlightTime + (item.logBookTotalFlightTime !== undefined ? item.logBookTotalFlightTime : 0))
             );
         totalFlightTime = Math.round(totalFlightTime * 100) / 100
 
         this.props.logBookList.forEach(item => {
             if(!item.logBookDual){
-                totalSoloTime = totalSoloTime + (item.logBookTotalFlightTime != undefined ? item.logBookTotalFlightTime : 0)
+                totalSoloTime = totalSoloTime + (item.logBookTotalFlightTime !== undefined ? item.logBookTotalFlightTime : 0)
             }
         })
         totalSoloTime = Math.round(totalSoloTime * 100) / 100;
@@ -127,7 +127,7 @@ class LogBookAircraft extends React.Component<Props, State>{
 
         let displayList = this.props.logBookList.map((item, index) => (
             <tr key={index}>
-                {item.logBookDescription != undefined
+                {item.logBookDescription !== undefined
                     ?
                     <td>
                         <MyPopover content={item.logBookDescription}></MyPopover>
@@ -137,12 +137,12 @@ class LogBookAircraft extends React.Component<Props, State>{
                     <td> {moment.parseZone(item.logBookDate).format('DD/MM/YYYY')}</td>
                 }
                 <td>{item.logBookAircraftRegistration}</td>
-                <td>{item.aircraftModel == undefined ? "" : item.aircraftModel.aircraftModelName}</td>
-                <td>{item.airportDeparture == undefined ? "" : item.airportDeparture.airportCode}</td>
+                <td>{item.aircraftModel === undefined ? "" : item.aircraftModel.aircraftModelName}</td>
+                <td>{item.airportDeparture === undefined ? "" : item.airportDeparture.airportCode}</td>
                 <td>{item.logBookDepartureTime}</td>
-                <td>{item.airportArrival == undefined ? "" : item.airportArrival.airportCode}</td>
+                <td>{item.airportArrival === undefined ? "" : item.airportArrival.airportCode}</td>
                 <td>{item.logBookArrivalTime}</td>
-                <td>{item.logBookTotalFlightTime == undefined ? "" : Math.round(item.logBookTotalFlightTime * 100) / 100}</td>
+                <td>{item.logBookTotalFlightTime === undefined ? "" : Math.round(item.logBookTotalFlightTime * 100) / 100}</td>
                 <td>
                     {item.logBookIFR === true ? <i className="fas fa-check"></i> : <i></i>}
                 </td>

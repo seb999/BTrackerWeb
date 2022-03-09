@@ -140,3 +140,44 @@ export const transferList = (accessToken : any) =>{
   }
  }
 
+ ///////////////////////////////////////////////////////////
+//-------------READ/UPDATE SETTING-----------------------//
+///////////////////////////////////////////////////////////
+export const GetAppMode = (accessToken: any) =>{
+  return async (dispatch  :any) =>{
+    try{
+      const res = await axios.get<any>(apiUrl + "GetAppMode/", {headers: {Authorization: 'Bearer ' + accessToken}});
+      return dispatch(GetAppModeSuccess(res.data));
+    }
+    catch (error) {
+      throw (error)
+    }
+  }
+ }
+ 
+ export const GetAppModeSuccess = (data :any) => {
+  return {
+    type: "GET_APP_MODE",
+    payload: data
+  }
+ }
+
+export const UpdateAppMode = (accessToken: any) =>{
+  return async (dispatch  :any) =>{
+    try{
+      const res = await axios.get<any>(apiUrl + "UpdateAppMode/", {headers: {Authorization: 'Bearer ' + accessToken}});
+      return dispatch(setAppModeSuccess(res.data));
+    }
+    catch (error) {
+      throw (error)
+    }
+  }
+ }
+ 
+ export const setAppModeSuccess = (data :any) => {
+  return {
+    type: "UPDATE_APP_MODE",
+    payload: data
+  }
+ }
+

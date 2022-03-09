@@ -24,6 +24,7 @@ namespace BTrackerWeb.EF
         public virtual DbSet<Terminal> cr_terminal { get; set; }
         public virtual DbSet<Symbol> cr_symbol { get; set; }
         public virtual DbSet<Currency> cr_currency { get; set; }
+        public virtual DbSet<Setting> cr_setting { get; set; }
         public virtual DbSet<UserKey> cr_userKey { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

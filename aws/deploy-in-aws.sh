@@ -13,5 +13,5 @@ sudo mv publish.tmp publish
 
 sudo killall dotnet
 
-sudo -s supervisord -n
-
+#we have to preserve env varioable for root profile
+sudo --preserve-env=BINANCE_SECRET_KEY -s supervisord -n

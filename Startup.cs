@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 
 using Microsoft.Extensions.Hosting;
 using BTrackerWeb.Misc;
+using System;
 
 namespace BTrackerWeb
 {
@@ -25,23 +26,27 @@ namespace BTrackerWeb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           
 
+            //for debugging
+            string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY");
+            Console.WriteLine("secretKey : ");
+            Console.WriteLine(secretKey);
+             
             services.AddControllersWithViews();
-services.AddSignalR();
+            services.AddSignalR();
             services.AddCors(options =>
             {
-                
+
                 // The CORS policy is open for testing purposes. In a production application, you should restrict it to known origins.
                 options.AddPolicy(
                     "AllowAll",
                     builder => builder
-                                        //.AllowAnyOrigin()
+                                    .AllowAnyOrigin()
                                       .AllowAnyMethod()
                                       .AllowAnyHeader()
-                                      .WithOrigins("http://localhost:3000")
+                                      .WithOrigins("http://localhost:3000", "http://localhost:5222", "http://www.dspx.eu", "http://dspx.eu")
                                         .AllowCredentials());
-                                      
+
             });
 
             services.AddAuthentication(options =>
@@ -53,7 +58,7 @@ services.AddSignalR();
            .AddOktaWebApi(new OktaWebApiOptions
            {
                OktaDomain = "https://dev-792490.okta.com",
-               
+
            });
 
             services.AddDbContextPool<ApplicationDbContext>(options =>
@@ -92,11 +97,11 @@ services.AddSignalR();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<signalRHub>("/signalRHub");
-                
+
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");

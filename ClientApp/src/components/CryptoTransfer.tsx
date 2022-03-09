@@ -23,6 +23,8 @@ interface AppFnProps {
     geSymbolCurrentPrice(symbol: any): void;
     saveTransferAmount(token: any, p: Transfer): void;
     getLookupList(): any;
+    getAppMode(token: any): void;
+    updateAppMode(token: any): void;
 
 }
 
@@ -35,6 +37,7 @@ interface AppObjectProps {
     auth?: any;
     symbolList: any;
     currencyList: any;
+    testMode: any;
 }
 
 interface Props
@@ -43,11 +46,11 @@ interface Props
 }
 
 interface State {
-
     token: any;
     currencySelected: any;
     symbolSelected: any;
     amount: any;
+    isTransferExecuted: boolean;
 
 }
 
@@ -57,11 +60,11 @@ class CryptoTransfer extends React.Component<Props, State>{
         super(props);
 
         this.state = {
-
             token: null,
             currencySelected: { value: 1, label: 'EURO' },
             symbolSelected: 0,
             amount: 0,
+            isTransferExecuted : false,
         };
     };
 
@@ -81,6 +84,7 @@ class CryptoTransfer extends React.Component<Props, State>{
                 this.props.getTransferList(this.state.token);
                 this.props.geSymbolCurrentPrice("ADAEUR");
                 this.props.getLookupList();
+                this.props.getAppMode(this.state.token);
             }
         } catch (err) {
             // handle error as needed
@@ -103,9 +107,9 @@ class CryptoTransfer extends React.Component<Props, State>{
         console.log(currencySelected);
     };
 
-    setAmount = (theSwitch: any) => {
-        if (theSwitch == 123) theSwitch = '.';
-        this.mykey = this.mykey + theSwitch;
+    setAmount = (key: any) => {
+        if (key == 123) key = '.';
+        this.mykey = this.mykey + key;
         this.setState({
             amount: this.mykey
         })
@@ -133,9 +137,15 @@ class CryptoTransfer extends React.Component<Props, State>{
     }
 
     refresh = () => {
-        this.props.getAssetList(this.state.token);
-        this.props.getTransactionList(this.state.token);
-        this.props.getTransferList(this.state.token);
+        this.setState({ isTransferExecuted: true,});
+        setTimeout(() => {
+            this.setState({
+                isTransferExecuted: false,
+            });
+            this.props.getAssetList(this.state.token);
+            this.props.getTransactionList(this.state.token);
+            this.props.getTransferList(this.state.token);
+        }, 3000);
     }
 
     cancel = () => {
@@ -145,7 +155,14 @@ class CryptoTransfer extends React.Component<Props, State>{
         })
     }
 
+    updateAppMode = () => {
+
+        this.props.updateAppMode(this.state.token);
+    }
+
     render() {
+        let testMode = this.props.testMode;
+
         let terminalList = this.props.terminalList.map((item, index) => (
             <tr key={index}>
                 <td>{item.terminalDescription}</td>
@@ -167,9 +184,9 @@ class CryptoTransfer extends React.Component<Props, State>{
 
         let transactionList = this.props.transactionList.map((item, index) => (
             <tr key={index}>
-                <td>Terminal {item.asset}</td>
+                <td>{item.asset}</td>
                 <td>{item.amount}</td>
-                <td>{item.trandId}</td>
+                <td>{item.tranId}</td>
             </tr>
         ));
 
@@ -189,8 +206,21 @@ class CryptoTransfer extends React.Component<Props, State>{
         return (
             <div style={{ marginTop: 10 }}>
                 <div className='row justify-content-end'>
+
+                    <div className="col-sm-4">
+                        {this.state.isTransferExecuted && <div style={{ height: "28px", padding: "1px" }} className="alert alert-danger" role="alert"> Payment executed!</div>}
+                    </div>
+
                     <div className="col-sm-1">
                         <Select id="currency" options={this.props.currencyList} value={this.state.currencySelected} onChange={this.currencyChange} className="input-sm" />
+                    </div>
+
+                    <div className="col-sm-1">
+                        <Toggle style={{ height: 10 }}
+                            id='cheese-status'
+                            checked={!testMode}
+                            onChange={() => this.updateAppMode()}
+                        />
                     </div>
                 </div>
 
@@ -198,39 +228,39 @@ class CryptoTransfer extends React.Component<Props, State>{
                     <div className='col-sm-6'>
                         <div className="row d-flex justify-content-center" >
                             <div className="btn-group" role="group" aria-label="Basic example">
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.setAmount(1)}>1</button>
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.setAmount(2)}>2</button>
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.setAmount(3)}>3</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.setAmount(1)}>1</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.setAmount(2)}>2</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.setAmount(3)}>3</button>
                             </div>
                         </div>
                         <div className="row d-flex justify-content-center">
                             <div className="btn-group" role="group" aria-label="Basic example">
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.setAmount(4)}>4</button>
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.setAmount(5)}>5</button>
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.setAmount(6)}>6</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.setAmount(4)}>4</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.setAmount(5)}>5</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.setAmount(6)}>6</button>
                             </div>
                         </div>
                         <div className="row d-flex justify-content-center" >
                             <div className="btn-group" role="group" aria-label="Basic example">
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.setAmount(7)}>7</button>
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.setAmount(8)}>8</button>
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.setAmount(9)}>9</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.setAmount(7)}>7</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.setAmount(8)}>8</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.setAmount(9)}>9</button>
                             </div>
                         </div>
                         <div className="row d-flex justify-content-center" >
                             <div className="btn-group" role="group" aria-label="Basic example">
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.cancel()}>Cancel</button>
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.setAmount(0)}>0</button>
-                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 100, width: 100 }} onClick={() => this.setAmount(123)}>.</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.cancel()}>Cancel</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.setAmount(0)}>0</button>
+                                <button type="button" className="btn btn-lg btn-outline-info rounded-0" style={{ height: 90, width: 90 }} onClick={() => this.setAmount(123)}>.</button>
                             </div>
                         </div>
 
                         <form id="newUserForm" onSubmit={this.requestPayment}>
-                            <div className='row justify-content-center' style={{ marginTop: 30 }}>
+                            <div className='row justify-content-center' style={{ marginTop: 30, marginLeft : 30 }}>
                                 <div className='col-sm-2' style={{ padding: 0 }}>
-                                    <input id="amount" value={this.state.amount || ''} type="text" className="form-control" placeholder="" required></input>
+                                    <input id="amount" defaultValue={this.state.amount || ''} type="text" className="form-control" placeholder="" required></input>
                                 </div>
-                                <div className='col-sm-3'>
+                                <div className='col-sm-4'>
                                     <button type="submit" className="btn btn-warning rounded-0 mr-2" form="newUserForm">Request Payment</button>
                                 </div>
                             </div>
@@ -239,26 +269,23 @@ class CryptoTransfer extends React.Component<Props, State>{
                         <div className='row justify-content-center' >
                             {transferList}
                         </div>
-
-
-
                     </div>
                     <div className='col-sm-6'>
-                        <h1>Terminal</h1>
+                        <h2>Terminal</h2>
                         <table className="table table-sm" >
                             <tbody>
                                 {terminalList}
                             </tbody>
                         </table>
                         <br />
-                        <h1>Balance</h1>
+                        <h2>Balance</h2>
                         <table className="table table-sm" >
                             <tbody>
                                 {assetList}
                             </tbody>
                         </table>
                         <br />
-                        <h1>Transaction history</h1>
+                        <h2>Transaction history</h2>
                         <table className="table table-sm" >
                             <tbody>
                                 {transactionList}
@@ -266,7 +293,7 @@ class CryptoTransfer extends React.Component<Props, State>{
                         </table>
                     </div>
                 </div>
-                <SignalRService onChange = {() =>{this.refresh()}}   />
+                <SignalRService onChange={() => { this.refresh() }} />
             </div>)
     }
 }
@@ -281,6 +308,7 @@ const mapStateToProps = (state: any) => {
         transactionList: state.transactionList,
         transferList: state.transferList,
         symbolCurrentPrice: state.symbolCurrentPrice,
+        testMode: state.testMode,
     }
 }
 
@@ -293,7 +321,8 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
         geSymbolCurrentPrice: (symbol: any) => dispatch<any>(actionCreator.default.crypto.symbolCurrentPrice(symbol)),
         getLookupList: () => dispatch<any>(actionCreator.default.lookup.getLookupList()),
         saveTransferAmount: (token: any, requestTrans: any) => dispatch<any>(actionCreator.default.crypto.SaveTransferAmount(token, requestTrans)),
-        //getTransferAmount: (token: any, requestTrans: any) => dispatch<any>(actionCreator.default.crypto.SaveTransferAmount(token, requestTrans)),
+        getAppMode: (token: any) => dispatch<any>(actionCreator.default.crypto.GetAppMode(token)),
+        updateAppMode: (token: any) => dispatch<any>(actionCreator.default.crypto.UpdateAppMode(token)),
     }
 }
 

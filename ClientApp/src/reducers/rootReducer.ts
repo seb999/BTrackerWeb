@@ -34,6 +34,7 @@ const initState = {
   isLogSaved: false,
   isLogDeleted: false,
   isTransSaved: false,
+  testMode: false,
 }
 
 const rootReducer = (state = initState, action: any) => {
@@ -188,6 +189,14 @@ const rootReducer = (state = initState, action: any) => {
     case "BINANCE_SYMBOL_PRICE":
       newState.symbolCurrentPrice = action.payload.price;
       return newState;
+
+    case "GET_APP_MODE":
+        newState.testMode = action.payload;
+        return newState;
+
+    case "UPDATE_APP_MODE":
+        newState.testMode = action.payload;
+        return newState;
 
 
     default:

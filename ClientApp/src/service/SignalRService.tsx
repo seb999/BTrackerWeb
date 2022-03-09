@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
+import  appsettings from "../appsettings";
 
 const SignalRService = (props: any) => {
   
@@ -7,7 +8,7 @@ const SignalRService = (props: any) => {
 
     useEffect(() => {
         const connection = new HubConnectionBuilder()
-            .withUrl('http://localhost:5222/signalRHub')
+            .withUrl(appsettings.signalRServer)
             .withAutomaticReconnect()
             .build();
 

@@ -3,6 +3,6 @@ export interface Transaction {
     amount? : string;
     type? : string;
     status? : string;
-    trandId? : number;
+    tranId? : number;
     timestamp? : number
 }

@@ -28,7 +28,7 @@ namespace BTrackerWeb.Controllers
             DbContext = appDbContext;
         }
 
-        #region FrontEnd methods
+        #region Transfer methods
 
         [HttpGet]
         [Authorize]
@@ -57,10 +57,13 @@ namespace BTrackerWeb.Controllers
         [HttpPost]
         [Authorize]
         [Route("[Action]")]
-        public List<Transfer> SaveTransferAmount([FromBody] Transfer transfer)
+        public async Task<List<Transfer>> SaveTransferAmount([FromBody] Transfer transfer)
         {
             DbContext.cr_transfer.Add(transfer);
             DbContext.SaveChanges();
+            //debug
+             //await ArduinoExecTransfer(transfer.TransferId);
+
             return GetTransferList();
         }
 
@@ -76,42 +79,35 @@ namespace BTrackerWeb.Controllers
                 .Select(p => p).OrderByDescending(p => p.TransferId).ToList();
         }
 
-        [HttpGet]
-        [Authorize]
-        [Route("[Action]")]
-        public Transfer GetTransferAmount(int terminalId)
-        {
-            return DbContext.cr_transfer.Where(p => p.TerminalId == terminalId).FirstOrDefault();
-        }
+        #endregion
 
-        [HttpGet]
-        [Authorize]
-        [Route("[Action]")]
-        public Transfer DeleteRequestAmount(int terminalId)
-        {
-            Transfer toBeDelted = DbContext.cr_transfer.Where(p => p.TerminalId == terminalId).FirstOrDefault();
-            DbContext.cr_transfer.Remove(toBeDelted);
-            DbContext.SaveChanges();
-            return GetTransferAmount(terminalId);
-        }
+        #region Binance
 
         [HttpGet]
         [Authorize]
         [Route("[Action]")]
         public List<CryptoAsset> BinanceBalance()
         {
-            string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY", EnvironmentVariableTarget.Process);
-            string apiKey = DbContext.cr_userKey.Where(predicate => predicate.UserId == userId).Select(p => p.UserApiKey).FirstOrDefault();
+            try
+            {
+                string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
+                string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY");
+                string apiKey = DbContext.cr_userKey.Where(predicate => predicate.UserId == userId).Select(p => p.UserApiKey).FirstOrDefault();
 
-            string parameters = $"timestamp={ServerTime(apiKey)}&recvWindow=60000";
-            string signature = GetSignature(parameters, secretKey);
-            string apiUrl = $"https://api3.binance.com/sapi/v1/asset/get-funding-asset?{parameters}&signature={signature}";
+                string parameters = $"timestamp={ServerTime(apiKey)}&recvWindow=60000";
+                string signature = GetSignature(parameters, secretKey);
+                string apiUrl = $"https://api3.binance.com/sapi/v1/asset/get-funding-asset?{parameters}&signature={signature}";
 
-            var result = HttpHelper.PostApiData<List<CryptoAsset>>(new Uri(apiUrl), apiKey, new StringContent("", Encoding.UTF8, "application/json"));
-            if (result != null)
-                return result;
-            else return new List<CryptoAsset>();
+                var result = HttpHelper.PostApiData<List<CryptoAsset>>(new Uri(apiUrl), apiKey, new StringContent("", Encoding.UTF8, "application/json"));
+                if (result != null)
+                    return result;
+                else return new List<CryptoAsset>();
+            }
+            catch (System.Exception e)
+            {
+                Console.WriteLine(e);
+                return new List<CryptoAsset>();
+            }
         }
 
         [HttpGet]
@@ -120,18 +116,49 @@ namespace BTrackerWeb.Controllers
         public List<CryptoTransfer> BinanceTransactionHistory()
         {
             string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY", EnvironmentVariableTarget.Process);
+            string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY");
             string apiKey = DbContext.cr_userKey.Where(predicate => predicate.UserId == userId).Select(p => p.UserApiKey).FirstOrDefault();
 
             string parameters = $"timestamp={ServerTime(apiKey)}&recvWindow=60000&type=MAIN_FUNDING";
             string signature = GetSignature(parameters, secretKey);
             string apiUrl = $"https://api3.binance.com/sapi/v1/asset/transfer?{parameters}&signature={signature}";
 
-
             var result = HttpHelper.GetApiData<CryptoTransferParent>(new Uri(apiUrl), apiKey).Rows;
             if (result != null)
-                return result;
+                return result.ToList();
             else return new List<CryptoTransfer>();
+        }
+
+        [HttpGet]
+        [Route("[Action]")]
+        private async void BinanceExecuteTransfer(decimal amount)
+        {
+            amount = 2;
+            string amount2 = amount.ToString().Replace(",",".");
+            try
+            {
+                 Console.WriteLine("Start binance transfer");
+                  Console.WriteLine("amount : " + amount.ToString());
+                    Console.WriteLine("amount2 : " + amount2);
+                string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY");
+                string apiKey = "lJ1rj5uEaCGEzd6RdXE5P6Em7oEc1Kp0bMXbcy7MoKFNEaajhEr873xzAkX5C2Px";
+                  Console.WriteLine("secretKey : " + secretKey);
+                  Console.WriteLine("apiKey : " + apiKey);
+                  Console.WriteLine("amount : " + amount.ToString());
+
+                string parameters = $"timestamp={ServerTime(apiKey)}&recvWindow=60000&type=MAIN_FUNDING&asset=ADA&amount={amount2}";
+                string signature = GetSignature(parameters, secretKey);
+                string apiUrl = $"https://api3.binance.com/sapi/v1/asset/transfer?{parameters}&signature={signature}";
+
+                Console.WriteLine(apiUrl);
+                HttpHelper.PostApiData<CryptoTransaction>(new Uri(apiUrl), apiKey, new StringContent("", Encoding.UTF8, "application/json"));
+                Console.WriteLine("http request completed");
+                await _hub.Clients.All.SendAsync("transferExecuted", "done");
+            }
+            catch (System.Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         #endregion
@@ -147,8 +174,8 @@ namespace BTrackerWeb.Controllers
                 .Select(p => new CryptoArduinoTransfer()
                 {
                     TerminalId = p.TerminalId,
-                    TransferAmount = p.TransferAmount.ToString() + " " + p.TransferSymbol,
-                    TransferAmountRequested = p.TransferAmountRequested.ToString(),
+                    TransferAmount = "(" + p.TransferAmount.ToString() + "ada)",
+                    TransferAmountRequested = p.TransferAmountRequested.ToString() + " " + p.TransferSymbol,
                     TransferId = p.TransferId,
                     TransferIsCompleted = p.TransferIsCompleted,
                     TransferSymbol = p.TransferSymbol
@@ -158,40 +185,54 @@ namespace BTrackerWeb.Controllers
         }
 
         [HttpGet]
-        [Route("[Action]/{transferId}")]
-        public async Task<string> ArduinoValidateTransfer(int transferId)
+        [Route("[Action]/{id}")]
+        public async Task<string> ArduinoExecTransfer(int id)
         {
-            Transfer myTransfert = DbContext.cr_transfer.Where(p => p.TransferId == transferId).FirstOrDefault();
+            Transfer myTransfert = DbContext.cr_transfer.Where(p => p.TransferId == id).FirstOrDefault();
             myTransfert.TransferIsCompleted = true;
             DbContext.cr_transfer.Update(myTransfert);
             DbContext.SaveChanges();
-            await _hub.Clients.All.SendAsync("transferExecuted", "done");
-            //BinanceExecuteTransfer(myTransfert.TransferAmount);
-            return "done";
-        }
 
-        [HttpGet]
-        [Route("[Action]")]
-        private async void BinanceExecuteTransfer(decimal amount)
-        {
-            //Get number of ADA from UI (convert euros requested into ADA and call this method)
-            string userId = DbContext.Users.Where(p => p.Email == User.Claims.Last().Value).Select(p => p.Id).FirstOrDefault();
-            //string secretKey = DbContext.cr_userKey.Where(predicate=>predicate.UserId == userId).Select(p=>p.UserSecretKey).FirstOrDefault();
-            string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY", EnvironmentVariableTarget.Process);
-            string apiKey = DbContext.cr_userKey.Where(predicate => predicate.UserId == userId).Select(p => p.UserApiKey).FirstOrDefault();
+            if (IsAppTestMode())
+            {
+               await _hub.Clients.All.SendAsync("transferExecuted", "done");
+            }
+            else
+            {
+                BinanceExecuteTransfer(myTransfert.TransferAmount);
+            }
 
-            string parameters = $"timestamp={ServerTime(apiKey)}&recvWindow=60000&type=MAIN_FUNDING&asset=ADA&amount={amount}";
-            string signature = GetSignature(parameters, secretKey);
-            string apiUrl = $"https://api3.binance.com/sapi/v1/asset/transfer?{parameters}&signature={signature}";
-
-            HttpHelper.PostApiData<List<CryptoAsset>>(new Uri(apiUrl), apiKey, new StringContent("", Encoding.UTF8, "application/json"));
-
-            await _hub.Clients.All.SendAsync("transferExecuted", "done");
+            return id.ToString();
         }
 
         #endregion
 
         #region Helper
+
+        private bool IsAppTestMode()
+        {
+            return DbContext.cr_setting.Where(p => p.SettingName == "TestMode").Select(p => p.SettingValue).FirstOrDefault();
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("[Action]")]
+        public bool GetAppMode()
+        {
+            return IsAppTestMode();
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("[Action]")]
+        public bool UpdateAppMode()
+        {
+            Setting mySetting = DbContext.cr_setting.Where(p => p.SettingName == "TestMode").FirstOrDefault();
+            mySetting.SettingValue = !mySetting.SettingValue;
+            DbContext.cr_setting.Update(mySetting);
+            DbContext.SaveChanges();
+            return mySetting.SettingValue;
+        }
 
         private static long ServerTime(string apiKey)
         {
@@ -199,7 +240,6 @@ namespace BTrackerWeb.Controllers
             CryptoTimeStamp result = HttpHelper.GetApiData<CryptoTimeStamp>(new Uri(apiUrl), apiKey);
             return result.ServerTime;
         }
-
 
         private static string GetSignature(string totalParams, string secretKey)
         {
@@ -214,7 +254,7 @@ namespace BTrackerWeb.Controllers
         {
             return new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
         }
-    }
 
-    #endregion
+        #endregion
+    }
 }
