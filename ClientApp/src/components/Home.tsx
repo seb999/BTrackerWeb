@@ -8,6 +8,7 @@ import trackerUpImg from '../images/PCB_Front.jpg'
 import trackerDownImg from '../images/PCB_Back.jpg'
 import trackerL80 from '../images/PCB_L80.png'
 import trackerLora from '../images/PCB_Lora.png'
+import cryptoPaymentStation from '../images/Crypto2CryptoReader.png'
 
 
 interface AppFnProps {
@@ -61,13 +62,15 @@ class Home extends React.Component<Props, State>{
         <section className="py-5 parallax-background " style={{ height: 600 }}>
           <div className="container">
             <h1 className="display-3" style={{ zIndex: 110, marginTop: 30, color: "gray" }} >IOT simless solution</h1>
-            {!this.state.token ? <h3 style={{ color: "gray" }}>GPS tracker with motion detector that help you to protect your bike </h3> : ""}
+            {!this.state.token ? <h3 style={{ color: "gray" }}>GPS tracker with motion detector </h3> : ""}
+            {!this.state.token ? <h3 style={{ color: "gray" }}>Crypto money transfer system from wallet to wallet</h3> : ""}
             {this.state.token ? <h3 style={{ color: "orange" }}>Welcome to BTracker, register a new tracker or go to map page </h3> : ""}
             <p className="lead" style={{ color: "gray" }}> </p>
             <img src={trackerUpImg} className="col-2 img-thumbnail" style={{ marginTop: 100, padding: 2 }} alt="#" />
-            <img src={trackerDownImg} className="col-2 img-thumbnail" style={{ marginTop: 100, padding: 2, marginLeft: 30 }} alt="#" />
+           
             <img src={trackerL80} className="col-2 img-thumbnail" style={{ marginTop: 100, padding: 2, marginLeft: 30 }} alt="#" />
             <img src={trackerLora} className="col-2 img-thumbnail" style={{ marginTop: 100, padding: 2, marginLeft: 30 }} alt="#" />
+            <img src={cryptoPaymentStation} className="col-2 img-thumbnail" style={{ marginTop: 100, padding: 2, marginLeft: 30 }} alt="#" />
             
           </div>
         </section>
