@@ -62,7 +62,7 @@ namespace BTrackerWeb.Controllers
             DbContext.cr_transfer.Add(transfer);
             DbContext.SaveChanges();
             //debug
-             //await ArduinoExecTransfer(transfer.TransferId);
+            //await ArduinoExecTransfer(transfer.TransferId);
 
             return GetTransferList();
         }
@@ -133,18 +133,17 @@ namespace BTrackerWeb.Controllers
         [Route("[Action]")]
         private async void BinanceExecuteTransfer(decimal amount)
         {
-            amount = 2;
-            string amount2 = amount.ToString().Replace(",",".");
+            string amount2 = amount.ToString().Replace(",", ".");
             try
             {
-                 Console.WriteLine("Start binance transfer");
-                  Console.WriteLine("amount : " + amount.ToString());
-                    Console.WriteLine("amount2 : " + amount2);
+                Console.WriteLine("Start binance transfer");
+                Console.WriteLine("amount : " + amount.ToString());
+                Console.WriteLine("amount2 : " + amount2);
                 string secretKey = Environment.GetEnvironmentVariable("BINANCE_SECRET_KEY");
                 string apiKey = "lJ1rj5uEaCGEzd6RdXE5P6Em7oEc1Kp0bMXbcy7MoKFNEaajhEr873xzAkX5C2Px";
-                  Console.WriteLine("secretKey : " + secretKey);
-                  Console.WriteLine("apiKey : " + apiKey);
-                  Console.WriteLine("amount : " + amount.ToString());
+                Console.WriteLine("secretKey : " + secretKey);
+                Console.WriteLine("apiKey : " + apiKey);
+                Console.WriteLine("amount : " + amount.ToString());
 
                 string parameters = $"timestamp={ServerTime(apiKey)}&recvWindow=60000&type=MAIN_FUNDING&asset=ADA&amount={amount2}";
                 string signature = GetSignature(parameters, secretKey);
@@ -195,7 +194,7 @@ namespace BTrackerWeb.Controllers
 
             if (IsAppTestMode())
             {
-               await _hub.Clients.All.SendAsync("transferExecuted", "done");
+                await _hub.Clients.All.SendAsync("transferExecuted", "done");
             }
             else
             {
