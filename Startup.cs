@@ -80,9 +80,9 @@ namespace BTrackerWeb
             {
                 swagger.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "Demo Employee API",
+                    Title = "DSPX Web API ",
                     Version = "v1",
-                    Description = "API to unerstand request and response schema.",
+                    Description = "This API has been buiklt by SEBASTIEN DUBOS for dspx",
                 });
             });
         }
