@@ -14,6 +14,7 @@ namespace BTrackerWeb
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args).Build().Run();
+   
         }
 
         public static IHostBuilder CreateWebHostBuilder(string[] args) =>
@@ -22,6 +23,7 @@ namespace BTrackerWeb
                 {
                     webBuilder.UseUrls("http://localhost:5222");
                     webBuilder.UseStartup<Startup>();
+                    
                 });
     }
 }

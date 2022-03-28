@@ -5,7 +5,6 @@ import { Dispatch } from 'redux';
 import { withAuth } from '@okta/okta-react';
 import './css/Home.css';
 import trackerUpImg from '../images/PCB_Front.jpg'
-import trackerDownImg from '../images/PCB_Back.jpg'
 import trackerL80 from '../images/PCB_L80.png'
 import trackerLora from '../images/PCB_Lora.png'
 import cryptoPaymentStation from '../images/Crypto2CryptoReader.png'

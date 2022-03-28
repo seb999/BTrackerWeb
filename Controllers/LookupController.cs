@@ -33,26 +33,31 @@ namespace BTrackerWeb.Controllers
             return result;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         public List<LookupItem> GetAircraftModelList()
         {
             return DbContext.pl_aircraftModel.Select(p=>GetAircraftLookup(p)).ToList();
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         public List<LookupItem> GetAirportList()
         {
             return DbContext.pl_airport.Select(p=>GetAirportLookup(p)).ToList();
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         public List<LookupItem> GetCurrencyList()
         {
             return DbContext.cr_currency.Select(p=>GetCurrencyLookup(p)).ToList();
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         public List<LookupItem> GetSymbolList()
         {
             return DbContext.cr_symbol.Select(p=>GetSymbolLookup(p)).ToList();
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         private static LookupItem GetAircraftLookup(AircraftModel aircraft)
         {
             LookupItem myItem = new LookupItem();
@@ -62,6 +67,7 @@ namespace BTrackerWeb.Controllers
             return myItem;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         private static LookupItem GetAirportLookup(Airport airport)
         {
             LookupItem myItem = new LookupItem();
@@ -70,6 +76,7 @@ namespace BTrackerWeb.Controllers
             return myItem;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         private static LookupItem GetCurrencyLookup(Currency currency)
         {
             LookupItem myItem = new LookupItem();
@@ -79,6 +86,7 @@ namespace BTrackerWeb.Controllers
             return myItem;
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         private static LookupItem GetSymbolLookup(Symbol symbol)
         {
             LookupItem myItem = new LookupItem();
