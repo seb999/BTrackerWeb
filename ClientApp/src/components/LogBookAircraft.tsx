@@ -158,6 +158,7 @@ class LogBookAircraft extends React.Component<Props, State>{
                 <td>
                     {item.logBookDual === true ? <i className="fas fa-check"></i> : <i></i>}
                 </td>
+                <td>{item.logBookLanding}</td>
                 <td><button className="btn" onClick={() => this.handleEditLog(item)}><span style={{ color: "green" }}><i className="fas fa-edit"></i></span></button></td>
                 <td><button className="btn" onClick={() => this.handleDeleteLog(item)}><span style={{ color: "red" }}><i className="far fa-trash-alt"></i></span></button></td>
             </tr>
@@ -167,8 +168,8 @@ class LogBookAircraft extends React.Component<Props, State>{
             <div>
                 <button type="button" className="btn btn-success btn-sm mt-2" onClick={this.handleAddLog}><span><i className="fas fa-edit"></i></span> New Log</button>
 
-                  <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success mt-2" role="alert"> Total flight time {totalFlightTime}</div>
-                  <div style={{ float: "right", height: "32px", padding: "3px", marginRight: "7px", border:"1px"}} className="alert alert-success mt-2" role="alert"> Total solo time {totalSoloTime}</div>
+                  <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-warning2 mt-2" role="alert"> Total flight time {totalFlightTime}</div>
+                  <div style={{ float: "right", height: "32px", padding: "3px", marginRight: "7px"}} className="alert alert-warning2 mt-2" role="alert"> Total solo time {totalSoloTime}</div>
               
                 {this.props.isLogSaved && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success mt-2 mr-2" role="alert"> New log added!</div>}
                 {this.props.isLogDeleted && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success mt-2 mr-2" role="alert"> Deleted!</div>}
@@ -189,6 +190,7 @@ class LogBookAircraft extends React.Component<Props, State>{
                             <th scope="col">PIC</th>
                             <th scope="col">Co-Pilot</th>
                             <th scope="col">Dual</th>
+                            <th scope="col">Landing</th>
                             <th scope="col"></th>
                             <th scope="col"></th>
                         </tr>
