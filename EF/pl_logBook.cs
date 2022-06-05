@@ -14,10 +14,9 @@ namespace BTrackerWeb.EF
 
         [ForeignKey("AirportArrival")]
         public int AirportArrivalId { get; set; }
-
         public int AircraftModelId { get; set; }
         public DateTime? LogBookDate { get; set; }
-         public string LogBookAircraftRegistration { get; set; }
+        public string LogBookAircraftRegistration { get; set; }
         public TimeSpan? LogBookDepartureTime {get; set;}
         public TimeSpan? LogBookArrivalTime { get; set; }
         public Decimal LogBookTotalFlightTime { get; set; }
@@ -27,6 +26,7 @@ namespace BTrackerWeb.EF
         public Boolean? LogBookCoPilot { get; set; }
         public Boolean? LogBookDual { get; set; }
         public string LogBookDescription { get; set; }
+        public int? LogBookLanding { get; set; }
 
         public AircraftModel AircraftModel { get; set; }
         public virtual Airport AirportDeparture { get; set; }
