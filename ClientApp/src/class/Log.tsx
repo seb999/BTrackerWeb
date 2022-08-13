@@ -21,5 +21,6 @@ export class Log {
     logBookPIC? : boolean;
     logBookCoPilot? : boolean;
     logBookDual? :boolean;
+    logBookLanding? :number;
     logBookDescription? : string;
 }

@@ -24,6 +24,7 @@ interface State {
     logBookNight: any;
     logBookDual: any;
     logBookCoPilot: any;
+    logBookLanding: number;
 }
 
 interface Props {
@@ -61,6 +62,7 @@ class LogBookPopup extends React.Component<Props, State>{
             logBookNight: null,
             logBookDual: null,
             logBookCoPilot: null,
+            logBookLanding: 0,
         };
     }
 
@@ -95,6 +97,7 @@ class LogBookPopup extends React.Component<Props, State>{
                 logBookCoPilot: this.props.log.logBookCoPilot != null ? this.props.log.logBookCoPilot : false,
                 logBookDual: this.props.log.logBookDual != null ? this.props.log.logBookDual : false,
                 logBookNight: this.props.log.logBookNight != null ? this.props.log.logBookNight : false,
+                logBookLanding: this.props.log.logBookLanding != undefined ? this.props.log.logBookLanding : 0,
             })
         }
     }
@@ -165,6 +168,8 @@ class LogBookPopup extends React.Component<Props, State>{
             logBookDual:this.state.logBookDual,
             logBookIFR:this.state.logBookIFR,
             logBookPIC:this.state.logBookPIC,
+            logBookLanding:this.state.logBookLanding,
+
         });
         if (myLog.logBookId != undefined) {
             this.props.updateLog(this.props.token, myLog);
@@ -275,6 +280,13 @@ class LogBookPopup extends React.Component<Props, State>{
                                 <label className="col-sm-4 col-form-label">Total time flight</label>
                                 <div className="col-sm-8">
                                     <input id="logBookTotalFlightTime" value={this.state.logBookTotalFlightTime || ''} type="text" className="form-control" placeholder="" required onChange={this.handleChange}></input>
+                                </div>
+                            </div>
+
+                            <div className="mb-2 row">
+                                <label className="col-sm-4 col-form-label">Landings</label>
+                                <div className="col-sm-8">
+                                    <input id="logBookLanding" value={this.state.logBookLanding || ''} type="text" className="form-control" placeholder="" required onChange={this.handleChange}></input>
                                 </div>
                             </div>
 
