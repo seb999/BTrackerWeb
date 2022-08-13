@@ -140,6 +140,31 @@ export const transferList = (accessToken : any) =>{
   }
  }
 
+  ////////////////////////////////////////////////////////////////
+//--------------TEST EXECUTE TRANSAVCTION----------------------//
+////////////////////////////////////////////////////////////////
+
+export const TestExecuteTransaction = (accessToken : any, transactionId : number) =>{
+  return async (dispatch  :any) =>{
+    try{
+      //We are logged in the API so we don't need to pass again the userId
+      console.log(transactionId);
+      const res = await axios.get<any>(apiUrl + "ArduinoExecTransfer/" + transactionId, {headers: {Authorization: 'Bearer ' + accessToken}});
+      return dispatch(testExecuteTransactionSuccess(res.data));
+    }
+    catch (error) {
+      throw (error)
+    }
+  }
+ }
+ 
+ export const testExecuteTransactionSuccess = (data :any) => {
+  return {
+    type: "TEST_EXEC_TRANS",
+    payload: data
+  }
+ }
+
  ///////////////////////////////////////////////////////////
 //-------------READ/UPDATE SETTING-----------------------//
 ///////////////////////////////////////////////////////////

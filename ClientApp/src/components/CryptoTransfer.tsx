@@ -25,6 +25,7 @@ interface AppFnProps {
     getLookupList(): any;
     getAppMode(token: any): void;
     updateAppMode(token: any): void;
+    testExecuteTransaction(token: any, transactionId: any): void;
 
 }
 
@@ -132,8 +133,11 @@ class CryptoTransfer extends React.Component<Props, State>{
         })
     }
 
-    getCurrentAvragePrice = () => {
-
+    testBinanceTransfer = () => {
+      
+        this.props.transferList.map((item, index) => (
+            this.props.testExecuteTransaction(this.state.token, item.transferId)
+        ));
     }
 
     refresh = () => {
@@ -156,7 +160,6 @@ class CryptoTransfer extends React.Component<Props, State>{
     }
 
     updateAppMode = () => {
-
         this.props.updateAppMode(this.state.token);
     }
 
@@ -219,8 +222,10 @@ class CryptoTransfer extends React.Component<Props, State>{
                         <Toggle style={{ height: 10 }}
                             id='cheese-status'
                             checked={!testMode}
-                            onChange={() => this.updateAppMode()}
-                        />
+                            onChange={() => this.updateAppMode()} />
+                    </div>
+                    <div className="col-sm-1">
+                    <button type="button" className="btn btn-secondary rounded-0 mr-2" form="newUserForm" onClick={() => this.testBinanceTransfer()}>Test</button>
                     </div>
                 </div>
 
@@ -323,6 +328,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
         saveTransferAmount: (token: any, requestTrans: any) => dispatch<any>(actionCreator.default.crypto.SaveTransferAmount(token, requestTrans)),
         getAppMode: (token: any) => dispatch<any>(actionCreator.default.crypto.GetAppMode(token)),
         updateAppMode: (token: any) => dispatch<any>(actionCreator.default.crypto.UpdateAppMode(token)),
+        testExecuteTransaction: (token: any, transactionId : any) => dispatch<any>(actionCreator.default.crypto.TestExecuteTransaction(token, transactionId)),
     }
 }
 
