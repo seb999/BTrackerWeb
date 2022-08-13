@@ -27,7 +27,7 @@ namespace BTrackerWeb.Controllers
                 .Include(p => p.AircraftModel)
                 .Include(p => p.AirportDeparture)
                 .Include(p => p.AirportArrival)
-                .Where(p => p.UserId == userId).OrderByDescending(p => p.LogBookDate).ToList();
+                .Where(p => p.UserId == userId).OrderByDescending(p => p.LogBookId).ToList();
         }
 
         [HttpPost]

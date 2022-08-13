@@ -112,17 +112,18 @@ class LogBookAircraft extends React.Component<Props, State>{
     render() {
         let totalFlightTime = 0;
         let totalSoloTime = 0;
-        this.props.logBookList.map((item, index) => (
-            totalFlightTime = totalFlightTime + (item.logBookTotalFlightTime !== undefined ? item.logBookTotalFlightTime : 0))
-            );
-        totalFlightTime = Math.round(totalFlightTime * 100) / 100
+        let totalLanding = 0;
 
         this.props.logBookList.forEach(item => {
-            if(!item.logBookDual){
+            totalLanding = totalLanding + (item.logBookLanding !== undefined ? item.logBookLanding : 0);
+            totalFlightTime = totalFlightTime + (item.logBookTotalFlightTime !== undefined ? item.logBookTotalFlightTime : 0);
+
+            if (!item.logBookDual) {
                 totalSoloTime = totalSoloTime + (item.logBookTotalFlightTime !== undefined ? item.logBookTotalFlightTime : 0)
             }
         })
         totalSoloTime = Math.round(totalSoloTime * 100) / 100;
+        totalFlightTime = Math.round(totalFlightTime * 100) / 100;
 
 
         let displayList = this.props.logBookList.map((item, index) => (
@@ -143,12 +144,12 @@ class LogBookAircraft extends React.Component<Props, State>{
                 <td>{item.airportArrival === undefined ? "" : item.airportArrival.airportCode}</td>
                 <td>{item.logBookArrivalTime}</td>
                 <td>{item.logBookTotalFlightTime === undefined ? "" : Math.round(item.logBookTotalFlightTime * 100) / 100}</td>
-                <td>
+                {/* <td>
                     {item.logBookIFR === true ? <i className="fas fa-check"></i> : <i></i>}
                 </td>
                 <td>
                     {item.logBookNight === true ? <i className="fas fa-check"></i> : <i></i>}
-                </td>
+                </td> */}
                 <td>
                     {item.logBookPIC === true ? <i className="fas fa-check"></i> : <i></i>}
                 </td>
@@ -167,10 +168,10 @@ class LogBookAircraft extends React.Component<Props, State>{
         return (
             <div>
                 <button type="button" className="btn btn-success btn-sm mt-2" onClick={this.handleAddLog}><span><i className="fas fa-edit"></i></span> New Log</button>
+                <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-warning2 mt-2" role="alert"> Flight time {totalFlightTime}</div>
+                <div style={{ float: "right", height: "32px", padding: "3px", marginRight: "7px" }} className="alert alert-warning2 mt-2" role="alert"> Solo time {totalSoloTime}</div>
+                <div style={{ float: "right", height: "32px", padding: "3px" , marginRight: "7px" }} className="alert alert-warning2 mt-2" role="alert"> Landing {totalLanding}</div>
 
-                  <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-warning2 mt-2" role="alert"> Total flight time {totalFlightTime}</div>
-                  <div style={{ float: "right", height: "32px", padding: "3px", marginRight: "7px"}} className="alert alert-warning2 mt-2" role="alert"> Total solo time {totalSoloTime}</div>
-              
                 {this.props.isLogSaved && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success mt-2 mr-2" role="alert"> New log added!</div>}
                 {this.props.isLogDeleted && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success mt-2 mr-2" role="alert"> Deleted!</div>}
 
@@ -185,8 +186,8 @@ class LogBookAircraft extends React.Component<Props, State>{
                             <th scope="col">Arrival</th>
                             <th scope="col">Time</th>
                             <th scope="col">Total</th>
-                            <th scope="col">IFR</th>
-                            <th scope="col">Night</th>
+                            {/* <th scope="col">IFR</th>
+                            <th scope="col">Night</th> */}
                             <th scope="col">PIC</th>
                             <th scope="col">Co-Pilot</th>
                             <th scope="col">Dual</th>
