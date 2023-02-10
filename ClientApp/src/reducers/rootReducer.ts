@@ -8,33 +8,41 @@ import { Terminal } from "../class/Cr_terminal";
 import { Transfer } from "../class/Cr_transfer";
 import { Asset } from "../class/Cr_asset";
 import { Transaction } from "../class/Cr_transaction";
+import { FlyTime } from "../class/flyTime";
 
 const initState = {
+  //For crypto transfer
   terminalList: new Array<Terminal>(),
   transferList: new Array<Transfer>(),
   assetList: new Array<Asset>(),
   transactionList: new Array<Transaction>(),
   symbolCurrentPrice: 0,
+  testMode: false,
+  isTransSaved: false,
 
+  //For smart house
   isSwitchUpdated: false,
   trackerList: new Array<Device>(),
   switchList: new Array<Switchs>(),
   doorSwitch: new Switchs(),
   userList: new Array<SmartHouseUser>(),
-  logBookList: new Array<Log>(),
+
   isNewDoorCodeValid: true,
   lookupList: new Array<Array<LookupItem>>(),
 
+  //for GPS trackers
   lookupTrackerList: new Array<LookupItem>(),
   gpsPositionList: new Array<GpsPosition>(),
   isGpsDeleted: false,
   isTrackerSaved: false,
   isTrackerDeleted: false,
   isTrackerUpdated: false,
+
+  //For Log book
   isLogSaved: false,
   isLogDeleted: false,
-  isTransSaved: false,
-  testMode: false,
+  logBookList: new Array<Log>(),
+  flyTime: new Array<FlyTime>(),
 }
 
 const rootReducer = (state = initState, action: any) => {
@@ -165,6 +173,10 @@ const rootReducer = (state = initState, action: any) => {
       newState.isLogDeleted = false;
       return newState;
 
+    case "FLYTIME":
+      newState.flyTime = action.payload;
+      return newState;
+
     case "TRANSACTION_SAVED":
       newState.isTransSaved = true;
       newState.transferList = action.payload;
@@ -191,12 +203,12 @@ const rootReducer = (state = initState, action: any) => {
       return newState;
 
     case "GET_APP_MODE":
-        newState.testMode = action.payload;
-        return newState;
+      newState.testMode = action.payload;
+      return newState;
 
     case "UPDATE_APP_MODE":
-        newState.testMode = action.payload;
-        return newState;
+      newState.testMode = action.payload;
+      return newState;
 
 
     default:

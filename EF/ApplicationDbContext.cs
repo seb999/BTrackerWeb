@@ -27,6 +27,7 @@ namespace BTrackerWeb.EF
         public virtual DbSet<Setting> cr_setting { get; set; }
         public virtual DbSet<UserKey> cr_userKey { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

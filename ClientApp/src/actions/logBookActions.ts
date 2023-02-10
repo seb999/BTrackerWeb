@@ -2,11 +2,11 @@ import axios from 'axios';
 const apiUrl = '/api/logbook/';    
 
 // -------------Get logbook list ----------------
-export const getLogList = (accessToken: any) =>{
+export const getLogList = (accessToken: any, year : number) =>{
   return async (dispatch  :any) =>{
     try{
       //We are logged in the API so we don't need to pass again the userId
-      const res = await axios.get<any>(apiUrl + "GetLogBookList/", {headers: {Authorization: 'Bearer ' + accessToken}});
+      const res = await axios.get<any>(apiUrl + "GetLogBookList/" + year, {headers: {Authorization: 'Bearer ' + accessToken}});
       return dispatch(getLogListSuccess(res.data));
     }
     catch (error) {
@@ -18,6 +18,27 @@ export const getLogList = (accessToken: any) =>{
  export const getLogListSuccess = (data :any) => {
   return {
     type: "LOG_LIST",
+    payload: data
+  }
+ }
+
+ // -------------Get Total fly time ----------------
+export const getTotalFlyTime = (accessToken: any) =>{
+  return async (dispatch  :any) =>{
+    try{
+      //We are logged in the API so we don't need to pass again the userId
+      const res = await axios.get<any>(apiUrl + "GetTotalFlyTime/", {headers: {Authorization: 'Bearer ' + accessToken}});
+      return dispatch(getTotalFlyTimeSuccess(res.data));
+    }
+    catch (error) {
+      throw (error)
+    }
+  }
+ }
+ 
+ export const getTotalFlyTimeSuccess = (data :any) => {
+  return {
+    type: "FLYTIME",
     payload: data
   }
  }

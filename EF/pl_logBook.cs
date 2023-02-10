@@ -6,6 +6,8 @@ namespace BTrackerWeb.EF
 {
     public class LogBook
     {
+         [NotMapped]
+        public string UserEmail { get; set; }
         public int LogBookId { get; set; }
         public string UserId { get; set; }
 

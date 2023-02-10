@@ -10,14 +10,27 @@ import LogBookPopup from "./popup/LogBookPopup";
 import MyPopover from "./element/MyPopover";
 import ConfirmPopup from './popup/ConfirmPopup';
 import { isTemplateExpression } from 'typescript';
+import DropDown from './element/DropDown';
+import { LookupItem } from './../class/LookupItem';
+import { lookup } from 'dns';
+import { FlyTime } from '../class/flyTime';
+
+const yearList: LookupItem[] = [];
+const currentYear = new Date().getFullYear();
+for (let i = currentYear; i > currentYear - 10; i--) {
+    let item = { label: (i).toString(), value: i }
+    yearList.push(item);
+}
 
 interface AppFnProps {
-    getLogBookList(token: any): void;
+    getLogBookList(token: any, year: number): void;
+    getTotalFlyTime(token: any): void;
     deleteLog(token: any, logId: any): void;
 }
 
 interface AppObjectProps {
     logBookList: Array<Log>;
+    flyTime: FlyTime;
     isLogSaved: boolean;
     isLogDeleted: boolean;
     auth?: any;
@@ -34,6 +47,7 @@ interface State {
     popupTitle: string,
     isLogSaved: boolean,
     showConfirmPopup: boolean,
+    selectedYear: any,
 }
 
 class LogBookAircraft extends React.Component<Props, State>{
@@ -47,11 +61,13 @@ class LogBookAircraft extends React.Component<Props, State>{
             selectedLog: {},
             showPopupLog: false,
             isLogSaved: false,
-            showConfirmPopup: false
+            showConfirmPopup: false,
+            selectedYear: { label: new Date().getFullYear().toString(), value: new Date().getFullYear() },
         };
     };
 
     async componentDidMount() {
+        console.log(yearList);
         try {
             this.setState({
                 token: await this.props.auth.getAccessToken()
@@ -61,7 +77,8 @@ class LogBookAircraft extends React.Component<Props, State>{
                 this.props.auth.login('/')
             }
             else {
-                this.props.getLogBookList(this.state.token);
+                this.props.getLogBookList(this.state.token, this.state.selectedYear.value);
+                this.props.getTotalFlyTime(this.state.token);
             }
         } catch (err) {
             // handle error as needed
@@ -109,21 +126,31 @@ class LogBookAircraft extends React.Component<Props, State>{
         });
     }
 
+    handleChangeYear = (year: any) => {
+        this.setState({
+            selectedYear: year,
+        })
+        this.props.getLogBookList(this.state.token, year.value);
+    }
+
     render() {
+        let flightTime = 0;
+        let soloTime = 0;
+        let landing = 0;
         let totalFlightTime = 0;
         let totalSoloTime = 0;
         let totalLanding = 0;
 
         this.props.logBookList.forEach(item => {
-            totalLanding = totalLanding + (item.logBookLanding !== undefined ? item.logBookLanding : 0);
-            totalFlightTime = totalFlightTime + (item.logBookTotalFlightTime !== undefined ? item.logBookTotalFlightTime : 0);
+            landing = landing + (item.logBookLanding !== undefined ? item.logBookLanding : 0);
+            flightTime = flightTime + (item.logBookTotalFlightTime !== undefined ? item.logBookTotalFlightTime : 0);
 
             if (!item.logBookDual) {
-                totalSoloTime = totalSoloTime + (item.logBookTotalFlightTime !== undefined ? item.logBookTotalFlightTime : 0)
+                soloTime = soloTime + (item.logBookTotalFlightTime !== undefined ? item.logBookTotalFlightTime : 0)
             }
         })
-        totalSoloTime = Math.round(totalSoloTime * 100) / 100;
-        totalFlightTime = Math.round(totalFlightTime * 100) / 100;
+        soloTime = Math.round(soloTime * 100) / 100;
+        flightTime = Math.round(flightTime * 100) / 100;
 
 
         let displayList = this.props.logBookList.map((item, index) => (
@@ -146,10 +173,10 @@ class LogBookAircraft extends React.Component<Props, State>{
                 <td>{item.logBookTotalFlightTime === undefined ? "" : Math.round(item.logBookTotalFlightTime * 100) / 100}</td>
                 {/* <td>
                     {item.logBookIFR === true ? <i className="fas fa-check"></i> : <i></i>}
-                </td>
+                </td>*/}
                 <td>
                     {item.logBookNight === true ? <i className="fas fa-check"></i> : <i></i>}
-                </td> */}
+                </td>
                 <td>
                     {item.logBookPIC === true ? <i className="fas fa-check"></i> : <i></i>}
                 </td>
@@ -164,13 +191,23 @@ class LogBookAircraft extends React.Component<Props, State>{
                 <td><button className="btn" onClick={() => this.handleDeleteLog(item)}><span style={{ color: "red" }}><i className="far fa-trash-alt"></i></span></button></td>
             </tr>
         ));
-
+        //---------------------
+        //-------UI-----------
+        //--------------------
         return (
             <div>
-                <button type="button" className="btn btn-success btn-sm mt-2" onClick={this.handleAddLog}><span><i className="fas fa-edit"></i></span> New Log</button>
-                <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-warning2 mt-2" role="alert"> Flight time {totalFlightTime}</div>
-                <div style={{ float: "right", height: "32px", padding: "3px", marginRight: "7px" }} className="alert alert-warning2 mt-2" role="alert"> Solo time {totalSoloTime}</div>
-                <div style={{ float: "right", height: "32px", padding: "3px" , marginRight: "7px" }} className="alert alert-warning2 mt-2" role="alert"> Landing {totalLanding}</div>
+                <div style={{ float: 'left' }} >
+                    <button type="button" className="btn btn-success btn-sm mt-2" onClick={this.handleAddLog}><span><i className="fas fa-edit"></i></span> New Log</button>
+                    <div style={{ float: 'left' }} className='mt-1 mr-2'><DropDown lookupList={yearList} onClick={this.handleChangeYear} selectedItem={this.state.selectedYear}></DropDown></div>
+                </div>
+
+                <div className="card bg-light mb-2 p-0 mt-1" style={{float: "right", padding: "3px"}} >
+                    <div className="card-body p-1">
+                        Flight time <b className="card-text mr-3">{flightTime}/{this.props.flyTime.totalFlyTime}</b>
+                        Solo <b className="card-text mr-3">{soloTime}/{this.props.flyTime.totalSolo}</b>
+                        Landing<b className="card-text mr-3">{landing}/{this.props.flyTime.totalLanding}</b>
+                    </div>
+                </div>
 
                 {this.props.isLogSaved && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success mt-2 mr-2" role="alert"> New log added!</div>}
                 {this.props.isLogDeleted && <div style={{ float: "right", height: "32px", padding: "3px" }} className="alert alert-success mt-2 mr-2" role="alert"> Deleted!</div>}
@@ -186,8 +223,8 @@ class LogBookAircraft extends React.Component<Props, State>{
                             <th scope="col">Arrival</th>
                             <th scope="col">Time</th>
                             <th scope="col">Total</th>
-                            {/* <th scope="col">IFR</th>
-                            <th scope="col">Night</th> */}
+                            {/* <th scope="col">IFR</th> */}
+                            <th scope="col">Night</th>
                             <th scope="col">PIC</th>
                             <th scope="col">Co-Pilot</th>
                             <th scope="col">Dual</th>
@@ -211,15 +248,18 @@ class LogBookAircraft extends React.Component<Props, State>{
 const mapStateToProps = (state: any) => {
     return {
         logBookList: state.logBookList,
+        flyTime: state.flyTime,
         isLogSaved: state.isLogSaved,
         isLogDeleted: state.isLogDeleted,
+
     }
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
-        getLogBookList: (token: any) => dispatch<any>(actionCreator.default.logbook.getLogList(token)),
+        getLogBookList: (token: any, year: number) => dispatch<any>(actionCreator.default.logbook.getLogList(token, year)),
         deleteLog: (token: any, logId: any) => dispatch<any>(actionCreator.default.logbook.deleteLog(token, logId)),
+        getTotalFlyTime: (token: any) => dispatch<any>(actionCreator.default.logbook.getTotalFlyTime(token)),
     }
 }
 
