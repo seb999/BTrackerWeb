@@ -115,7 +115,7 @@ namespace BTrackerWeb.Controllers
         [Route("/api/[controller]/[Action]")]
         public List<SmartHouseUser> SaveUser([FromBody] SmartHouseUser user)
         {
-            DbContext.Add(user);
+            DbContext.SmartHouseUser.Add(user);
             DbContext.SaveChanges();
             return GetUserList();
         }
@@ -132,7 +132,6 @@ namespace BTrackerWeb.Controllers
             myUser.SmartHouseUserLeave = user.SmartHouseUserLeave;
             myUser.SmartHouseUserName = user.SmartHouseUserName;
             myUser.SmartHouseUserPhone = user.SmartHouseUserPhone;
-            myUser.SmartHouseUserAmount = user.SmartHouseUserAmount;
             myUser.SmartHouseUserIsDesactivated = user.SmartHouseUserIsDesactivated;
             // DbContext.Update(user);   try this
 

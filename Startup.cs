@@ -44,7 +44,7 @@ namespace BTrackerWeb
                                     .AllowAnyOrigin()
                                       .AllowAnyMethod()
                                       .AllowAnyHeader()
-                                      .WithOrigins("http://localhost:3000", "http://localhost:5222", "http://www.dspx.eu", "http://dspx.eu")
+                                      .WithOrigins("http://localhost","http://localhost:8100","http://localhost:3000", "http://localhost:5222", "http://www.dspx.eu", "http://dspx.eu")
                                         .AllowCredentials());
 
             });

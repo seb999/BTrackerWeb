@@ -16,7 +16,7 @@ namespace BTrackerWeb.EF
         public string SmartHouseUserCode { get; set; }
         public DateTime SmartHouseUserArrival {get; set;}
         public DateTime SmartHouseUserLeave {get; set;}
-        public decimal SmartHouseUserAmount { get; set; }
+
         public bool? SmartHouseUserIsDesactivated {get; set;}
 
         public ICollection<SmartHouseEntry> SmartHouseEntry { get; set; }

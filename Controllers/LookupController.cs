@@ -82,7 +82,6 @@ namespace BTrackerWeb.Controllers
             LookupItem myItem = new LookupItem();
             myItem.Value = currency.CurrencyId;
             myItem.Label = currency.CurrencyName;
-
             return myItem;
         }
 

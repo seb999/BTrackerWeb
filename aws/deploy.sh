@@ -3,7 +3,7 @@
 cd $(dirname ${0})/..
 
 rm -rf publish_aws publish_aws.tar
-dotnet publish -o publish_aws --configuration release
+dotnet publish -o publish_aws --configuration debug
 
 tar cf publish_aws.tar -C publish_aws .
 

@@ -156,6 +156,7 @@ export const getUserList = (accessToken: any) =>{
  export const saveUser = (accessToken: any, user :any) =>{
   return async (dispatch  :any) =>{
     try{
+      console.log(user);
       const res = await axios.post<any>(apiUrl + "SaveUser/",user, {headers: {Authorization: 'Bearer ' + accessToken}});
       return dispatch(saveUseruccess(res.data));
     }

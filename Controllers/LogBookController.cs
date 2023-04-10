@@ -80,18 +80,20 @@ namespace BTrackerWeb.Controllers
 
         [HttpPost]
         [Route("[Action]")]
-        public List<LogBook> SaveLogFromApp([FromBody] LogBook log)
+        public void SaveLogFromApp([FromBody] LogBook log)
         {
             string userId = DbContext.Users.Where(p => p.Email == log.UserEmail).Select(p => p.Id).FirstOrDefault();
             log.UserId = userId;
-            log.AirportDepartureId = 1;
-            log.AirportArrivalId = 1;
+            log.AirportDepartureId = 120;
+            log.AirportArrivalId = 120;
             log.AircraftModelId = 1;
-
+            //log.LogBookTotalFlightTime = 1;
+            log.LogBookPIC = true;
             DbContext.pl_logBook.Add(log);
             DbContext.SaveChanges();
-            return GetLogBookList(DateTime.Now.Year);
         }
+
+
 
         [HttpGet]
         [Authorize]
@@ -102,6 +104,32 @@ namespace BTrackerWeb.Controllers
             DbContext.pl_logBook.Remove(logItem);
             DbContext.SaveChanges();
             return GetLogBookList(DateTime.Now.Year);
+        }
+
+        [HttpPost]
+        [Route("[Action]")]
+        public void UpdateLogFromApp([FromBody] LogBook log)
+        {
+            string userId = DbContext.Users.Where(p => p.Email == log.UserEmail).Select(p => p.Id).FirstOrDefault();
+            log.UserId = userId;
+            var myLog = DbContext.pl_logBook.Where(p=>p.LogBookId == log.LogBookId).FirstOrDefault();
+            myLog.LogBookLanding = log.LogBookLanding;
+            myLog.AircraftModelId = log.AircraftModel.AircraftModelId;
+            myLog.LogBookAircraftRegistration = log.LogBookAircraftRegistration;
+            myLog.LogBookTotalFlightTime = log.LogBookTotalFlightTime;
+            myLog.LogBookArrivalTime = log.LogBookArrivalTime;
+            myLog.LogBookDepartureTime = log.LogBookDepartureTime;
+            myLog.AirportDepartureId = log.AirportDeparture.AirportId;
+            myLog.AirportArrivalId = log.AirportArrival.AirportId;
+
+            myLog.LogBookPIC = log.LogBookPIC;
+            myLog.LogBookDual = log.LogBookDual;
+            myLog.LogBookCoPilot = log.LogBookCoPilot;
+            myLog.LogBookIFR = log.LogBookIFR;
+            myLog.LogBookNight = log.LogBookNight;
+            myLog.LogBookTotalFlightTime = log.LogBookTotalFlightTime;
+            DbContext.pl_logBook.Update(myLog);
+            DbContext.SaveChanges();
         }
 
         [HttpPost]

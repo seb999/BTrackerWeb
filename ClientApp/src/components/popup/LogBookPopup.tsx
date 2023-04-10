@@ -169,8 +169,9 @@ class LogBookPopup extends React.Component<Props, State>{
             logBookIFR:this.state.logBookIFR,
             logBookPIC:this.state.logBookPIC,
             logBookLanding:this.state.logBookLanding,
-
         });
+        console.log(myLog);
+        
         if (myLog.logBookId != undefined) {
             this.props.updateLog(this.props.token, myLog);
         }
